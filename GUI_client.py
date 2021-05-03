@@ -1,7 +1,9 @@
 import tkinter
 from tkinter import *
 from PIL import ImageTk, Image
+import client
 
+buff = None
 #window_name: biến giữ cửa sổ window tên name
 #func_name: chức năng tên name
 #lbl_name: label hiển thị chữ ra cửa sổ
@@ -19,7 +21,9 @@ def GUI_connect():
 def func_connect(window_name):
     #hàm gọi tạo GUI connect
     def clicked_connect():
-        GUI_connect()
+        global buff
+        buff = client.connectServer('temp')
+        # GUI_connect()
 
     lbl_IP_input = Label(window_name, text = "IP: ")  #label "IP: " ở cửa sổ window_name
     lbl_IP_input.grid(column = 0, row = 0)              #đặt ở cột 0 dòng 0
@@ -34,14 +38,20 @@ def func_connect(window_name):
 def GUI_screenshot():
     window_screenshot = Tk()
     window_screenshot.title("Screenshot")
-    window_screenshot.geometry('300x200')
+    window_screenshot.geometry('1000x1000')
+    image = client.getScreenShot(buff)
+    image.show()
+
+    render = ImageTk.PhotoImage(image)
+    label1 = Label(image = render)
+    label1.image = render
+    label1.place(x=0, y=0)
 
     window_screenshot.mainloop()
 
 def func_screenshot(window_name):
     def clicked_screenshot():
-        nonlocal window_name
-        GUI_screenshot(window_name)
+        GUI_screenshot()
     
     btn_screenshot = Button(window_name, text="Screenshot", width=20, height=2, command=clicked_screenshot)
     btn_screenshot.grid(column = 1, row = 2)
