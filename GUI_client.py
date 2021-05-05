@@ -1,4 +1,4 @@
-import tkinter
+import tkinter as tk
 from tkinter import *
 from tkinter.messagebox import showerror, showwarning, showinfo
 from PIL import ImageTk, Image
@@ -11,39 +11,44 @@ class ClientGUI:
         self.buff = None
         self.master = master
         self.master.title("Client")
-        self.master.geometry('240x330')
+        self.master.geometry('300x420')
+        self.master.resizable(0, 0)
 
+        # configure the grid
+        self.master.columnconfigure(0, weight=1)
+        self.master.columnconfigure(1, weight=3)
+        self.master.columnconfigure(2, weight=1)
 
-        self.lbl_IP_input = Label(self.master, text = "IP: ")
-        self.lbl_IP_input.grid(column = 0, row = 0)
+        self.lbl_IP_input = Label(self.master, text = "Server IP: ")
+        self.lbl_IP_input.grid(column = 0, row = 0, sticky = tk.W, padx = 10, pady = 10)
 
-        self.txt_IP_input = Entry(self.master, width = 20)
+        self.txt_IP_input = Entry(self.master)
         self.txt_IP_input.focus()
         self.txt_IP_input.grid(column = 1, row = 0)
 
         self.btn_connect = Button(self.master, text="Connect", command = self.connect)
-        self.btn_connect.grid(column=2, row=0)
+        self.btn_connect.grid(column=2, row=0, sticky = tk.W, padx = 10, pady = 10)
 
-        self.btn_screenshot = Button(self.master, text = "Screenshot", width = 20, height = 2, command = self.screenshot)
-        self.btn_screenshot.grid(column = 1, row = 2)
+        self.btn_screenshot = Button(self.master, text = "Screenshot", width = 10, command = self.screenshot)
+        self.btn_screenshot.grid(column = 1, row = 2, sticky = tk.N, pady = 5, ipadx = 20, ipady = 8)
 
-        self.btn_process_running = Button(self.master, text = "Process running", width = 20, height = 2, command = self.runningProcess)
-        self.btn_process_running.grid(column = 1, row = 3)
+        self.btn_process_running = Button(self.master, text = "Process running", width = 10, command = self.runningProcess)
+        self.btn_process_running.grid(column = 1, row = 3, sticky = tk.N, pady = 5, ipadx = 20, ipady = 8)
 
-        self.btn_app_running = Button(self.master, text = "App running", width = 20, height = 2, command = self.runningApp)
-        self.btn_app_running.grid(column = 1, row = 4)
+        self.btn_app_running = Button(self.master, text = "App running", width = 10, command = self.runningApp)
+        self.btn_app_running.grid(column = 1, row = 4, sticky = tk.N, pady = 5, ipadx = 20, ipady = 8)
 
-        self.btn_keystroke = Button(self.master, text = "Keystroke", width = 20, height = 2, command=self.keystroke)
-        self.btn_keystroke.grid(column = 1, row = 5)
+        self.btn_keystroke = Button(self.master, text = "Keystroke", width = 10, command=self.keystroke)
+        self.btn_keystroke.grid(column = 1, row = 5, sticky = tk.N, pady = 5, ipadx = 20, ipady = 8)
 
-        self.btn_edit_registry = Button(self.master, text = "Edit registry", width = 20, height = 2, command = self.editRegistry)
-        self.btn_edit_registry.grid(column = 1, row = 6)
+        self.btn_edit_registry = Button(self.master, text = "Edit registry", width = 10, command = self.editRegistry)
+        self.btn_edit_registry.grid(column = 1, row = 6, sticky = tk.N, pady = 5, ipadx = 20, ipady = 8)
 
-        self.btn_shutdown = Button(self.master, text = "Shutdown", width = 20, height = 2, command = self.shutdown)
-        self.btn_shutdown.grid(column = 1, row = 7)
+        self.btn_shutdown = Button(self.master, text = "Shutdown", width = 10, command = self.shutdown)
+        self.btn_shutdown.grid(column = 1, row = 7, sticky = tk.N, pady = 5, ipadx = 20, ipady = 8)
 
-        self.btn_exit = Button(self.master, text = "Exit", width = 20, height = 2, command = self.exit)
-        self.btn_exit.grid(column = 1, row = 8)
+        self.btn_exit = Button(self.master, text = "Exit", width = 10, command = self.exit)
+        self.btn_exit.grid(column = 1, row = 8, sticky = tk.N, pady = 5, ipadx = 20, ipady = 8)
     
     def connect(self):
         self.buff = client.connectServer('temp')
