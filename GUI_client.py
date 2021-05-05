@@ -27,10 +27,10 @@ class ClientGUI:
         self.btn_screenshot = Button(self.master, text = "Screenshot", width = 20, height = 2, command = self.screenshot)
         self.btn_screenshot.grid(column = 1, row = 2)
 
-        self.btn_process_running = Button(self.master, text = "Process running", width = 20, height = 2, command = self.processRunning)
+        self.btn_process_running = Button(self.master, text = "Process running", width = 20, height = 2, command = self.runningProcess)
         self.btn_process_running.grid(column = 1, row = 3)
 
-        self.btn_app_running = Button(self.master, text = "App running", width = 20, height = 2, command = self.appRunning)
+        self.btn_app_running = Button(self.master, text = "App running", width = 20, height = 2, command = self.runningApp)
         self.btn_app_running.grid(column = 1, row = 4)
 
         self.btn_keystroke = Button(self.master, text = "Keystroke", width = 20, height = 2, command=self.keystroke)
@@ -53,18 +53,30 @@ class ClientGUI:
         screenshotGUI(window_screenshot, self.buff)
         window_screenshot.mainloop()
 
-    def processRunning(self):
-        pass
-    def appRunning(self):
-        pass
+    def runningProcess(self):
+        window_runningProcess = Toplevel()
+        runningProcessGUI(window_runningProcess, self.buff)
+        window_runningProcess.mainloop()
+
+    def runningApp(self):
+        window_runningApp = Toplevel()
+        runningAppGUI(window_runningApp, self.buff)
+        window_runningApp.mainloop()
+
     def keystroke(self):
-        pass
+        window_keystroke = Toplevel()
+        keystrokeGUI(window_keystroke, self.buff)
+        window_keystroke.mainloop()
+
     def editRegistry(self):
-        pass
+        window_editRegistry = Toplevel()
+        editRegistryGUI(window_editRegistry, self.buff)
+        window_editRegistry.mainloop()
     def shutdown(self):
-        pass
+        showinfo(title='Shutdown', message='Shutdown request sent.')
+
     def exit(self):
-        pass
+        self.master.destroy()
     
 class screenshotGUI:
     def __init__(self, master, buff):
@@ -100,95 +112,63 @@ class screenshotGUI:
         f = asksaveasfile(mode='w', initialfile = 'screenshot.png', defaultextension=".png",filetypes=[("PNG Files", "*.png")])
         self.image.save(f.name)
 
+class runningProcessGUI:
+    def __init__(self, master, buff):
+        self.buff = buff
+        self.master = master
+        self.master.title("Running process")
+        self.master.geometry('320x200')
+        self.master.focus()
+        self.master.grab_set()
 
-# def GUI_process_running():
-#     window_process_running=Toplevel()
-#     window_process_running.title("Process running")
-#     window_process_running.geometry('320x200')
-#     window_process_running.focus()
-#     window_process_running.grab_set()
+        self.btn_kill = Button(self.master, text = "Kill", width = 10, height = 2, command = self.kill)
+        self.btn_kill.grid(column = 0, row = 0)
 
-#     def clicked_kill():
-#         return
-#     btn_kill=Button(window_process_running, text="Kill", width=10, height=2, command=clicked_kill)
-#     btn_kill.grid(column=0, row=0)
-#     def clicked_show():
-#         return
-#     btn_show=Button(window_process_running, text="Show", width=10, height=2, command=clicked_show)
-#     btn_show.grid(column=1, row=0)
-#     def clicked_hide():
-#         return
-#     btn_hide=Button(window_process_running, text="Hide", width=10, height=2, command=clicked_hide)
-#     btn_hide.grid(column=2, row=0)
-#     def clicked_start():
-#         return
-#     btn_start=Button(window_process_running, text="Start", width=10, height=2, command=clicked_start)
-#     btn_start.grid(column=3, row=0)
+        self.btn_show = Button(self.master, text = "Show", width = 10, height = 2, command = self.show)
+        self.btn_show.grid(column = 1, row = 0)
 
-#     window_process_running.mainloop()
+        self.btn_hide = Button(self.master, text = "Hide", width = 10, height = 2, command = self.hide)
+        self.btn_hide.grid(column = 2, row = 0)
 
-# def func_process_running(window_name):
-#     def clicked_process_running():
-#         if connection_status==0:
-#             showerror(title='Error', message='Not connected to the server.')
-#             return
-#         GUI_process_running()
-    
-#     btn_process_running=Button(window_name, text="Process running", width=20, height=2, command=clicked_process_running)
-#     btn_process_running.grid(column=1, row=3)
+        self.btn_start = Button(self.master, text = "Start", width = 10, height = 2, command = self.start)
+        self.btn_start.grid(column = 3, row = 0)
 
-# def GUI_app_running():
-#     window_app_running=Toplevel()
-#     window_app_running.title("App running")
-#     window_app_running.geometry('300x200')
-#     window_app_running.focus()
-#     window_app_running.grab_set()
-#     window_app_running.mainloop()
+    def kill(self):
+        pass
+    def show(self):
+        pass
+    def hide(self):
+        pass
+    def start(self):
+        pass
 
-# def func_app_running(window_name):
-#     def clicked_app_running():
-#         if connection_status==0:
-#             showerror(title='Error', message='Not connected to the server.')
-#             return        
-#         GUI_app_running()
-    
-    
+class runningAppGUI:
+    def __init__(self, master, buff):
+        self.buff = buff
+        self.master = master
+        self.master.title("Running app")
+        self.master.geometry('300x200')
+        self.master.focus()
+        self.master.grab_set()
 
-# def GUI_keystroke():
-#     window_keystroke=Toplevel()
-#     window_keystroke.title("Keystroke")
-#     window_keystroke.geometry('300x200')
-#     window_keystroke.focus()
-#     window_keystroke.grab_set()
-#     window_keystroke.mainloop()
+class keystrokeGUI:
+    def __init__(self, master, buff):
+        self.buff = buff
+        self.master = master
+        self.master.title("Keystroke")
+        self.master.geometry('300x200')
+        self.master.focus()
+        self.master.grab_set()    
 
-# def func_keystroke(window_name):
-#     def clicked_keystroke():
-#         if connection_status==0:
-#             showerror(title='Error', message='Not connected to the server.')
-#             return                
-#         GUI_keystroke()
-    
-#     btn_keystroke=Button(window_name, text="Keystroke", width=20, height=2, command=clicked_keystroke)
-#     btn_keystroke.grid(column=1, row=5)
+class editRegistryGUI:
+    def __init__(self, master, buff):
+        self.buff = buff
+        self.master = master
+        self.master.title("Edit registry")
+        self.master.geometry('300x200')
+        self.master.focus()
+        self.master.grab_set()    
 
-# def GUI_edit_registry():
-#     window_edit_registry=Toplevel()
-#     window_edit_registry.title("Edit registry")
-#     window_edit_registry.geometry('300x200')
-#     window_edit_registry.focus()
-#     window_edit_registry.grab_set()
-#     window_edit_registry.mainloop()
-
-# def func_edit_registry(window_name):
-#     def clicked_edit_registry():
-#         if connection_status==0:
-#             showerror(title='Error', message='Not connected to the server.')
-#             return        
-#         GUI_edit_registry()
-    
-#     btn_edit_registry=Button(window_name, text="Edit registry", width=20, height=2, command=clicked_edit_registry)
-#     btn_edit_registry.grid(column=1, row=6)
 
 # def GUI_shutdown():
 #     window_shutdown=Toplevel()
