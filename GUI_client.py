@@ -49,26 +49,41 @@ class ClientGUI:
         self.buff = client.connectServer('temp')
 
     def screenshot(self):
+        if self.buff == None:
+            showerror(title = 'Error', message = 'Not connected to the server.')
+            return
         window_screenshot = Toplevel()
         screenshotGUI(window_screenshot, self.buff)
         window_screenshot.mainloop()
 
     def runningProcess(self):
+        if self.buff == None:
+            showerror(title = 'Error', message = 'Not connected to the server.')
+            return        
         window_runningProcess = Toplevel()
         runningProcessGUI(window_runningProcess, self.buff)
         window_runningProcess.mainloop()
 
     def runningApp(self):
+        if self.buff == None:
+            showerror(title = 'Error', message = 'Not connected to the server.')
+            return        
         window_runningApp = Toplevel()
         runningAppGUI(window_runningApp, self.buff)
         window_runningApp.mainloop()
 
     def keystroke(self):
+        if self.buff == None:
+            showerror(title = 'Error', message = 'Not connected to the server.')
+            return        
         window_keystroke = Toplevel()
         keystrokeGUI(window_keystroke, self.buff)
         window_keystroke.mainloop()
 
     def editRegistry(self):
+        if self.buff == None:
+            showerror(title = 'Error', message = 'Not connected to the server.')
+            return        
         window_editRegistry = Toplevel()
         editRegistryGUI(window_editRegistry, self.buff)
         window_editRegistry.mainloop()
@@ -169,31 +184,6 @@ class editRegistryGUI:
         self.master.focus()
         self.master.grab_set()    
 
-
-# def GUI_shutdown():
-#     window_shutdown=Toplevel()
-#     window_shutdown.title("Shutdown")
-#     window_shutdown.geometry('300x200')
-#     window_shutdown.focus()
-#     window_shutdown.grab_set()
-#     window_shutdown.mainloop()
-
-# def func_shutdown(window_name):
-#     def clicked_shutdown():
-#         if connection_status==0:
-#             showerror(title='Error', message='Not connected to the server.')
-#             return        
-#         GUI_shutdown()
-    
-#     btn_shutdown=Button(window_name, text="Shutdown", width=20, height=2, command=clicked_shutdown)
-#     btn_shutdown.grid(column=1, row=7)
-
-# def func_exit(window_name):
-#     def clicked_exit():
-#         window_name.destroy()   #đóng cửa sổ window_name
-    
-#     btn_exit=Button(window_name, text="Exit", width=20, height=2, command=clicked_exit)
-#     btn_exit.grid(column=1, row=8)
 
 window_client = Tk()
 a = ClientGUI(window_client)
