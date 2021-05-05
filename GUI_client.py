@@ -1,8 +1,10 @@
 import tkinter
 from tkinter import *
+from tkinter.messagebox import showerror, showwarning, showinfo
 from PIL import ImageTk, Image
 import client
 
+connection_status = 1     # 0: chưa kết nối đến server; 1: đã kết nối server
 buff = None
 #window_name: biến giữ cửa sổ window tên name
 #func_name: chức năng tên name
@@ -10,20 +12,16 @@ buff = None
 #txt_name: textbox để nhập text vào
 #btn_name: button để bấm
 
-#hàm tạo GUI khi nhấn button connect
-def GUI_connect():
-    window_connect=Tk()                     #tạo cửa sổ mới
-    window_connect.title("Connect status")  #tên cửa sổ
-    window_connect.geometry('300x200')      #kính thước ngang x dọc
-    window_connect.mainloop()
-
 #hàm chức năng connect, tham số là cửa sổ window_name
 def func_connect(window_name):
     #hàm gọi tạo GUI connect
     def clicked_connect():
-        global buff
-        buff = client.connectServer('temp')
-        # GUI_connect()
+        #global buff
+        #buff = client.connectServer('temp')
+        if connection_status==0:
+            showerror(title='Connection status', message='Can not connect to server.')
+        else:
+            showinfo(title='Connection status',message='Connected to server.')
 
     lbl_IP_input = Label(window_name, text = "IP: ")  #label "IP: " ở cửa sổ window_name
     lbl_IP_input.grid(column = 0, row = 0)              #đặt ở cột 0 dòng 0
@@ -36,9 +34,11 @@ def func_connect(window_name):
     btn_connect.grid(column=2, row=0)
 
 def GUI_screenshot():
-    window_screenshot = Tk()
+    window_screenshot = Toplevel()
     window_screenshot.title("Screenshot")
     window_screenshot.geometry('1000x1000')
+    window_screenshot.focus()
+    window_screenshot.grab_set()
     image = client.getScreenShot(buff)
     image.show()
 
@@ -51,15 +51,20 @@ def GUI_screenshot():
 
 def func_screenshot(window_name):
     def clicked_screenshot():
+        if connection_status==0:
+            showerror(title='Error', message='Not connected to the server.')
+            return
         GUI_screenshot()
     
     btn_screenshot = Button(window_name, text="Screenshot", width=20, height=2, command=clicked_screenshot)
     btn_screenshot.grid(column = 1, row = 2)
 
 def GUI_process_running():
-    window_process_running=Tk()
+    window_process_running=Toplevel()
     window_process_running.title("Process running")
     window_process_running.geometry('320x200')
+    window_process_running.focus()
+    window_process_running.grab_set()
 
     def clicked_kill():
         return
@@ -82,58 +87,81 @@ def GUI_process_running():
 
 def func_process_running(window_name):
     def clicked_process_running():
+        if connection_status==0:
+            showerror(title='Error', message='Not connected to the server.')
+            return
         GUI_process_running()
     
     btn_process_running=Button(window_name, text="Process running", width=20, height=2, command=clicked_process_running)
     btn_process_running.grid(column=1, row=3)
 
 def GUI_app_running():
-    window_app_running=Tk()
+    window_app_running=Toplevel()
     window_app_running.title("App running")
     window_app_running.geometry('300x200')
+    window_app_running.focus()
+    window_app_running.grab_set()
     window_app_running.mainloop()
 
 def func_app_running(window_name):
     def clicked_app_running():
+        if connection_status==0:
+            showerror(title='Error', message='Not connected to the server.')
+            return        
         GUI_app_running()
     
     btn_app_running=Button(window_name, text="App running", width=20, height=2, command=clicked_app_running)
     btn_app_running.grid(column=1, row=4)
 
 def GUI_keystroke():
-    window_keystroke=Tk()
+    window_keystroke=Toplevel()
     window_keystroke.title("Keystroke")
     window_keystroke.geometry('300x200')
+    window_keystroke.focus()
+    window_keystroke.grab_set()
     window_keystroke.mainloop()
 
 def func_keystroke(window_name):
     def clicked_keystroke():
+        if connection_status==0:
+            showerror(title='Error', message='Not connected to the server.')
+            return                
         GUI_keystroke()
     
     btn_keystroke=Button(window_name, text="Keystroke", width=20, height=2, command=clicked_keystroke)
     btn_keystroke.grid(column=1, row=5)
 
 def GUI_edit_registry():
-    window_edit_registry=Tk()
+    window_edit_registry=Toplevel()
     window_edit_registry.title("Edit registry")
     window_edit_registry.geometry('300x200')
+    window_edit_registry.focus()
+    window_edit_registry.grab_set()
     window_edit_registry.mainloop()
 
 def func_edit_registry(window_name):
     def clicked_edit_registry():
+        if connection_status==0:
+            showerror(title='Error', message='Not connected to the server.')
+            return        
         GUI_edit_registry()
     
     btn_edit_registry=Button(window_name, text="Edit registry", width=20, height=2, command=clicked_edit_registry)
     btn_edit_registry.grid(column=1, row=6)
 
 def GUI_shutdown():
-    window_shutdown=Tk()
+    window_shutdown=Toplevel()
     window_shutdown.title("Shutdown")
     window_shutdown.geometry('300x200')
+    window_shutdown.focus()
+    window_shutdown.grab_set()
     window_shutdown.mainloop()
 
 def func_shutdown(window_name):
     def clicked_shutdown():
+        if connection_status==0:
+            showerror(title='Error', message='Not connected to the server.')
+            return        
         GUI_shutdown()
     
     btn_shutdown=Button(window_name, text="Shutdown", width=20, height=2, command=clicked_shutdown)
