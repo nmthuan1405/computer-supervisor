@@ -42,12 +42,16 @@ def GUI_screenshot():
     image = client.getScreenShot(buff)
     image.show()
 
-    render = ImageTk.PhotoImage(image)
-    label1 = Label(image = render)
-    label1.image = render
-    label1.place(x=0, y=0)
+        render = ImageTk.PhotoImage(image)
 
-    window_screenshot.mainloop()
+
+        canvas = Canvas(width = 300, height = 300)  
+        canvas.grid(column = 0, row = 0)  
+        img = render
+        canvas.create_image(20, 20, anchor=NW, image=img)  
+
+        window_screenshot.mainloop()
+
 
 def func_screenshot(window_name):
     def clicked_screenshot():

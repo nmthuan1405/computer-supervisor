@@ -10,7 +10,7 @@ PORT = 1234
 DELIM = b'\x00'
 
 # dump func
-def recvDump(buff):
+def recvDump(buff): 
     dump_size = int(buff.recv_until(DELIM).decode())
     dump = buff.recv_size(dump_size)
 
