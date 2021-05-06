@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import *
 from tkinter.messagebox import showerror, showwarning, showinfo
+from tkinter import scrolledtext
 from PIL import ImageTk, Image
 import client
 from functools import partial
@@ -297,10 +298,60 @@ class editRegistryGUI:
         self.buff = buff
         self.master = master
         self.master.title("Edit registry")
-        self.master.geometry('300x200')
+        # self.master.geometry('400x200')
         self.master.focus()
-        self.master.grab_set()    
+        self.master.grab_set()
 
+        self.master.columnconfigure(0, weight=1)
+        self.master.columnconfigure(1, weight=1)
+        # self.master.columnconfigure(2, weight=1)
+        # self.master.columnconfigure(3, weight=1)
+        # self.master.rowconfigure(0, weight=1)
+        # self.master.rowconfigure(1, weight=1)
+        # self.master.rowconfigure(2, weight=1)  
+        # self.master.rowconfigure(3, weight=1)
+        self.master['padx'] = 10
+        self.master['pady'] = 10
+
+        self.txt_pathInput = Entry(self.master, width = 50)
+        self.txt_pathInput.insert(-1, 'Path')
+        # self.txt_pathInput.focus()
+        self.txt_pathInput.grid(column = 0, row = 0)
+
+        self.btn_browse = Button(self.master, text="Browse")
+        self.btn_browse.grid(column=1, row=0, padx = 5, ipadx = 5)
+
+        self.text_area = scrolledtext.ScrolledText(self.master, wrap = tk.WORD, width = 35, height = 5)
+        self.text_area.grid(column = 0, row = 1, pady = 10)
+
+        self.btn_send = Button(self.master, text="Send")
+        self.btn_send.grid(column=1, row=1, padx = 5, ipadx = 10, ipady = 30)
+
+        self.frame_editDirectly = ttk.LabelFrame(self.master, text = "Edit value directly", relief = tk.RIDGE)
+        self.frame_editDirectly.grid(row = 2, columnspan = 2, column = 0, sticky = tk.E + tk.W + tk.N + tk.S, padx = 0, pady = 4)
+        self.frame_editDirectly.columnconfigure(0, weight=1)
+        self.frame_editDirectly.columnconfigure(1, weight=1)
+        self.frame_editDirectly.columnconfigure(2, weight=1)
+
+        options = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')
+        selected_option = tk.StringVar()
+        self.option_cb = ttk.Combobox(self.frame_editDirectly, width = 57, textvariable = selected_option)
+        self.option_cb.set('default') #chưa hiện đc chữ default
+        self.option_cb['values'] = options
+        self.option_cb['state'] = 'readonly'  # normal
+        self.option_cb.grid(column = 0, row = 0, columnspan = 3, padx = 5, pady = 5)
+
+        self.txt_pathInput2 = Entry(self.frame_editDirectly, width = 60)
+        self.txt_pathInput2.insert(-1, 'Path')
+        self.txt_pathInput2.grid(column = 0, row = 1, columnspan = 3, padx = 5)
+
+        self.result_area = scrolledtext.ScrolledText(self.frame_editDirectly, wrap = tk.WORD, width = 43, height = 4, bg = "light gray", state = tk.DISABLED)
+        self.result_area.grid(column = 0, row = 2, columnspan = 3, padx = 5, pady = 5)
+
+        self.button1 = ttk.Button(self.frame_editDirectly, text="Send")
+        self.button1.grid(row=3, column=0)
+        self.button2 = ttk.Button(self.frame_editDirectly, text="Delete")
+        self.button2.grid(row=3, column=2)
 
 window_client = Tk()
 a = ClientGUI(window_client)
