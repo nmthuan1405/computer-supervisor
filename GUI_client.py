@@ -24,6 +24,7 @@ class ClientGUI:
         self.lbl_IP_input.grid(column = 0, row = 0, sticky = tk.W, padx = 10, pady = 10)
 
         self.txt_IP_input = Entry(self.master)
+        self.txt_IP_input.insert(-1, 'localhost')
         self.txt_IP_input.focus()
         self.txt_IP_input.grid(column = 1, row = 0)
 
@@ -52,7 +53,14 @@ class ClientGUI:
         self.btn_exit.grid(column = 1, row = 8, sticky = tk.N, pady = 5, ipadx = 20, ipady = 8)
     
     def connect(self):
-        self.buff = client.connectServer('temp')
+        if self.buff == None:
+            try:
+                self.buff = client.connectServer(self.txt_IP_input.get())
+            except:
+                showerror(title = 'Error', message = 'Cannot connect to server.')
+        else:
+            client.sendCloseConection(self.buff)
+            self.buff = None
 
     def screenshot(self):
         if self.buff == None:
