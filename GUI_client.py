@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 from tkinter import *
 from tkinter.messagebox import showerror, showwarning, showinfo
 from PIL import ImageTk, Image
@@ -105,19 +106,26 @@ class screenshotGUI:
         self.image = None
         self.render = None
         self.master.title("Screenshot")
-        self.master.geometry('700x500')
+        self.master.geometry('800x500')
         self.master.focus()
         self.master.grab_set()
-        
+
+        # configure the grid
+        self.master.columnconfigure(0, weight=1)
+        self.master.columnconfigure(1, weight=1)
+        self.master.columnconfigure(2, weight=1)
+        self.master.rowconfigure(0, weight=1)
+        self.master.rowconfigure(1, weight=1)
+        self.master.rowconfigure(2, weight=1)        
         self.canvas = Canvas(self.master, width = 600, height = 400)  
-        self.canvas.grid(column = 0, row = 0)
+        self.canvas.grid(column = 0, columnspan = 2, row = 0, rowspan = 2)
         self.imgOnCanvas = self.canvas.create_image(0, 0, anchor = NW)
 
         self.btn_cap = Button(self.master, text = "Capture", width = 10, height = 2, command = self.capture)
-        self.btn_cap.grid(column = 0, row= 1)
+        self.btn_cap.grid(column = 2, row= 0, sticky = tk.W, padx = 5, pady = 5, ipadx = 8, ipady = 40)
 
         self.btn_save = Button(self.master, text = "Save", width = 10, height = 2, command = self.save)
-        self.btn_save.grid(column = 1, row = 1)
+        self.btn_save.grid(column = 2, row = 1, sticky = tk.W, padx = 5, pady = 5, ipadx = 8, ipady = 40)
         
         self.capture()
 
@@ -137,21 +145,61 @@ class runningProcessGUI:
         self.buff = buff
         self.master = master
         self.master.title("Running process")
-        self.master.geometry('320x200')
+        self.master.geometry('400x400')
         self.master.focus()
         self.master.grab_set()
 
-        self.btn_kill = Button(self.master, text = "Kill", width = 10, height = 2, command = self.kill)
-        self.btn_kill.grid(column = 0, row = 0)
+        # configure the grid
+        self.master.columnconfigure(0, weight=1)
+        self.master.columnconfigure(1, weight=1)
+        self.master.columnconfigure(2, weight=1)
+        self.master.columnconfigure(3, weight=1)
+        self.master.rowconfigure(0, weight=1)
+        self.master.rowconfigure(1, weight=1)
+        self.master.rowconfigure(2, weight=1)  
+        self.master.rowconfigure(3, weight=1) 
 
-        self.btn_show = Button(self.master, text = "Show", width = 10, height = 2, command = self.show)
-        self.btn_show.grid(column = 1, row = 0)
+        self.btn_kill = Button(self.master, text = "Kill", width = 10, command = self.kill)
+        self.btn_kill.grid(column = 0, row = 0, sticky = tk.N, pady = 5, ipady = 10)
 
-        self.btn_hide = Button(self.master, text = "Hide", width = 10, height = 2, command = self.hide)
-        self.btn_hide.grid(column = 2, row = 0)
+        self.btn_show = Button(self.master, text = "Show", width = 10, command = self.show)
+        self.btn_show.grid(column = 1, row = 0, sticky = tk.N, pady = 5, ipady = 10)
 
-        self.btn_start = Button(self.master, text = "Start", width = 10, height = 2, command = self.start)
-        self.btn_start.grid(column = 3, row = 0)
+        self.btn_hide = Button(self.master, text = "Hide", width = 10, command = self.hide)
+        self.btn_hide.grid(column = 2, row = 0, sticky = tk.N, pady = 5, ipady = 10)
+
+        self.btn_start = Button(self.master, text = "Start", width = 10, command = self.start)
+        self.btn_start.grid(column = 3, row = 0, sticky = tk.N, pady = 5, ipady = 10)
+
+        # columns
+        columns = ('#1', '#2', '#3')
+        self.tree = ttk.Treeview(self.master, columns = columns, show = 'headings')
+
+        #config column width
+        self.tree.column("#1", minwidth = 0, width = 10)
+        self.tree.column("#2", minwidth = 0, width = 10)
+        self.tree.column("#3", minwidth = 0, width = 10)
+
+        # define headings
+        self.tree.heading('#1', text='First Name')
+        self.tree.heading('#2', text='Last Name')
+        self.tree.heading('#3', text='Email')
+
+        # generate sample data
+        contacts = []
+        for n in range(1, 100):
+            contacts.append((f'first {n}', f'last {n}', f'email{n}@example.com'))
+        
+        # adding data to the treeview
+        for contact in contacts:
+            self.tree.insert('', tk.END, values = contact)
+
+        self.tree.grid(row = 1, rowspan = 1, column = 0, columnspan = 4, sticky='nsew')
+
+        # add a scrollbar
+        self.scrollbar = ttk.Scrollbar(self.master, orient = tk.VERTICAL, command = self.tree.yview)
+        self.tree.configure(yscroll = self.scrollbar.set)
+        self.scrollbar.grid(row = 1, column = 4, sticky = 'ns')
 
     def kill(self):
         pass
