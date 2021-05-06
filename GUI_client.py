@@ -210,12 +210,68 @@ class runningProcessGUI:
         self.scrollbar.grid(row = 1, column = 4, sticky = 'ns')
 
     def kill(self):
-        pass
+        window_killProcess = Toplevel()
+        killProcessGUI(window_killProcess, self.buff)
+        window_killProcess.mainloop()
     def show(self):
         pass
     def hide(self):
         pass
     def start(self):
+        window_startProcess = Toplevel()
+        startProcessGUI(window_startProcess, self.buff)
+        window_startProcess.mainloop()
+
+class killProcessGUI:
+    def __init__(self, master, buff):
+        self.buff = buff
+        self.master = master
+        self.master.title("Kill")
+        # self.master.geometry('400x200')
+        self.master.focus()
+        self.master.grab_set()
+
+        self.master.columnconfigure(0, weight=1)
+        self.master.columnconfigure(1, weight=2)
+        self.master.columnconfigure(2, weight=1)
+
+        self.lbl_ID_input = Label(self.master, text = "Process ID: ")
+        self.lbl_ID_input.grid(column = 0, row = 0, sticky = tk.W, padx = 10, pady = 10)
+
+        self.txt_ID_input = Entry(self.master)
+        self.txt_ID_input.focus()
+        self.txt_ID_input.grid(column = 1, row = 0, sticky = tk.W, padx = 10, pady = 10)
+
+        self.btn_kill = Button(self.master, text="Kill", command = self.killProcess)
+        self.btn_kill.grid(column=2, row=0, sticky = tk.W, padx = 10, pady = 10, ipadx = 10)
+
+    def killProcess(self):
+        pass
+
+class startProcessGUI:
+    def __init__(self, master, buff):
+        self.buff = buff
+        self.master = master
+        self.master.title("Start")
+        # self.master.geometry('400x200')
+        self.master.focus()
+        self.master.grab_set()
+
+        self.master.columnconfigure(0, weight=1)
+        self.master.columnconfigure(1, weight=2)
+        self.master.columnconfigure(2, weight=1)
+
+        self.lbl_ID_input = Label(self.master, text = "Process ID: ")
+        self.lbl_ID_input.grid(column = 0, row = 0, sticky = tk.W, padx = 10, pady = 10)
+
+        self.txt_ID_input = Entry(self.master)
+        self.txt_ID_input.focus()
+        self.txt_ID_input.grid(column = 1, row = 0, sticky = tk.W, padx = 10, pady = 10)
+
+        self.btn_start = Button(self.master, text="Start", command = self.startProcess)
+        self.btn_start.grid(column=2, row=0, sticky = tk.W, padx = 10, pady = 10, ipadx = 10)
+
+    def startProcess(self):
         pass
 
 class runningAppGUI:
