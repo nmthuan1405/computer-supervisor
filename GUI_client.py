@@ -333,25 +333,65 @@ class editRegistryGUI:
         self.frame_editDirectly.columnconfigure(1, weight=1)
         self.frame_editDirectly.columnconfigure(2, weight=1)
 
-        options = ('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec')
+        options = ('Get value', 'Set value', 'Delete value', 'Create key', 'Delete key')
         selected_option = tk.StringVar()
-        self.option_cb = ttk.Combobox(self.frame_editDirectly, width = 57, textvariable = selected_option)
-        self.option_cb.set('default') #chưa hiện đc chữ default
-        self.option_cb['values'] = options
-        self.option_cb['state'] = 'readonly'  # normal
-        self.option_cb.grid(column = 0, row = 0, columnspan = 3, padx = 5, pady = 5)
+        self.cbb_option = ttk.Combobox(self.frame_editDirectly, width = 57, textvariable = selected_option)
+        self.cbb_option.set('default') #chưa hiện đc chữ default
+        self.cbb_option['values'] = options
+        self.cbb_option['state'] = 'readonly'  # normal
+        self.cbb_option.grid(column = 0, row = 0, columnspan = 3, padx = 5, pady = 5)
+
+        def optionChanged(event):
+            if(self.cbb_option.get() == options[0]):
+                self.txt_nameValue['state'] = 'normal'
+                self.txt_value['state'] = 'disabled'
+                self.cbb_dataType['state'] = 'disabled'
+            if(self.cbb_option.get() == options[1]):
+                self.txt_nameValue['state'] = 'normal'
+                self.txt_value['state'] = 'normal'
+                self.cbb_dataType['state'] = 'normal'
+            if(self.cbb_option.get() == options[2]):
+                self.txt_nameValue['state'] = 'normal'
+                self.txt_value['state'] = 'disabled'
+                self.cbb_dataType['state'] = 'disabled'
+            if(self.cbb_option.get() == options[3]):
+                self.txt_nameValue['state'] = 'disabled'
+                self.txt_value['state'] = 'disabled'
+                self.cbb_dataType['state'] = 'disabled'
+            if(self.cbb_option.get() == options[4]):
+                self.txt_nameValue['state'] = 'disabled'
+                self.txt_value['state'] = 'disabled'
+                self.cbb_dataType['state'] = 'disabled'
+                
+        self.cbb_option.bind('<<ComboboxSelected>>', optionChanged)
 
         self.txt_pathInput2 = Entry(self.frame_editDirectly, width = 60)
         self.txt_pathInput2.insert(-1, 'Path')
         self.txt_pathInput2.grid(column = 0, row = 1, columnspan = 3, padx = 5)
 
+        self.txt_nameValue = Entry(self.frame_editDirectly, width = 15)
+        self.txt_nameValue.insert(-1, 'Name value')
+        self.txt_nameValue.grid(column = 0, row = 2, padx = 0, pady = 5)
+
+        self.txt_value = Entry(self.frame_editDirectly, width = 20)
+        self.txt_value.insert(-1, 'Value')
+        self.txt_value.grid(column = 1, row = 2, padx = 0, pady = 5)
+
+        dataTypes = ('String', 'Binary', 'DWORD', 'QWORD', 'Multi-String', 'Expandable String')
+        selected_dataType = tk.StringVar()
+        self.cbb_dataType = ttk.Combobox(self.frame_editDirectly, width = 15, textvariable = selected_dataType)
+        self.cbb_dataType.set('default') #chưa hiện đc chữ default
+        self.cbb_dataType['values'] = dataTypes
+        self.cbb_dataType['state'] = 'readonly'  # normal
+        self.cbb_dataType.grid(column = 2, row = 2, padx = 0, pady = 5)
+
         self.result_area = scrolledtext.ScrolledText(self.frame_editDirectly, wrap = tk.WORD, width = 43, height = 4, bg = "light gray", state = tk.DISABLED)
-        self.result_area.grid(column = 0, row = 2, columnspan = 3, padx = 5, pady = 5)
+        self.result_area.grid(column = 0, row = 3, columnspan = 3, padx = 5, pady = 5)
 
         self.button1 = ttk.Button(self.frame_editDirectly, text="Send")
-        self.button1.grid(row=3, column=0)
+        self.button1.grid(row=4, column=0, pady = 5)
         self.button2 = ttk.Button(self.frame_editDirectly, text="Delete")
-        self.button2.grid(row=3, column=2)
+        self.button2.grid(row=4, column=2, pady = 5)
 
 window_client = Tk()
 a = ClientGUI(window_client)
