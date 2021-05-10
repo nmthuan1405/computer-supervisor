@@ -154,31 +154,23 @@ class runningProcessGUI:
         self.buff = buff
         self.master = master
         self.master.title("Running process")
-        self.master.geometry('400x400')
+        # self.master.geometry('400x400')
         self.master.focus()
         self.master.grab_set()
-
-        # configure the grid
-        self.master.columnconfigure(0, weight=1)
-        self.master.columnconfigure(1, weight=1)
-        self.master.columnconfigure(2, weight=1)
-        self.master.columnconfigure(3, weight=1)
-        self.master.rowconfigure(0, weight=1)
-        self.master.rowconfigure(1, weight=1)
-        self.master.rowconfigure(2, weight=1)  
-        self.master.rowconfigure(3, weight=1) 
+        self.master['padx'] = 10
+        self.master['pady'] = 10
 
         self.btn_kill = Button(self.master, text = "Kill", width = 10, command = self.kill)
-        self.btn_kill.grid(column = 0, row = 0, sticky = tk.N, pady = 5, ipady = 10)
+        self.btn_kill.grid(column = 0, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
 
         self.btn_show = Button(self.master, text = "Show", width = 10, command = self.show)
-        self.btn_show.grid(column = 1, row = 0, sticky = tk.N, pady = 5, ipady = 10)
+        self.btn_show.grid(column = 1, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
 
         self.btn_hide = Button(self.master, text = "Hide", width = 10, command = self.hide)
-        self.btn_hide.grid(column = 2, row = 0, sticky = tk.N, pady = 5, ipady = 10)
+        self.btn_hide.grid(column = 2, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
 
         self.btn_start = Button(self.master, text = "Start", width = 10, command = self.start)
-        self.btn_start.grid(column = 3, row = 0, sticky = tk.N, pady = 5, ipady = 10)
+        self.btn_start.grid(column = 3, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
 
         # columns
         columns = ('#1', '#2', '#3')
@@ -190,25 +182,25 @@ class runningProcessGUI:
         self.tree.column("#3", minwidth = 0, width = 10)
 
         # define headings
-        self.tree.heading('#1', text='First Name')
-        self.tree.heading('#2', text='Last Name')
-        self.tree.heading('#3', text='Email')
+        self.tree.heading('#1', text='Process Name')
+        self.tree.heading('#2', text='Process ID')
+        self.tree.heading('#3', text='Thread Count')
 
         # generate sample data
         contacts = []
         for n in range(1, 100):
-            contacts.append((f'first {n}', f'last {n}', f'email{n}@example.com'))
+            contacts.append((f'Process {n}', f'ID {n}', f'{n}'))
         
         # adding data to the treeview
         for contact in contacts:
             self.tree.insert('', tk.END, values = contact)
 
-        self.tree.grid(row = 1, rowspan = 1, column = 0, columnspan = 4, sticky='nsew')
+        self.tree.grid(row = 1, rowspan = 1, column = 0, padx = 0, pady = 5, columnspan = 4, sticky='nsew')
 
         # add a scrollbar
         self.scrollbar = ttk.Scrollbar(self.master, orient = tk.VERTICAL, command = self.tree.yview)
         self.tree.configure(yscroll = self.scrollbar.set)
-        self.scrollbar.grid(row = 1, column = 4, sticky = 'ns')
+        self.scrollbar.grid(row = 1, column = 4, padx = 0, pady = 5, sticky = 'ns')
 
     def kill(self):
         window_killProcess = Toplevel()
@@ -231,20 +223,22 @@ class killProcessGUI:
         # self.master.geometry('400x200')
         self.master.focus()
         self.master.grab_set()
+        self.master['padx'] = 10
+        self.master['pady'] = 10
 
         self.master.columnconfigure(0, weight=1)
         self.master.columnconfigure(1, weight=2)
         self.master.columnconfigure(2, weight=1)
 
         self.lbl_ID_input = Label(self.master, text = "Process ID: ")
-        self.lbl_ID_input.grid(column = 0, row = 0, sticky = tk.W, padx = 10, pady = 10)
+        self.lbl_ID_input.grid(column = 0, row = 0, sticky = tk.W, padx = 0, pady = 0)
 
         self.txt_ID_input = Entry(self.master)
         self.txt_ID_input.focus()
-        self.txt_ID_input.grid(column = 1, row = 0, sticky = tk.W, padx = 10, pady = 10)
+        self.txt_ID_input.grid(column = 1, row = 0, sticky = tk.W, padx = 10, pady = 0)
 
         self.btn_kill = Button(self.master, text="Kill", command = self.killProcess)
-        self.btn_kill.grid(column=2, row=0, sticky = tk.W, padx = 10, pady = 10, ipadx = 10)
+        self.btn_kill.grid(column=2, row=0, sticky = tk.W, padx = 0, pady = 0, ipadx = 10)
 
     def killProcess(self):
         pass
@@ -257,20 +251,22 @@ class startProcessGUI:
         # self.master.geometry('400x200')
         self.master.focus()
         self.master.grab_set()
+        self.master['padx'] = 10
+        self.master['pady'] = 10
 
         self.master.columnconfigure(0, weight=1)
         self.master.columnconfigure(1, weight=2)
         self.master.columnconfigure(2, weight=1)
 
-        self.lbl_ID_input = Label(self.master, text = "Process ID: ")
-        self.lbl_ID_input.grid(column = 0, row = 0, sticky = tk.W, padx = 10, pady = 10)
+        self.lbl_ID_input = Label(self.master, text = "Process Name: ")
+        self.lbl_ID_input.grid(column = 0, row = 0, sticky = tk.W, padx = 0, pady = 0)
 
         self.txt_ID_input = Entry(self.master)
         self.txt_ID_input.focus()
-        self.txt_ID_input.grid(column = 1, row = 0, sticky = tk.W, padx = 10, pady = 10)
+        self.txt_ID_input.grid(column = 1, row = 0, sticky = tk.W, padx = 10, pady = 0)
 
         self.btn_start = Button(self.master, text="Start", command = self.startProcess)
-        self.btn_start.grid(column=2, row=0, sticky = tk.W, padx = 10, pady = 10, ipadx = 10)
+        self.btn_start.grid(column=2, row=0, sticky = tk.W, padx = 0, pady = 0, ipadx = 10)
 
     def startProcess(self):
         pass
@@ -280,9 +276,122 @@ class runningAppGUI:
         self.buff = buff
         self.master = master
         self.master.title("Running app")
-        self.master.geometry('300x200')
+        # self.master.geometry('300x200')
         self.master.focus()
         self.master.grab_set()
+        self.master['padx'] = 10
+        self.master['pady'] = 10
+
+        self.btn_kill = Button(self.master, text = "Kill", width = 10, command = self.kill)
+        self.btn_kill.grid(column = 0, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
+
+        self.btn_show = Button(self.master, text = "Show", width = 10, command = self.show)
+        self.btn_show.grid(column = 1, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
+
+        self.btn_hide = Button(self.master, text = "Hide", width = 10, command = self.hide)
+        self.btn_hide.grid(column = 2, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
+
+        self.btn_start = Button(self.master, text = "Start", width = 10, command = self.start)
+        self.btn_start.grid(column = 3, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
+
+        # columns
+        columns = ('#1', '#2', '#3')
+        self.tree = ttk.Treeview(self.master, columns = columns, show = 'headings')
+
+        #config column width
+        self.tree.column("#1", minwidth = 0, width = 10)
+        self.tree.column("#2", minwidth = 0, width = 10)
+        self.tree.column("#3", minwidth = 0, width = 10)
+
+        # define headings
+        self.tree.heading('#1', text='Application Name')
+        self.tree.heading('#2', text='Application ID')
+        self.tree.heading('#3', text='Thread Count')
+
+        # generate sample data
+        contacts = []
+        for n in range(1, 100):
+            contacts.append((f'Application {n}', f'ID {n}', f'{n}'))
+        
+        # adding data to the treeview
+        for contact in contacts:
+            self.tree.insert('', tk.END, values = contact)
+
+        self.tree.grid(row = 1, rowspan = 1, column = 0, padx = 0, pady = 5, columnspan = 4, sticky='nsew')
+
+        # add a scrollbar
+        self.scrollbar = ttk.Scrollbar(self.master, orient = tk.VERTICAL, command = self.tree.yview)
+        self.tree.configure(yscroll = self.scrollbar.set)
+        self.scrollbar.grid(row = 1, column = 4, padx = 0, pady = 5, sticky = 'ns')
+
+    def kill(self):
+        window_killApp = Toplevel()
+        killAppGUI(window_killApp, self.buff)
+        window_killApp.mainloop()
+    def show(self):
+        pass
+    def hide(self):
+        pass
+    def start(self):
+        window_startApp = Toplevel()
+        startAppGUI(window_startApp, self.buff)
+        window_startApp.mainloop()
+
+class killAppGUI:
+    def __init__(self, master, buff):
+        self.buff = buff
+        self.master = master
+        self.master.title("Kill")
+        # self.master.geometry('400x200')
+        self.master.focus()
+        self.master.grab_set()
+        self.master['padx'] = 10
+        self.master['pady'] = 10
+
+        self.master.columnconfigure(0, weight=1)
+        self.master.columnconfigure(1, weight=2)
+        self.master.columnconfigure(2, weight=1)
+
+        self.lbl_ID_input = Label(self.master, text = "Application ID: ")
+        self.lbl_ID_input.grid(column = 0, row = 0, sticky = tk.W, padx = 0, pady = 0)
+
+        self.txt_ID_input = Entry(self.master)
+        self.txt_ID_input.focus()
+        self.txt_ID_input.grid(column = 1, row = 0, sticky = tk.W, padx = 10, pady = 0)
+
+        self.btn_kill = Button(self.master, text="Kill", command = self.killApp)
+        self.btn_kill.grid(column=2, row=0, sticky = tk.W, padx = 0, pady = 0, ipadx = 10)
+
+    def killApp(self):
+        pass
+
+class startAppGUI:
+    def __init__(self, master, buff):
+        self.buff = buff
+        self.master = master
+        self.master.title("Start")
+        # self.master.geometry('400x200')
+        self.master.focus()
+        self.master.grab_set()
+        self.master['padx'] = 10
+        self.master['pady'] = 10
+
+        self.master.columnconfigure(0, weight=1)
+        self.master.columnconfigure(1, weight=2)
+        self.master.columnconfigure(2, weight=1)
+
+        self.lbl_ID_input = Label(self.master, text = "Application Name: ")
+        self.lbl_ID_input.grid(column = 0, row = 0, sticky = tk.W, padx = 0, pady = 0)
+
+        self.txt_ID_input = Entry(self.master)
+        self.txt_ID_input.focus()
+        self.txt_ID_input.grid(column = 1, row = 0, sticky = tk.W, padx = 10, pady = 0)
+
+        self.btn_start = Button(self.master, text="Start", command = self.startApp)
+        self.btn_start.grid(column=2, row=0, sticky = tk.W, padx = 0, pady = 0, ipadx = 10)
+
+    def startApp(self):
+        pass
 
 class keystrokeGUI:
     def __init__(self, master, buff):
