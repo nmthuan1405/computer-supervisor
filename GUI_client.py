@@ -398,9 +398,36 @@ class keystrokeGUI:
         self.buff = buff
         self.master = master
         self.master.title("Keystroke")
-        self.master.geometry('300x200')
+        # self.master.geometry('300x200')
         self.master.focus()
-        self.master.grab_set()    
+        self.master.grab_set()
+        self.master['padx'] = 10
+        self.master['pady'] = 10
+
+        self.btn_kill = Button(self.master, text = "Hook", width = 10, command = self.hook)
+        self.btn_kill.grid(column = 0, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
+
+        self.btn_show = Button(self.master, text = "Unhook", width = 10, command = self.unhook)
+        self.btn_show.grid(column = 1, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
+
+        self.btn_hide = Button(self.master, text = "Print", width = 10, command = self.print)
+        self.btn_hide.grid(column = 2, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
+
+        self.btn_start = Button(self.master, text = "Clear", width = 10, command = self.clear)
+        self.btn_start.grid(column = 3, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
+
+        self.text_area = scrolledtext.ScrolledText(self.master, wrap = tk.WORD, width = 41, height = 10)
+        self.text_area.grid(column = 0, row = 1, columnspan = 4, pady = 10)
+        self.text_area['state'] = 'disabled'
+
+    def hook(self):
+        pass
+    def unhook(self):
+        pass
+    def print(self):
+        pass
+    def clear(self):
+        pass
 
 class editRegistryGUI:
     def __init__(self, master, buff):
@@ -494,7 +521,7 @@ class editRegistryGUI:
         self.cbb_dataType['state'] = 'readonly'  # normal
         self.cbb_dataType.grid(column = 2, row = 2, padx = 0, pady = 5)
 
-        self.result_area = scrolledtext.ScrolledText(self.frame_editDirectly, wrap = tk.WORD, width = 43, height = 4, bg = "light gray", state = tk.DISABLED)
+        self.result_area = scrolledtext.ScrolledText(self.frame_editDirectly, wrap = tk.WORD, width = 43, height = 4, bg = "gray92", state = tk.DISABLED)
         self.result_area.grid(column = 0, row = 3, columnspan = 3, padx = 5, pady = 5)
 
         self.button1 = ttk.Button(self.frame_editDirectly, text="Send")
