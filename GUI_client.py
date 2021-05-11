@@ -5,12 +5,11 @@ from tkinter.messagebox import showerror, showwarning, showinfo
 from tkinter import scrolledtext
 from PIL import ImageTk, Image
 import client
-from functools import partial
 from tkinter.filedialog import asksaveasfile
 
 class ClientGUI:
     def __init__(self, master):
-        self.buff = None
+        self.services = None
         self.master = master
         self.master.title("Client")
         self.master.geometry('300x420')
@@ -54,29 +53,39 @@ class ClientGUI:
         self.btn_exit.grid(column = 1, row = 8, sticky = tk.N, pady = 5, ipadx = 20, ipady = 8)
     
     def connect(self):
-        if self.buff == None:
+        if self.services == None:
             try:
-                self.buff = client.connectServer(self.txt_IP_input.get())
+                self.services = client.ClientServices(self.txt_IP_input.get())
+                self.services.connectServer()
+
+                self.txt_IP_input.config(state = 'disabled')
+                self.btn_connect.config(text = 'Disconnect')
             except:
                 showerror(title = 'Error', message = 'Cannot connect to server.')
+                self.services = None
         else:
-            client.sendCloseConection(self.buff)
-            self.buff = None
+            self.services.sendCloseConection()
+            self.services = None
+
+            self.txt_IP_input.config(state = 'normal')
+            self.btn_connect.config(text = 'Connect')
 
     def screenshot(self):
-        if self.buff == None:
+        if self.services == None:
             showerror(title = 'Error', message = 'Not connected to the server.')
             return
+
         window_screenshot = Toplevel()
-        screenshotGUI(window_screenshot, self.buff)
+        screenshotGUI(window_screenshot, self.services)
         window_screenshot.mainloop()
 
     def runningProcess(self):
-        if self.buff == None:
+        if self.services == None:
             showerror(title = 'Error', message = 'Not connected to the server.')
             return        
+
         window_runningProcess = Toplevel()
-        runningProcessGUI(window_runningProcess, self.buff)
+        runningProcessGUI(window_runningProcess, self.services)
         window_runningProcess.mainloop()
 
     def runningApp(self):
@@ -109,9 +118,9 @@ class ClientGUI:
         self.master.destroy()
     
 class screenshotGUI:
-    def __init__(self, master, buff):
-        self.buff = buff
+    def __init__(self, master, services):
         self.master = master
+        self.services = services
         self.image = None
         self.render = None
         self.master.title("Screenshot")
@@ -139,7 +148,7 @@ class screenshotGUI:
         self.capture()
 
     def capture(self):
-        self.image = client.getScreenShot(self.buff)
+        self.image = self.services.getScreenShot()
 
         imageShow = self.image.resize((600, 400), Image.ANTIALIAS)
         self.render = ImageTk.PhotoImage(imageShow)
@@ -150,11 +159,10 @@ class screenshotGUI:
         self.image.save(f.name)
 
 class runningProcessGUI:
-    def __init__(self, master, buff):
-        self.buff = buff
+    def __init__(self, master, services):
         self.master = master
+        self.services = services
         self.master.title("Running process")
-        # self.master.geometry('400x400')
         self.master.focus()
         self.master.grab_set()
         self.master['padx'] = 10
@@ -166,7 +174,7 @@ class runningProcessGUI:
         self.btn_show = Button(self.master, text = "Show", width = 10, command = self.show)
         self.btn_show.grid(column = 1, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
 
-        self.btn_hide = Button(self.master, text = "Hide", width = 10, command = self.hide)
+        self.btn_hide = Button(self.master, text = "Clear", width = 10, command = self.clear)
         self.btn_hide.grid(column = 2, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
 
         self.btn_start = Button(self.master, text = "Start", width = 10, command = self.start)
@@ -187,13 +195,7 @@ class runningProcessGUI:
         self.tree.heading('#3', text='Thread Count')
 
         # generate sample data
-        contacts = []
-        for n in range(1, 100):
-            contacts.append((f'Process {n}', f'ID {n}', f'{n}'))
-        
-        # adding data to the treeview
-        for contact in contacts:
-            self.tree.insert('', tk.END, values = contact)
+        self.insert(self.services.getProcessList())
 
         self.tree.grid(row = 1, rowspan = 1, column = 0, padx = 0, pady = 5, columnspan = 4, sticky='nsew')
 
@@ -204,23 +206,32 @@ class runningProcessGUI:
 
     def kill(self):
         window_killProcess = Toplevel()
-        killProcessGUI(window_killProcess, self.buff)
+        killProcessGUI(window_killProcess, self.services)
         window_killProcess.mainloop()
+
+    def insert(self, data):
+        for line in data:
+            self.tree.insert('', tk.END, values = line)
+
     def show(self):
-        pass
-    def hide(self):
-        pass
+        self.clear()
+        self.insert(self.services.getProcessList())
+
+    def clear(self):
+        for row in self.tree.get_children():
+            self.tree.delete(row)
+
     def start(self):
         window_startProcess = Toplevel()
         startProcessGUI(window_startProcess, self.buff)
         window_startProcess.mainloop()
 
 class killProcessGUI:
-    def __init__(self, master, buff):
-        self.buff = buff
+    def __init__(self, master, services):
+        self.services = services
         self.master = master
         self.master.title("Kill")
-        # self.master.geometry('400x200')
+        
         self.master.focus()
         self.master.grab_set()
         self.master['padx'] = 10

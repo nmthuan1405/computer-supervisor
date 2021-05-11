@@ -1,5 +1,5 @@
 from tkinter import *
-from tkinter.messagebox import showerror, showwarning, showinfo, askokcancel
+from tkinter.messagebox import askokcancel
 import server
 
 
