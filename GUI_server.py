@@ -1,21 +1,48 @@
 from tkinter import *
+from tkinter.messagebox import showerror, showwarning, showinfo, askokcancel
 import server
 
-def func_start(window_name):
-    def clicked_start():
-        server.createSocket()
 
-    btn_start = Button(window_name, text="Start", width = 20, height = 3, command = clicked_start)
-    btn_start.pack()
-    # btn_start.grid(column = 0, row = 0)
+class Server_GUI:
+    def __init__(self, master):
+        self.services = None
+        self.master = master
 
-def GUI_Server():
-    window_server = Tk()
-    window_server.title("Server")
-    window_server.geometry('200x100')
+        self.master.title("Server")
+        self.master.geometry('200x200')
 
-    func_start(window_server)
+        self.btn_start = Button(self.master, text = "Start Server", width = 20, height = 5, command = self.start)
+        self.btn_start.place(relx = 0.5, rely = 0.5, anchor = CENTER)
 
-    window_server.mainloop()
+        self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
 
-GUI_Server()
+    def start(self):
+        if self.services == None:
+            try:
+                self.services = server.ServerServices()
+                self.services.startServices()
+
+                self.btn_start.config(text = "Stop Server")
+            except:
+                print('Cannot create server')
+                self.services = None
+        else:
+            self.services.stopServices()
+            self.services = None
+
+            self.btn_start.config(text = "Start Server")
+
+    def on_closing(self):
+        if self.services != None:
+            if askokcancel("Quit", "Server is running.\nDo you want to quit?"):
+                self.services.stopServices()
+            else:
+                return
+            
+        self.master.destroy()
+
+            
+
+window_server = Tk()
+Server_GUI(window_server)
+window_server.mainloop()
