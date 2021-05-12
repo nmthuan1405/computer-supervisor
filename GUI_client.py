@@ -6,6 +6,7 @@ from tkinter import scrolledtext
 from PIL import ImageTk, Image
 import client
 from tkinter.filedialog import asksaveasfilename, askopenfilename
+from functools import partial
 
 class ClientGUI:
     def __init__(self, master):
@@ -169,7 +170,7 @@ class runningProcessGUI:
         self.master['padx'] = 10
         self.master['pady'] = 10
 
-        self.btn_kill = Button(self.master, text = "Kill", width = 10, command = self.kill)
+        self.btn_kill = Button(self.master, text = "Kill", width = 10, command = partial(self.kill, self.master))
         self.btn_kill.grid(column = 0, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
 
         self.btn_show = Button(self.master, text = "Refresh", width = 10, command = self.refresh)
@@ -178,7 +179,7 @@ class runningProcessGUI:
         self.btn_hide = Button(self.master, text = "Clear", width = 10, command = self.clear)
         self.btn_hide.grid(column = 2, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
 
-        self.btn_start = Button(self.master, text = "Start", width = 10, command = self.start)
+        self.btn_start = Button(self.master, text = "Start", width = 10, command = partial(self.start, self.master))
         self.btn_start.grid(column = 3, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
 
         # columns
@@ -205,13 +206,13 @@ class runningProcessGUI:
         self.tree.configure(yscroll = self.scrollbar.set)
         self.scrollbar.grid(row = 1, column = 4, padx = 0, pady = 5, sticky = 'ns')
 
-    def kill(self):
+    def kill(self, parent):
         uid = self.tree.item(self.tree.focus())['values']
         if uid != '':
             uid = uid[1]
 
         window_killProcess = Toplevel()
-        killProcessGUI(window_killProcess, self.services, uid)
+        killProcessGUI(window_killProcess, parent, self.services, uid)
         window_killProcess.mainloop()
 
     def insert(self, data):
@@ -226,13 +227,13 @@ class runningProcessGUI:
         for row in self.tree.get_children():
             self.tree.delete(row)
 
-    def start(self):
+    def start(self, parent):
         window_startProcess = Toplevel()
-        startProcessGUI(window_startProcess, self.services)
+        startProcessGUI(window_startProcess, parent, self.services)
         window_startProcess.mainloop()
 
 class killProcessGUI:
-    def __init__(self, master, services, uid):
+    def __init__(self, master, parent, services, uid):
         self.services = services
         self.master = master
         self.master.title("Kill")
@@ -241,6 +242,8 @@ class killProcessGUI:
         self.master.grab_set()
         self.master['padx'] = 10
         self.master['pady'] = 10
+
+        self.parent = parent
 
         self.master.columnconfigure(0, weight=1)
         self.master.columnconfigure(1, weight=2)
@@ -257,6 +260,12 @@ class killProcessGUI:
         self.btn_kill = Button(self.master, text="Kill", command = self.killProcess)
         self.btn_kill.grid(column=2, row=0, sticky = tk.W, padx = 0, pady = 0, ipadx = 10)
 
+        self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
+    def on_closing(self):
+        self.master.destroy()
+        self.parent.focus()
+        self.parent.grab_set()
+
     def killProcess(self):
         if (self.services.sendKillProcess(self.txt_ID_input.get()) == 'OK'):
             showinfo("Sucess", "Kill process successful !")
@@ -264,7 +273,7 @@ class killProcessGUI:
             showerror("Error", "Unable to kill this process")
 
 class startProcessGUI:
-    def __init__(self, master, services):
+    def __init__(self, master, parent, services):
         self.services = services
         self.master = master
         self.master.title("Start")
@@ -273,6 +282,8 @@ class startProcessGUI:
         self.master.grab_set()
         self.master['padx'] = 10
         self.master['pady'] = 10
+
+        self.parent = parent
 
         self.master.columnconfigure(0, weight=1)
         self.master.columnconfigure(1, weight=2)
@@ -287,6 +298,12 @@ class startProcessGUI:
 
         self.btn_start = Button(self.master, text="Start", command = self.startProcess)
         self.btn_start.grid(column=2, row=0, sticky = tk.W, padx = 0, pady = 0, ipadx = 10)
+
+        self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
+    def on_closing(self):
+        self.master.destroy()
+        self.parent.focus()
+        self.parent.grab_set()
 
     def startProcess(self):
         if (self.services.sendStartProcess(self.txt_ID_input.get()) == 'OK'):
