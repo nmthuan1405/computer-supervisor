@@ -60,6 +60,7 @@ class ClientGUI:
 
                 self.txt_IP_input.config(state = 'disabled')
                 self.btn_connect.config(text = 'Disconnect')
+                showinfo("Sucess", "Connect to server sucessfully")
             except:
                 showerror(title = 'Error', message = 'Cannot connect to server.')
                 self.services = None
@@ -171,7 +172,7 @@ class runningProcessGUI:
         self.btn_kill = Button(self.master, text = "Kill", width = 10, command = self.kill)
         self.btn_kill.grid(column = 0, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
 
-        self.btn_show = Button(self.master, text = "Show", width = 10, command = self.show)
+        self.btn_show = Button(self.master, text = "Refresh", width = 10, command = self.refresh)
         self.btn_show.grid(column = 1, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
 
         self.btn_hide = Button(self.master, text = "Clear", width = 10, command = self.clear)
@@ -205,15 +206,19 @@ class runningProcessGUI:
         self.scrollbar.grid(row = 1, column = 4, padx = 0, pady = 5, sticky = 'ns')
 
     def kill(self):
+        uid = self.tree.item(self.tree.focus())['values']
+        if uid != '':
+            uid = uid[1]
+
         window_killProcess = Toplevel()
-        killProcessGUI(window_killProcess, self.services)
+        killProcessGUI(window_killProcess, self.services, uid)
         window_killProcess.mainloop()
 
     def insert(self, data):
         for line in data:
             self.tree.insert('', tk.END, values = line)
 
-    def show(self):
+    def refresh(self):
         self.clear()
         self.insert(self.services.getProcessList())
 
@@ -223,11 +228,11 @@ class runningProcessGUI:
 
     def start(self):
         window_startProcess = Toplevel()
-        startProcessGUI(window_startProcess, self.buff)
+        startProcessGUI(window_startProcess, self.services)
         window_startProcess.mainloop()
 
 class killProcessGUI:
-    def __init__(self, master, services):
+    def __init__(self, master, services, uid):
         self.services = services
         self.master = master
         self.master.title("Kill")
@@ -245,6 +250,7 @@ class killProcessGUI:
         self.lbl_ID_input.grid(column = 0, row = 0, sticky = tk.W, padx = 0, pady = 0)
 
         self.txt_ID_input = Entry(self.master)
+        self.txt_ID_input.insert(-1, uid)
         self.txt_ID_input.focus()
         self.txt_ID_input.grid(column = 1, row = 0, sticky = tk.W, padx = 10, pady = 0)
 
@@ -252,11 +258,14 @@ class killProcessGUI:
         self.btn_kill.grid(column=2, row=0, sticky = tk.W, padx = 0, pady = 0, ipadx = 10)
 
     def killProcess(self):
-        pass
+        if (self.services.sendKillProcess(self.txt_ID_input.get()) == 'OK'):
+            showinfo("Sucess", "Kill process successful !")
+        else:
+            showerror("Error", "Unable to kill this process")
 
 class startProcessGUI:
-    def __init__(self, master, buff):
-        self.buff = buff
+    def __init__(self, master, services):
+        self.services = services
         self.master = master
         self.master.title("Start")
         # self.master.geometry('400x200')
@@ -280,7 +289,10 @@ class startProcessGUI:
         self.btn_start.grid(column=2, row=0, sticky = tk.W, padx = 0, pady = 0, ipadx = 10)
 
     def startProcess(self):
-        pass
+        if (self.services.sendStartProcess(self.txt_ID_input.get()) == 'OK'):
+            showinfo("Sucess", "Start process successful !")
+        else:
+            showerror("Error", "Unable to start this process")
 
 class runningAppGUI:
     def __init__(self, master, buff):
