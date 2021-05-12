@@ -268,9 +268,9 @@ class killProcessGUI:
 
     def killProcess(self):
         if (self.services.sendKillProcess(self.txt_ID_input.get()) == 'OK'):
-            showinfo("Sucess", "Kill process successful !")
+            showinfo("Sucess", "Kill process successful !", parent = self.master)
         else:
-            showerror("Error", "Unable to kill this process")
+            showerror("Error", "Unable to kill this process", parent = self.master)
 
 class startProcessGUI:
     def __init__(self, master, parent, services):
@@ -307,9 +307,9 @@ class startProcessGUI:
 
     def startProcess(self):
         if (self.services.sendStartProcess(self.txt_ID_input.get()) == 'OK'):
-            showinfo("Sucess", "Start process successful !")
+            showinfo("Sucess", "Start process successful !", parent = self.master)
         else:
-            showerror("Error", "Unable to start this process")
+            showerror("Error", "Unable to start this process", parent = self.master)
 
 class runningAppGUI:
     def __init__(self, master, services):
