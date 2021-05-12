@@ -5,7 +5,7 @@ from tkinter.messagebox import showerror, showwarning, showinfo
 from tkinter import scrolledtext
 from PIL import ImageTk, Image
 import client
-from tkinter.filedialog import asksaveasfile
+from tkinter.filedialog import asksaveasfilename, askopenfilename
 
 class ClientGUI:
     def __init__(self, master):
@@ -106,9 +106,9 @@ class ClientGUI:
         window_keystroke.mainloop()
 
     def editRegistry(self):
-        if self.services == None:
-            showerror(title = 'Error', message = 'Not connected to the server.')
-            return        
+        # if self.services == None:
+        #     showerror(title = 'Error', message = 'Not connected to the server.')
+        #     return        
         window_editRegistry = Toplevel()
         editRegistryGUI(window_editRegistry, self.services)
         window_editRegistry.mainloop()
@@ -156,8 +156,8 @@ class screenshotGUI:
         self.canvas.itemconfig(self.imgOnCanvas, image = self.render)
 
     def save(self):
-        f = asksaveasfile(mode='w', initialfile = 'screenshot.png', defaultextension=".png",filetypes=[("PNG Files", "*.png")])
-        self.image.save(f.name)
+        f = asksaveasfilename(initialfile = 'screenshot.png', defaultextension=".png",filetypes=[("PNG Files", "*.png")])
+        self.image.save(f)
 
 class runningProcessGUI:
     def __init__(self, master, services):
@@ -501,15 +501,15 @@ class editRegistryGUI:
         self.txt_pathInput.insert(-1, 'Path')
         # self.txt_pathInput.focus()
         self.txt_pathInput.grid(column = 0, row = 0)
-        self.txt_pathInput['state'] = 'disabled'
+        self.txt_pathInput['state'] = 'readonly'
 
-        self.btn_browse = Button(self.master, text="Browse")
+        self.btn_browse = Button(self.master, text="Browse", command = self.browse)
         self.btn_browse.grid(column=1, row=0, padx = 5, ipadx = 5)
 
         self.text_area = scrolledtext.ScrolledText(self.master, wrap = tk.WORD, width = 35, height = 5)
         self.text_area.grid(column = 0, row = 1, pady = 10)
 
-        self.btn_send = Button(self.master, text="Send")
+        self.btn_send = Button(self.master, text="Send", command = self.sendReg)
         self.btn_send.grid(column=1, row=1, padx = 5, ipadx = 10, ipady = 30)
 
         self.frame_editDirectly = ttk.LabelFrame(self.master, text = "Edit value directly", relief = tk.RIDGE)
@@ -565,7 +565,7 @@ class editRegistryGUI:
         dataTypes = ('String', 'Binary', 'DWORD', 'QWORD', 'Multi-String', 'Expandable String')
         selected_dataType = tk.StringVar()
         self.cbb_dataType = ttk.Combobox(self.frame_editDirectly, width = 15, textvariable = selected_dataType)
-        self.cbb_dataType.set('default') #chưa hiện đc chữ default
+        self.cbb_dataType.set('default') # chưa hiện đc chữ default
         self.cbb_dataType['values'] = dataTypes
         self.cbb_dataType['state'] = 'readonly'  # normal
         self.cbb_dataType.grid(column = 2, row = 2, padx = 0, pady = 5)
@@ -573,15 +573,38 @@ class editRegistryGUI:
         self.result_area = scrolledtext.ScrolledText(self.frame_editDirectly, wrap = tk.WORD, width = 43, height = 4, bg = "gray92", state = tk.DISABLED)
         self.result_area.grid(column = 0, row = 3, columnspan = 3, padx = 5, pady = 5)
 
-        self.button1 = ttk.Button(self.frame_editDirectly, text="Send")
+        self.button1 = ttk.Button(self.frame_editDirectly, text="Send", command = self.sendCommand)
         self.button1.grid(row=4, column=0, pady = 5)
-        self.button2 = ttk.Button(self.frame_editDirectly, text="Delete")
+        self.button2 = ttk.Button(self.frame_editDirectly, text="Delete", command = self.clearLog)
         self.button2.grid(row=4, column=2, pady = 5)
 
-        def clearLog(self):
-            self.text_area.config(state = 'normal')
-            self.text_area.delete(1.0, END)
-            self.text_area.config(state = 'disabled')
+    def browse(self):
+        try:
+            filename = askopenfilename(defaultextension=".reg", filetypes=[("Registry Files", "*.reg"), ("All Files", "*.*")])
+            self.txt_pathInput.config(state = 'normal')
+            self.txt_pathInput.delete(0, END)
+            self.txt_pathInput.insert(-1, filename)
+            self.txt_pathInput.config(state = 'readonly')
+
+            f = open(filename, 'r', encoding = "utf-16")
+            data = f.read()
+            f.close()
+        except:
+            data = 'ERROR'
+
+        self.text_area.delete(1.0, END)
+        self.text_area.insert(INSERT, data)\
+
+    def sendReg(self):
+        pass
+
+    def sendCommand(self):
+        pass
+
+    def clearLog(self):
+        self.result_area.config(state = 'normal')
+        self.result_area.delete(1.0, END)
+        self.result_area.config(state = 'readonly')
 
 window_client = Tk()
 a = ClientGUI(window_client)
