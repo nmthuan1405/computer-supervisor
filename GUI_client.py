@@ -535,32 +535,32 @@ class editRegistryGUI:
         self.frame_editDirectly.columnconfigure(1, weight=1)
         self.frame_editDirectly.columnconfigure(2, weight=1)
 
-        options = ('Get value', 'Set value', 'Delete value', 'Create key', 'Delete key')
+        self.options = ('Get value', 'Set value', 'Delete value', 'Create key', 'Delete key')
         selected_option = tk.StringVar()
         self.cbb_option = ttk.Combobox(self.frame_editDirectly, width = 57, textvariable = selected_option)
         self.cbb_option.set('default') #chưa hiện đc chữ default
-        self.cbb_option['values'] = options
+        self.cbb_option['values'] = self.options
         self.cbb_option['state'] = 'readonly'  # normal
         self.cbb_option.grid(column = 0, row = 0, columnspan = 3, padx = 5, pady = 5)
 
         def optionChanged(event):
-            if(self.cbb_option.get() == options[0]):
+            if(self.cbb_option.get() == self.options[0]):
                 self.txt_nameValue.grid()
                 self.txt_value.grid_remove()
                 self.cbb_dataType.grid_remove()
-            if(self.cbb_option.get() == options[1]):
+            if(self.cbb_option.get() == self.options[1]):
                 self.txt_nameValue.grid()
                 self.txt_value.grid()
                 self.cbb_dataType.grid()
-            if(self.cbb_option.get() == options[2]):
+            if(self.cbb_option.get() == self.options[2]):
                 self.txt_nameValue.grid()
                 self.txt_value.grid_remove()
                 self.cbb_dataType.grid_remove()
-            if(self.cbb_option.get() == options[3]):
+            if(self.cbb_option.get() == self.options[3]):
                 self.txt_nameValue.grid_remove()
                 self.txt_value.grid_remove()
                 self.cbb_dataType.grid_remove()
-            if(self.cbb_option.get() == options[4]):
+            if(self.cbb_option.get() == self.options[4]):
                 self.txt_nameValue.grid_remove()
                 self.txt_value.grid_remove()
                 self.cbb_dataType.grid_remove()
@@ -610,18 +610,35 @@ class editRegistryGUI:
             data = 'ERROR'
 
         self.text_area.delete(1.0, END)
-        self.text_area.insert(INSERT, data)\
+        self.text_area.insert(INSERT, data)
 
     def sendReg(self):
-        pass
+        if (self.service.sendRegFile(self.text_area.get(1.0, END)) == 'OK'):
+            pass
 
     def sendCommand(self):
-        pass
+        # get value
+        if (self.cbb_option.get() == self.options[0]):
+            data = self.service.sendRegGetVal(self.txt_pathInput2.get(), self.txt_nameValue.get())
+
+            self.result_area.config(state='normal')
+            self.result_area.insert(INSERT, str(data[0]))
+            self.result_area.config(state='disabled')
+            pass
+
+        elif (self.cbb_option.get() == self.options[1]):
+            pass
+        elif (self.cbb_option.get() == self.options[2]):
+            pass
+        elif (self.cbb_option.get() == self.options[3]):
+            pass
+        elif (self.cbb_option.get() == self.options[4]):
+            pass
 
     def clearLog(self):
         self.result_area.config(state = 'normal')
         self.result_area.delete(1.0, END)
-        self.result_area.config(state = 'readonly')
+        self.result_area.config(state = 'disabled')
 
 window_client = Tk()
 a = ClientGUI(window_client)

