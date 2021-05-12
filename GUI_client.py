@@ -501,6 +501,7 @@ class editRegistryGUI:
         self.txt_pathInput.insert(-1, 'Path')
         # self.txt_pathInput.focus()
         self.txt_pathInput.grid(column = 0, row = 0)
+        self.txt_pathInput['state'] = 'disabled'
 
         self.btn_browse = Button(self.master, text="Browse")
         self.btn_browse.grid(column=1, row=0, padx = 5, ipadx = 5)
@@ -527,25 +528,25 @@ class editRegistryGUI:
 
         def optionChanged(event):
             if(self.cbb_option.get() == options[0]):
-                self.txt_nameValue['state'] = 'normal'
-                self.txt_value['state'] = 'disabled'
-                self.cbb_dataType['state'] = 'disabled'
+                self.txt_nameValue.grid()
+                self.txt_value.grid_remove()
+                self.cbb_dataType.grid_remove()
             if(self.cbb_option.get() == options[1]):
-                self.txt_nameValue['state'] = 'normal'
-                self.txt_value['state'] = 'normal'
-                self.cbb_dataType['state'] = 'normal'
+                self.txt_nameValue.grid()
+                self.txt_value.grid()
+                self.cbb_dataType.grid()
             if(self.cbb_option.get() == options[2]):
-                self.txt_nameValue['state'] = 'normal'
-                self.txt_value['state'] = 'disabled'
-                self.cbb_dataType['state'] = 'disabled'
+                self.txt_nameValue.grid()
+                self.txt_value.grid_remove()
+                self.cbb_dataType.grid_remove()
             if(self.cbb_option.get() == options[3]):
-                self.txt_nameValue['state'] = 'disabled'
-                self.txt_value['state'] = 'disabled'
-                self.cbb_dataType['state'] = 'disabled'
+                self.txt_nameValue.grid_remove()
+                self.txt_value.grid_remove()
+                self.cbb_dataType.grid_remove()
             if(self.cbb_option.get() == options[4]):
-                self.txt_nameValue['state'] = 'disabled'
-                self.txt_value['state'] = 'disabled'
-                self.cbb_dataType['state'] = 'disabled'
+                self.txt_nameValue.grid_remove()
+                self.txt_value.grid_remove()
+                self.cbb_dataType.grid_remove()
                 
         self.cbb_option.bind('<<ComboboxSelected>>', optionChanged)
 
