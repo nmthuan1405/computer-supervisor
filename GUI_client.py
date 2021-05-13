@@ -514,34 +514,35 @@ class editRegistryGUI:
         self.master['padx'] = 10
         self.master['pady'] = 10
 
-        self.txt_pathInput = Entry(self.master, width = 50)
+        self.txt_pathInput = Entry(self.master, width = 60)
         self.txt_pathInput.insert(-1, 'Path')
         # self.txt_pathInput.focus()
         self.txt_pathInput.grid(column = 0, row = 0)
         self.txt_pathInput['state'] = 'readonly'
 
         self.btn_browse = Button(self.master, text="Browse", command = self.browse)
-        self.btn_browse.grid(column=1, row=0, padx = 5, ipadx = 5)
+        self.btn_browse.grid(column=1, row=0, padx = 5, ipadx = 10)
 
-        self.text_area = scrolledtext.ScrolledText(self.master, wrap = tk.WORD, width = 35, height = 5)
+        self.text_area = scrolledtext.ScrolledText(self.master, wrap = tk.WORD, width = 43, height = 10)
         self.text_area.grid(column = 0, row = 1, pady = 10)
 
         self.btn_send = Button(self.master, text="Send", command = self.sendReg)
-        self.btn_send.grid(column=1, row=1, padx = 5, ipadx = 10, ipady = 30)
+        self.btn_send.grid(column=1, row=1, padx = 0, ipadx = 15, ipady = 70)
 
         self.frame_editDirectly = ttk.LabelFrame(self.master, text = "Edit value directly", relief = tk.RIDGE)
         self.frame_editDirectly.grid(row = 2, columnspan = 2, column = 0, sticky = tk.E + tk.W + tk.N + tk.S, padx = 0, pady = 4)
         self.frame_editDirectly.columnconfigure(0, weight=1)
         self.frame_editDirectly.columnconfigure(1, weight=1)
         self.frame_editDirectly.columnconfigure(2, weight=1)
+        self.frame_editDirectly.columnconfigure(3, weight=1)
 
         self.options = ('Get value', 'Set value', 'Delete value', 'Create key', 'Delete key')
         selected_option = tk.StringVar()
-        self.cbb_option = ttk.Combobox(self.frame_editDirectly, width = 57, textvariable = selected_option)
+        self.cbb_option = ttk.Combobox(self.frame_editDirectly, width = 67, textvariable = selected_option)
         self.cbb_option.set('default') #chưa hiện đc chữ default
         self.cbb_option['values'] = self.options
         self.cbb_option['state'] = 'readonly'  # normal
-        self.cbb_option.grid(column = 0, row = 0, columnspan = 3, padx = 5, pady = 5)
+        self.cbb_option.grid(column = 0, row = 0, columnspan = 4, padx = 5, pady = 5)
 
         def optionChanged(event):
             if(self.cbb_option.get() == self.options[0]):
@@ -567,17 +568,21 @@ class editRegistryGUI:
                 
         self.cbb_option.bind('<<ComboboxSelected>>', optionChanged)
 
-        self.txt_pathInput2 = Entry(self.frame_editDirectly, width = 60)
+        self.txt_pathInput2 = Entry(self.frame_editDirectly, width = 70)
         self.txt_pathInput2.insert(-1, 'Path')
-        self.txt_pathInput2.grid(column = 0, row = 1, columnspan = 3, padx = 5)
+        self.txt_pathInput2.grid(column = 0, row = 1, columnspan = 4, padx = 5)
 
         self.txt_nameValue = Entry(self.frame_editDirectly, width = 15)
         self.txt_nameValue.insert(-1, 'Name value')
-        self.txt_nameValue.grid(column = 0, row = 2, padx = 0, pady = 5)
+        self.txt_nameValue.grid(column = 0, row = 2, padx = 5, pady = 5)
 
         self.txt_value = Entry(self.frame_editDirectly, width = 20)
         self.txt_value.insert(-1, 'Value')
-        self.txt_value.grid(column = 1, row = 2, padx = 0, pady = 5)
+        self.txt_value.grid(column = 1, row = 2, padx = 5, pady = 5)
+
+        self.txt_seperator = Entry(self.frame_editDirectly, width = 10)
+        self.txt_seperator.insert(-1, 'Seperator')
+        self.txt_seperator.grid(column = 2, row = 2, padx = 5, pady = 5)
 
         dataTypes = ('String', 'Binary', 'DWORD', 'QWORD', 'Multi-String', 'Expandable String')
         selected_dataType = tk.StringVar()
@@ -585,13 +590,13 @@ class editRegistryGUI:
         self.cbb_dataType.set('default') # chưa hiện đc chữ default
         self.cbb_dataType['values'] = dataTypes
         self.cbb_dataType['state'] = 'readonly'  # normal
-        self.cbb_dataType.grid(column = 2, row = 2, padx = 0, pady = 5)
+        self.cbb_dataType.grid(column = 3, row = 2, padx = 5, pady = 5)
 
-        self.result_area = scrolledtext.ScrolledText(self.frame_editDirectly, wrap = tk.WORD, width = 43, height = 4, bg = "gray92", state = tk.DISABLED)
-        self.result_area.grid(column = 0, row = 3, columnspan = 3, padx = 5, pady = 5)
+        self.result_area = scrolledtext.ScrolledText(self.frame_editDirectly, wrap = tk.WORD, width = 51, height = 10, bg = "gray92", state = tk.DISABLED)
+        self.result_area.grid(column = 0, row = 3, columnspan = 4, padx = 5, pady = 5)
 
         self.button1 = ttk.Button(self.frame_editDirectly, text="Send", command = self.sendCommand)
-        self.button1.grid(row=4, column=0, pady = 5)
+        self.button1.grid(row=4, column=1, pady = 5)
         self.button2 = ttk.Button(self.frame_editDirectly, text="Delete", command = self.clearLog)
         self.button2.grid(row=4, column=2, pady = 5)
 
