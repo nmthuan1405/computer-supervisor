@@ -65,7 +65,7 @@ class ClientServices:
         print('SEND KILL PROCESS SIGNAL')
 
         self.buff.send('killprocess!F!'.encode())
-        self.buff.send(str(pid).encode() + self.DELIM)
+        self.buff.send(pid.encode() + self.DELIM)
         return self.buff.recv_until(self.DELIM).decode()
 
     def sendStartProcess(self, name):

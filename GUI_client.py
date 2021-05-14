@@ -184,7 +184,7 @@ class screenshotGUI:
             
             self.image.save(f)
         except:
-            print('\tErr: Unable to save screenshot')
+            print('\tError: Unable to save screenshot')
 
 class runningProcessGUI:
     def __init__(self, master, services):
@@ -222,15 +222,23 @@ class runningProcessGUI:
         self.tree.heading('#2', text='Process ID')
         self.tree.heading('#3', text='Thread Count')
 
-        # add data
-        self.insert(self.services.getProcessList())
-
         self.tree.grid(row = 1, rowspan = 1, column = 0, padx = 0, pady = 5, columnspan = 4, sticky='nsew')
 
         # add a scrollbar
         self.scrollbar = ttk.Scrollbar(self.master, orient = tk.VERTICAL, command = self.tree.yview)
         self.tree.configure(yscroll = self.scrollbar.set)
         self.scrollbar.grid(row = 1, column = 4, padx = 0, pady = 5, sticky = 'ns')
+
+        # add data
+        self.insert(self.services.getProcessList())
+
+    def insert(self, data):
+        try:
+            for line in data:
+                self.tree.insert('', tk.END, values = line)
+        except:
+            print('Error: Unable to get process list')
+            self.clear()
 
     def kill(self, parent):
         uid = self.tree.item(self.tree.focus())['values']
@@ -241,10 +249,6 @@ class runningProcessGUI:
         killProcessGUI(window_killProcess, parent, self.services, uid)
         center(window_killProcess)
         window_killProcess.mainloop()
-
-    def insert(self, data):
-        for line in data:
-            self.tree.insert('', tk.END, values = line)
 
     def refresh(self):
         self.clear()
@@ -288,6 +292,7 @@ class killProcessGUI:
         self.btn_kill.grid(column=2, row=0, sticky = tk.W, padx = 0, pady = 0, ipadx = 10)
 
         self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
+
     def on_closing(self):
         self.master.destroy()
         self.parent.focus()
@@ -327,6 +332,7 @@ class startProcessGUI:
         self.btn_start.grid(column=2, row=0, sticky = tk.W, padx = 0, pady = 0, ipadx = 10)
 
         self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
+
     def on_closing(self):
         self.master.destroy()
         self.parent.focus()

