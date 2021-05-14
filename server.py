@@ -291,9 +291,9 @@ class Client:
             result = QueryValueEx(OpenKeyEx(getHKEY(hkey), key, 0, KEY_QUERY_VALUE), value)
         except:
             print(f'{self.addr} \tErr: send registry value')
-            self.sendDump(('ER'))
+            self.sendDump(('ER',))
         else:
-            self.sendDump(result)
+            self.sendDump((result[0], returnType(result[1])))
         
     def getSetRegVal(self):
         print(f'{self.addr} \tSET REG VALUE')
@@ -382,4 +382,16 @@ def getType(type):
     elif type == 'Expandable String':
         return REG_EXPAND_SZ 
 
-
+def returnType(type):
+    if type == REG_SZ:
+        return 'String'
+    elif type == REG_BINARY:
+        return 'Binary'
+    elif type == REG_DWORD:
+        return 'DWORD'
+    elif type == REG_QWORD:
+        return 'QWORD'
+    elif type == REG_MULTI_SZ:
+        return 'Multi-String'
+    elif type == REG_EXPAND_SZ:
+        return 'Expandable String' 

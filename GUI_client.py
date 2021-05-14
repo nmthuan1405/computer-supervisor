@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import *
-from tkinter.messagebox import showerror, showwarning, showinfo
+from tkinter.messagebox import showerror, showinfo
 from tkinter import scrolledtext
 from PIL import ImageTk, Image
 import client
@@ -654,8 +654,8 @@ class editRegistryGUI:
         self.txt_value = Entry(self.frame_editDirectly, width = 25)
         # self.txt_value.grid(column = 1, columnspan = 2, row = 5, padx = 5, pady = 0)
 
-        self.txt_seperator = Entry(self.frame_editDirectly, width = 3)
-        self.txt_seperator.insert(-1, ';')
+        self.txt_seperator = Entry(self.frame_editDirectly, width = 3, justify = 'center')
+        self.txt_seperator.insert(-1, '\\0')
         # self.txt_seperator.grid(column = 2, row = 5, padx = 5, pady = 0)
 
         self.lbl_dataType = Label(self.frame_editDirectly, text = "Data type")
@@ -762,7 +762,7 @@ class editRegistryGUI:
         self.button1 = ttk.Button(self.frame_editDirectly, text="Send", command = self.sendCommand)
         self.button1.place(x = 100, y = 320)
         # self.button1.grid(row=8, column=0, pady = 5, sticky = W)
-        self.button2 = ttk.Button(self.frame_editDirectly, text="Clear result", command = self.clearLog)
+        self.button2 = ttk.Button(self.frame_editDirectly, text="Clear log", command = self.clearLog)
         self.button2.place(x = 220, y = 320)
         # self.button2.grid(row=8, column=1, pady = 5, sticky = W)
 
@@ -784,48 +784,67 @@ class editRegistryGUI:
         self.text_area.insert(INSERT, data)
 
     def sendReg(self):
-        try:
-            check = self.service.sendRegFile(self.text_area.get(1.0, END))
-            if (check == 'ER'):
-                raise Exception
-            showinfo('Success', 'Merge registry successfully')
-        except:
+        if self.service.sendRegFile(self.text_area.get(1.0, END)) == 'OK':
+            showinfo('Success', 'Merge registry successfully')             
+        else:
             showerror('Error', 'Unable to merge registry')
 
     def sendCommand(self):
-        try:
-            if (self.cbb_option.get() == self.options[0]):
-                data = self.service.sendRegGetVal(self.txt_pathInput2.get(), self.txt_nameValue.get())
-                self.writeLog(self.txt_nameValue.get() + ': ' +str(data[0]))
+        if self.cbb_option.get() == self.options[0]:
+            data = self.service.sendRegGetVal(self.txt_pathInput2.get(), self.txt_nameValue.get())
+            if (len(data) == 2):
 
-            elif (self.cbb_option.get() == self.options[1]):
-                data = self.txt_value.get()
-                type = self.cbb_dataType.get()
+                if data[1] == self.dataTypes[1]:
+                    dataDisplay = str(data[0].hex())
+                else:
+                    dataDisplay = str(data[0])
 
+                self.writeLog(self.txt_nameValue.get() + ': ' + dataDisplay)
+                self.writeLog('\t\tType: ' + data[1])
+            else:
+                self.writeLog(self.txt_nameValue.get() + ': Error')
+
+        elif self.cbb_option.get() == self.options[1]:
+            data = self.txt_value.get()
+            type = self.cbb_dataType.get()
+
+            try:
                 if type == self.dataTypes[1]:
                     data = bytearray.fromhex(data)
                 elif type == self.dataTypes[2] or type == self.dataTypes[3]:
                     data = int(data)
                 elif type == self.dataTypes[4]:
-                    data = data.split( '\\0')
+                    data = data.split(self.txt_seperator.get())
 
-                self.service.sendRegSetVal(self.txt_pathInput2.get(), self.txt_nameValue.get(), data, type)
+                    dataDisplay = ['\'' + element + '\'' for element in data]
+                    self.writeLog('Data: ' + ', '.join(dataDisplay))
+            except:
+                self.writeLog('Unable to parse data')
+                return
+
+            if self.service.sendRegSetVal(self.txt_pathInput2.get(), self.txt_nameValue.get(), data, type) == 'OK':
                 self.writeLog('Set value successfully')
+            else:
+                self.writeLog('Unable to set value')
 
-            elif (self.cbb_option.get() == self.options[2]):
-                self.service.sendRegDeVal(self.txt_pathInput2.get(), self.txt_nameValue.get())
+        elif (self.cbb_option.get() == self.options[2]):
+            if self.service.sendRegDeVal(self.txt_pathInput2.get(), self.txt_nameValue.get()) == 'OK':
                 self.writeLog('Delete value successfully')
-                
-            elif (self.cbb_option.get() == self.options[3]):
-                self.service.sendRegCreateKey(self.txt_pathInput2.get())
+            else:
+                self.writeLog('Unable to delete value')
+            
+        elif (self.cbb_option.get() == self.options[3]):
+            if self.service.sendRegCreateKey(self.txt_pathInput2.get()) == 'OK':
                 self.writeLog('Create key successfully')
-                pass
-            elif (self.cbb_option.get() == self.options[4]):
-                self.service.sendRegDelKey(self.txt_pathInput2.get())
+            else:
+                self.writeLog('Unable to create key')
+            
+        elif (self.cbb_option.get() == self.options[4]):
+            if self.service.sendRegDelKey(self.txt_pathInput2.get()) == 'OK':
                 self.writeLog('Delete key successfully')
-                pass
-        except:
-            self.writeLog('Error')
+            else:
+                self.writeLog('Unable to delete key')
+            
 
     def clearLog(self):
         self.result_area.config(state = 'normal')
@@ -836,6 +855,7 @@ class editRegistryGUI:
         self.result_area.config(state='normal')
         self.result_area.insert(INSERT, data + '\n')
         self.result_area.config(state='disabled')
+        self.result_area.see('end')
 
 window_client = Tk()
 a = ClientGUI(window_client)

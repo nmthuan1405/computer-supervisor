@@ -88,12 +88,14 @@ class ClientServices:
 
     # send Reg
     def sendRegFile(self, data):
+        print('SEND REG FILE')
         self.buff.send('regfile!F!'.encode())
         self.buff.send(data.encode() + self.DELIM)
         
         return self.buff.recv_until(self.DELIM).decode()
 
     def sendRegGetVal(self, path, val):
+        print('SEND GET REG VALUE SIGNAL')
         self.buff.send('reggetval!F!'.encode())
         self.buff.send(path.encode() + self.DELIM)
         self.buff.send(val.encode() + self.DELIM)
@@ -101,6 +103,7 @@ class ClientServices:
         return self.recvDump()
     
     def sendRegSetVal(self, path, val, data, type):
+        print('SEND SET REG VALUE')
         self.buff.send('regsetval!F!'.encode())
         self.buff.send(path.encode() + self.DELIM)
         self.buff.send(val.encode() + self.DELIM)
@@ -110,6 +113,7 @@ class ClientServices:
         return self.buff.recv_until(self.DELIM).decode()
 
     def sendRegDeVal(self, path, val):
+        print('SEND DELETE REG VALUE')
         self.buff.send('regdelval!F!'.encode())
         self.buff.send(path.encode() + self.DELIM)
         self.buff.send(val.encode() + self.DELIM)
@@ -117,12 +121,14 @@ class ClientServices:
         return self.buff.recv_until(self.DELIM).decode()
 
     def sendRegCreateKey(self, path):
+        print('SEMD CREATE REG KEY')
         self.buff.send('regcreatekey!F!'.encode())
         self.buff.send(path.encode() + self.DELIM)
 
         return self.buff.recv_until(self.DELIM).decode()
 
     def sendRegDelKey(self, path):
+        print('SEND DELETE REG KEY')
         self.buff.send('regdelkey!F!'.encode())
         self.buff.send(path.encode() + self.DELIM)
 
