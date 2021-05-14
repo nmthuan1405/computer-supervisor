@@ -73,9 +73,9 @@ class ClientGUI:
 
                 self.txt_IP_input.config(state = 'disabled')
                 self.btn_connect.config(text = 'Disconnect')
-                showinfo("Sucess", "Connect to server sucessfully")
+                showinfo("Sucess", "Connect to server sucessfully", parent = self.master)
             except:
-                showerror(title = 'Error', message = 'Cannot connect to server.')
+                showerror(title = 'Error', message = 'Cannot connect to server.', parent = self.master)
                 self.services = None
         else:
             self.services.sendCloseConection()
@@ -86,7 +86,7 @@ class ClientGUI:
 
     def screenshot(self):
         if self.services == None:
-            showerror(title = 'Error', message = 'Not connected to the server.')
+            showerror(title = 'Error', message = 'Not connected to the server.', parent = self.master)
             return
 
         window_screenshot = Toplevel(self.master)
@@ -96,7 +96,7 @@ class ClientGUI:
 
     def runningProcess(self):
         if self.services == None:
-            showerror(title = 'Error', message = 'Not connected to the server.')
+            showerror(title = 'Error', message = 'Not connected to the server.', parent = self.master)
             return        
 
         window_runningProcess = Toplevel(self.master)
@@ -106,7 +106,7 @@ class ClientGUI:
 
     def runningApp(self):
         if self.buff == None:
-            showerror(title = 'Error', message = 'Not connected to the server.')
+            showerror(title = 'Error', message = 'Not connected to the server.', parent = self.master)
             return        
         window_runningApp = Toplevel()
         runningAppGUI(window_runningApp, self.services)
@@ -115,7 +115,7 @@ class ClientGUI:
 
     def keystroke(self):
         if self.services == None:
-            showerror(title = 'Error', message = 'Not connected to the server.')
+            showerror(title = 'Error', message = 'Not connected to the server.', parent = self.master)
             return        
         window_keystroke = Toplevel()
         keystrokeGUI(window_keystroke, self.services)
@@ -124,14 +124,14 @@ class ClientGUI:
 
     def editRegistry(self):
         if self.services == None:
-            showerror(title = 'Error', message = 'Not connected to the server.')
+            showerror(title = 'Error', message = 'Not connected to the server.', parent = self.master)
             return        
         window_editRegistry = Toplevel()
         editRegistryGUI(window_editRegistry, self.services)
         center(window_editRegistry)
         window_editRegistry.mainloop()
     def shutdown(self):
-        showinfo(title='Shutdown', message='Shutdown request sent.')
+        showinfo(title='Shutdown', message='Shutdown request sent.', parent = self.master)
 
     def exit(self):
         self.master.destroy()
@@ -794,9 +794,9 @@ class editRegistryGUI:
 
     def sendReg(self):
         if self.service.sendRegFile(self.text_area.get(1.0, END)) == 'OK':
-            showinfo('Success', 'Merge registry successfully')             
+            showinfo('Success', 'Merge registry successfully', parent = self.master)             
         else:
-            showerror('Error', 'Unable to merge registry')
+            showerror('Error', 'Unable to merge registry', parent = self.master)
 
     def sendCommand(self):
         if self.cbb_option.get() == self.options[0]:
