@@ -174,7 +174,7 @@ class screenshotGUI:
         self.canvas.itemconfig(self.imgOnCanvas, image = self.render)
 
     def save(self):
-        f = asksaveasfilename(initialfile = 'screenshot.png', defaultextension=".png",filetypes=[("PNG Files", "*.png")])
+        f = asksaveasfilename(initialfile = 'screenshot.png', defaultextension=".png",filetypes=[("PNG Files", "*.png")], parent = self.master)
         self.image.save(f)
 
 class runningProcessGUI:
@@ -768,7 +768,7 @@ class editRegistryGUI:
 
     def browse(self):
         try:
-            filename = askopenfilename(defaultextension=".reg", filetypes=[("Registry Files", "*.reg"), ("All Files", "*.*")])
+            filename = askopenfilename(defaultextension=".reg", filetypes=[("Registry Files", "*.reg"), ("All Files", "*.*")], parent = self.master)
             self.txt_pathInput.config(state = 'normal')
             self.txt_pathInput.delete(0, END)
             self.txt_pathInput.insert(-1, filename)
