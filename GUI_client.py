@@ -29,7 +29,7 @@ class ClientGUI:
         self.txt_IP_input.focus()
         self.txt_IP_input.grid(column = 1, row = 0)
 
-        self.btn_connect = Button(self.master, text="Connect", command = self.connect)
+        self.btn_connect = Button(self.master, text="Connect", width = 10, command = self.connect)
         self.btn_connect.grid(column=2, row=0, sticky = tk.W, padx = 10, pady = 10)
 
         self.btn_screenshot = Button(self.master, text = "Screenshot", width = 10, command = self.screenshot)
@@ -184,7 +184,7 @@ class runningProcessGUI:
 
         # columns
         columns = ('#1', '#2', '#3')
-        self.tree = ttk.Treeview(self.master, columns = columns, show = 'headings')
+        self.tree = ttk.Treeview(self.master, columns = columns, show = 'headings', height = 20)
 
         #config column width
         self.tree.column("#1", minwidth = 0, width = 10)
@@ -336,7 +336,7 @@ class runningAppGUI:
 
         # columns
         columns = ('#1', '#2', '#3')
-        self.tree = ttk.Treeview(self.master, columns = columns, show = 'headings')
+        self.tree = ttk.Treeview(self.master, columns = columns, show = 'headings', height = 20)
 
         #config column width
         self.tree.column("#1", minwidth = 0, width = 10)
@@ -457,7 +457,7 @@ class keystrokeGUI:
         self.btn_clear = Button(self.master, text = "Clear", width = 10, command = self.clear)
         self.btn_clear.grid(column = 3, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
 
-        self.text_area = scrolledtext.ScrolledText(self.master, wrap = tk.WORD, width = 41, height = 10)
+        self.text_area = scrolledtext.ScrolledText(self.master, wrap = tk.WORD, width = 41, height = 25)
         self.text_area.grid(column = 0, row = 1, columnspan = 4, pady = 10)
         self.text_area['state'] = 'disabled'
 
@@ -499,7 +499,7 @@ class editRegistryGUI:
         self.service = services
         self.master = master
         self.master.title("Edit registry")
-        self.master.geometry('435x640')
+        self.master.geometry('430x637')
         self.master.resizable(0, 0)
         self.master.focus()
         self.master.grab_set()
@@ -518,21 +518,21 @@ class editRegistryGUI:
         self.lbl_pathInput = Label(self.master, text = "Path")
         self.lbl_pathInput.grid(column = 0, row = 0, sticky = tk.SW)
 
-        self.txt_pathInput = Entry(self.master, width = 52)
+        self.txt_pathInput = Entry(self.master, width = 53)
         self.txt_pathInput.grid(column = 0, row = 1)
         self.txt_pathInput['state'] = 'readonly'
 
         self.btn_browse = Button(self.master, text="Browse", command = self.browse)
-        self.btn_browse.grid(column = 1, row = 1, padx = 5, ipadx = 10)
+        self.btn_browse.grid(column = 1, row = 1, padx = 4, ipadx = 10, sticky = E)
 
         self.lbl_data = Label(self.master, text = "Data")
         self.lbl_data.grid(column = 0, row = 2, sticky = tk.SW)
 
-        self.text_area = scrolledtext.ScrolledText(self.master, wrap = tk.WORD, width = 37, height = 10)
+        self.text_area = scrolledtext.ScrolledText(self.master, wrap = tk.WORD, width = 38, height = 10)
         self.text_area.grid(column = 0, row = 3)
 
         self.btn_send = Button(self.master, text="Send", command = self.sendReg)
-        self.btn_send.grid(column = 1, row = 3, padx = 0, ipadx = 15, ipady = 70)
+        self.btn_send.grid(column = 1, row = 3, padx = 4, ipadx = 15, ipady = 70, sticky = E)
 
         self.frame_editDirectly = ttk.LabelFrame(self.master, text = "Edit value directly", relief = tk.RIDGE)
         # self.frame_editDirectly.grid(row = 4, columnspan = 2, column = 0, sticky = tk.E + tk.W + tk.N + tk.S, padx = 0, pady = 4)
@@ -568,10 +568,12 @@ class editRegistryGUI:
                 self.lbl_value.grid()
                 self.txt_value.grid()
 
-                self.txt_seperator.grid()
-
                 self.lbl_dataType.grid()
                 self.cbb_dataType.grid()
+
+                if(self.cbb_dataType.get() == self.dataTypes[4]):
+                    self.txt_value.config(width = 19)
+                    self.txt_seperator.grid(column = 2, row = 5, padx = 5, pady = 0)
 
             if(self.cbb_option.get() == self.options[2]):
                 self.lbl_nameValue.grid()
@@ -626,23 +628,103 @@ class editRegistryGUI:
         self.lbl_value = Label(self.frame_editDirectly, text = "Value")
         self.lbl_value.grid(column = 1, row = 4, padx = 2, pady = 0, sticky = tk.SW)
 
-        self.txt_value = Entry(self.frame_editDirectly, width = 20)
-        self.txt_value.grid(column = 1, row = 5, padx = 5, pady = 0)
+        self.txt_value = Entry(self.frame_editDirectly, width = 25)
+        self.txt_value.grid(column = 1, columnspan = 2, row = 5, padx = 5, pady = 0)
 
         self.txt_seperator = Entry(self.frame_editDirectly, width = 3)
         self.txt_seperator.insert(-1, ';')
-        self.txt_seperator.grid(column = 2, row = 5, padx = 5, pady = 0)
+        # self.txt_seperator.grid(column = 2, row = 5, padx = 5, pady = 0)
 
         self.lbl_dataType = Label(self.frame_editDirectly, text = "Data type")
         self.lbl_dataType.grid(column = 3, row = 4, padx = 2, pady = 0, sticky = tk.SW)
 
-        dataTypes = ('String', 'Binary', 'DWORD', 'QWORD', 'Multi-String', 'Expandable String')
+        self.dataTypes = ('String', 'Binary', 'DWORD', 'QWORD', 'Multi-String', 'Expandable String')
         selected_dataType = tk.StringVar()
-        self.cbb_dataType = ttk.Combobox(self.frame_editDirectly, width = 15, textvariable = selected_dataType)
-        self.cbb_dataType.set('default') # chưa hiện đc chữ default
-        self.cbb_dataType['values'] = dataTypes
+        self.cbb_dataType = ttk.Combobox(self.frame_editDirectly, width = 16, textvariable = selected_dataType)
+        self.cbb_dataType['values'] = self.dataTypes
         self.cbb_dataType['state'] = 'readonly'  # normal
         self.cbb_dataType.grid(column = 3, row = 5, padx = 5, pady = 0)
+
+        def dataTypeChanged(event):
+            if(self.cbb_dataType.get() == self.dataTypes[0]):
+                self.lbl_nameValue.grid()
+                self.txt_nameValue.grid()
+
+                self.lbl_value.grid()
+                self.txt_value.config(width = 25)
+                self.txt_value.grid(column = 1, columnspan = 2, row = 5, padx = 5, pady = 0)
+
+                self.txt_seperator.grid_remove()
+
+                self.lbl_dataType.grid()
+                self.cbb_dataType.grid()
+            
+            if(self.cbb_dataType.get() == self.dataTypes[1]):
+                self.lbl_nameValue.grid()
+                self.txt_nameValue.grid()
+
+                self.lbl_value.grid()
+                self.txt_value.config(width = 25)
+                self.txt_value.grid(column = 1, columnspan = 2, row = 5, padx = 5, pady = 0)
+
+                self.txt_seperator.grid_remove()
+
+                self.lbl_dataType.grid()
+                self.cbb_dataType.grid()
+
+            if(self.cbb_dataType.get() == self.dataTypes[2]):
+                self.lbl_nameValue.grid()
+                self.txt_nameValue.grid()
+
+                self.lbl_value.grid()
+                self.txt_value.config(width = 25)
+                self.txt_value.grid(column = 1, columnspan = 2, row = 5, padx = 5, pady = 0)
+
+                self.txt_seperator.grid_remove()
+
+                self.lbl_dataType.grid()
+                self.cbb_dataType.grid()
+
+            if(self.cbb_dataType.get() == self.dataTypes[3]):
+                self.lbl_nameValue.grid()
+                self.txt_nameValue.grid()
+
+                self.lbl_value.grid()
+                self.txt_value.config(width = 25)
+                self.txt_value.grid(column = 1, columnspan = 2, row = 5, padx = 5, pady = 0)
+
+                self.txt_seperator.grid_remove()
+
+                self.lbl_dataType.grid()
+                self.cbb_dataType.grid()
+
+            if(self.cbb_dataType.get() == self.dataTypes[4]):
+                self.lbl_nameValue.grid()
+                self.txt_nameValue.grid()
+
+                self.lbl_value.grid()
+                self.txt_value.config(width = 19)
+                self.txt_value.grid(column = 1, columnspan = 1, row = 5, padx = 5, pady = 0)
+
+                self.txt_seperator.grid(column = 2, row = 5, padx = 5, pady = 0)
+
+                self.lbl_dataType.grid()
+                self.cbb_dataType.grid()
+
+            if(self.cbb_dataType.get() == self.dataTypes[5]):
+                self.lbl_nameValue.grid()
+                self.txt_nameValue.grid()
+
+                self.lbl_value.grid()
+                self.txt_value.config(width = 25)
+                self.txt_value.grid(column = 1, columnspan = 2, row = 5, padx = 5, pady = 0)
+
+                self.txt_seperator.grid_remove()
+
+                self.lbl_dataType.grid()
+                self.cbb_dataType.grid()
+
+        self.cbb_dataType.bind('<<ComboboxSelected>>', dataTypeChanged)
 
         self.lbl_result = Label(self.frame_editDirectly, text = "Result")
         self.lbl_result.place(x = 4, y = 130)
