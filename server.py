@@ -7,6 +7,8 @@ import os
 import threading
 import subprocess
 from winreg import *
+from tempfile import NamedTemporaryFile
+
 
 SERVER = ""
 PORT = 1234
@@ -116,15 +118,25 @@ class Client:
                     self.getRegFile()
                 elif flag == 'reggetval':
                     self.sendRegVal()
+                elif flag == 'regsetval':
+                    self.getSetRegVal()
+                elif flag == 'regdelval':
+                    self.getDelRegVal()
+                elif flag == 'regcreatekey':
+                    self.getCreateReyKey()
+                elif flag == 'regdelkey':
+                    self.getDelRegKey()
                 elif flag == 'close':
                     self.closeConnection()
-            except:
+            except socketutils.ConnectionClosed:
                 if self.conn == None:
                     print(f'{self.addr} \tClient closed. Exit thread')
                 else:
                     print(f'{self.addr} \tClient have unexpected error. Exit thread')
-                    # self.closeConnection()
+                    self.conn = None
                 break
+            except:
+                continue
 
 
     # dump func
@@ -135,6 +147,13 @@ class Client:
         self.buff.send(str(dump_size).encode() + self.DELIM)
         self.buff.send(dump)
         print(f'{self.addr} \tSent dump data. Size: {dump_size}')
+    
+    def recvDump(self): 
+        dump_size = int(self.buff.recv_until(self.DELIM).decode())
+        dump = self.buff.recv_size(dump_size)
+
+        print(f'\tReceived dump data, size: {dump_size}')
+        return pickle.loads(dump)
 
     # cmd func
     def getResultCMD(self, cmd, headers):
@@ -242,21 +261,95 @@ class Client:
                 break
             
     def getRegFile(self):
+        print(f'{self.addr} \tMERGE REG FILE')
         data = self.buff.recv_until(self.DELIM).decode()
-        print(data)
 
-        self.buff.send('OK'.encode() + self.DELIM)
+        try:
+            f = NamedTemporaryFile(mode = 'w', encoding = 'utf-16', delete = False)
+            f.write(data)
+            f.close()
+
+            res = subprocess.run(f'reg import \"{f.name}\"', shell = True, capture_output = True)
+            os.remove(f.name)
+            if res.stderr.decode().rstrip().find('ERROR') != -1:
+                raise Exception
+        except:
+            print(f'{self.addr} \tErr: merge registry file')
+            self.buff.send('ER'.encode() + self.DELIM)
+        else:
+            self.buff.send('OK'.encode() + self.DELIM)
+
+            
 
     def sendRegVal(self):
+        print(f'{self.addr} \tSEND REG VALUE')
         path = self.buff.recv_until(self.DELIM).decode()
         value = self.buff.recv_until(self.DELIM).decode()
 
-        hkey, key = path.split('\\', 1)
+        try:
+            hkey, key = path.split('\\', 1)
+            result = QueryValueEx(OpenKeyEx(getHKEY(hkey), key, 0, KEY_QUERY_VALUE), value)
+        except:
+            print(f'{self.addr} \tErr: send registry value')
+            self.sendDump(('ER'))
+        else:
+            self.sendDump(result)
         
-        result = QueryValueEx(OpenKeyEx(getHKEY(hkey), key), value)
-        self.sendDump(result)
-        
+    def getSetRegVal(self):
+        print(f'{self.addr} \tSET REG VALUE')
+        path = self.buff.recv_until(self.DELIM).decode()
+        value = self.buff.recv_until(self.DELIM).decode()
+        type = self.buff.recv_until(self.DELIM).decode()
+        data = self.recvDump()
 
+        try:
+            hkey, key = path.split('\\', 1)
+            SetValueEx(OpenKeyEx(getHKEY(hkey), key, 0, KEY_SET_VALUE), value, 0, getType(type), data)
+        except:
+            print(f'{self.addr} \tErr: set registry value')
+            self.buff.send('ER'.encode() + self.DELIM)
+        else:
+            self.buff.send('OK'.encode() + self.DELIM)
+
+    def getDelRegVal(self):
+        print(f'{self.addr} \tDEL REG VALUE')
+        path = self.buff.recv_until(self.DELIM).decode()
+        value = self.buff.recv_until(self.DELIM).decode()
+
+        try:
+            hkey, key = path.split('\\', 1)
+            DeleteValue(OpenKeyEx(getHKEY(hkey), key, 0, KEY_SET_VALUE), value)
+        except:
+            print(f'{self.addr} \tErr: delete registry value')
+            self.buff.send('ER'.encode() + self.DELIM)
+        else:
+            self.buff.send('OK'.encode() + self.DELIM)  
+
+    def getCreateReyKey(self):
+        print(f'{self.addr} \tCREATE REG KEY')
+        path = self.buff.recv_until(self.DELIM).decode()
+        hkey, key = path.split('\\', 1)
+
+        try:
+            CreateKeyEx(getHKEY(hkey), key, 0, KEY_CREATE_SUB_KEY)
+        except:
+            print(f'{self.addr} \tErr: create registry key')
+            self.buff.send('ER'.encode() + self.DELIM)
+        else:
+            self.buff.send('OK'.encode() + self.DELIM)
+
+    def getDelRegKey(self):
+        print(f'{self.addr} \tDEL REG KEY')
+        path = self.buff.recv_until(self.DELIM).decode()
+        hkey, key = path.split('\\', 1)
+
+        try:
+            DeleteKeyEx(getHKEY(hkey), key)
+        except:
+            print(f'{self.addr} \tErr: delete registry key')
+            self.buff.send('ER'.encode() + self.DELIM)
+        else:
+            self.buff.send('OK'.encode() + self.DELIM)
         
 
 def getHKEY(name):

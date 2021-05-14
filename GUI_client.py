@@ -545,6 +545,7 @@ class editRegistryGUI:
         selected_option = tk.StringVar()
         self.cbb_option = ttk.Combobox(self.frame_editDirectly, width = 61, textvariable = selected_option)
         self.cbb_option['values'] = self.options
+        self.cbb_option.current(1)
         self.cbb_option['state'] = 'readonly'  # normal
         self.cbb_option.grid(column = 0, row = 1, columnspan = 4, padx = 5, pady = 0)
 
@@ -640,8 +641,10 @@ class editRegistryGUI:
 
         self.dataTypes = ('String', 'Binary', 'DWORD', 'QWORD', 'Multi-String', 'Expandable String')
         selected_dataType = tk.StringVar()
-        self.cbb_dataType = ttk.Combobox(self.frame_editDirectly, width = 16, textvariable = selected_dataType)
+        self.cbb_dataType = ttk.Combobox(self.frame_editDirectly, width = 15, textvariable = selected_dataType)
+        self.cbb_dataType.set('default') # chưa hiện đc chữ default
         self.cbb_dataType['values'] = self.dataTypes
+        self.cbb_dataType.current(1)
         self.cbb_dataType['state'] = 'readonly'  # normal
         self.cbb_dataType.grid(column = 3, row = 5, padx = 5, pady = 0)
 
@@ -759,32 +762,58 @@ class editRegistryGUI:
         self.text_area.insert(INSERT, data)
 
     def sendReg(self):
-        if (self.service.sendRegFile(self.text_area.get(1.0, END)) == 'OK'):
-            pass
+        try:
+            check = self.service.sendRegFile(self.text_area.get(1.0, END))
+            if (check == 'ER'):
+                raise Exception
+            showinfo('Success', 'Merge registry successfully')
+        except:
+            showerror('Error', 'Unable to merge registry')
 
     def sendCommand(self):
-        # get value
-        if (self.cbb_option.get() == self.options[0]):
-            data = self.service.sendRegGetVal(self.txt_pathInput2.get(), self.txt_nameValue.get())
+        try:
+            if (self.cbb_option.get() == self.options[0]):
+                data = self.service.sendRegGetVal(self.txt_pathInput2.get(), self.txt_nameValue.get())
+                self.writeLog(self.txt_nameValue.get() + ': ' +str(data[0]))
 
-            self.result_area.config(state='normal')
-            self.result_area.insert(INSERT, str(data[0]))
-            self.result_area.config(state='disabled')
-            pass
+            elif (self.cbb_option.get() == self.options[1]):
+                data = self.txt_value.get()
+                type = self.cbb_dataType.get()
 
-        elif (self.cbb_option.get() == self.options[1]):
-            pass
-        elif (self.cbb_option.get() == self.options[2]):
-            pass
-        elif (self.cbb_option.get() == self.options[3]):
-            pass
-        elif (self.cbb_option.get() == self.options[4]):
-            pass
+                if type == self.dataTypes[1]:
+                    data = bytearray.fromhex(data)
+                elif type == self.dataTypes[2] or type == self.dataTypes[3]:
+                    data = int(data)
+                elif type == self.dataTypes[4]:
+                    data = data.split( '\\0')
+
+                self.service.sendRegSetVal(self.txt_pathInput2.get(), self.txt_nameValue.get(), data, type)
+                self.writeLog('Set value successfully')
+
+            elif (self.cbb_option.get() == self.options[2]):
+                self.service.sendRegDeVal(self.txt_pathInput2.get(), self.txt_nameValue.get())
+                self.writeLog('Delete value successfully')
+                
+            elif (self.cbb_option.get() == self.options[3]):
+                self.service.sendRegCreateKey(self.txt_pathInput2.get())
+                self.writeLog('Create key successfully')
+                pass
+            elif (self.cbb_option.get() == self.options[4]):
+                self.service.sendRegDelKey(self.txt_pathInput2.get())
+                self.writeLog('Delete key successfully')
+                pass
+        except:
+            self.writeLog('Error')
 
     def clearLog(self):
         self.result_area.config(state = 'normal')
         self.result_area.delete(1.0, END)
         self.result_area.config(state = 'disabled')
+
+    def writeLog(self, data):
+        self.result_area.config(state='normal')
+        self.result_area.insert(INSERT, data + '\n')
+        self.result_area.config(state='disabled')
 
 window_client = Tk()
 a = ClientGUI(window_client)

