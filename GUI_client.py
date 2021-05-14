@@ -123,9 +123,9 @@ class ClientGUI:
         window_keystroke.mainloop()
 
     def editRegistry(self):
-        # if self.services == None:
-        #     showerror(title = 'Error', message = 'Not connected to the server.')
-        #     return        
+        if self.services == None:
+            showerror(title = 'Error', message = 'Not connected to the server.')
+            return        
         window_editRegistry = Toplevel()
         editRegistryGUI(window_editRegistry, self.services)
         center(window_editRegistry)
@@ -169,13 +169,22 @@ class screenshotGUI:
     def capture(self):
         self.image = self.services.getScreenShot()
 
-        imageShow = self.image.resize((600, 400), Image.ANTIALIAS)
-        self.render = ImageTk.PhotoImage(imageShow)
-        self.canvas.itemconfig(self.imgOnCanvas, image = self.render)
+        try:
+            imageShow = self.image.resize((600, 400), Image.ANTIALIAS)
+            self.render = ImageTk.PhotoImage(imageShow)
+            self.canvas.itemconfig(self.imgOnCanvas, image = self.render)
+        except:
+            showerror("Error", "Unable to get screenshot", parent = self.master)
 
     def save(self):
-        f = asksaveasfilename(initialfile = 'screenshot.png', defaultextension=".png",filetypes=[("PNG Files", "*.png")])
-        self.image.save(f)
+        print('SAVE SCREENSHOT')
+        try:
+            f = asksaveasfilename(initialfile = 'screenshot.png', defaultextension=".png",filetypes=[("PNG Files", "*.png")], parent = self.master)
+            print('\tPath: ' + f)
+            
+            self.image.save(f)
+        except:
+            print('\tErr: Unable to save screenshot')
 
 class runningProcessGUI:
     def __init__(self, master, services):
