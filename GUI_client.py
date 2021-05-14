@@ -230,6 +230,7 @@ class runningProcessGUI:
 
         window_killProcess = Toplevel()
         killProcessGUI(window_killProcess, parent, self.services, uid)
+        center(window_killProcess)
         window_killProcess.mainloop()
 
     def insert(self, data):
@@ -247,6 +248,7 @@ class runningProcessGUI:
     def start(self, parent):
         window_startProcess = Toplevel()
         startProcessGUI(window_startProcess, parent, self.services)
+        center(window_startProcess)
         window_startProcess.mainloop()
 
 class killProcessGUI:
@@ -254,7 +256,6 @@ class killProcessGUI:
         self.services = services
         self.master = master
         self.master.title("Kill")
-        center(self.master)
         self.master.focus()
         self.master.grab_set()
         self.master['padx'] = 10
@@ -295,7 +296,6 @@ class startProcessGUI:
         self.master = master
         self.master.title("Start")
         # self.master.geometry('400x200')
-        center(self.master)
         self.master.focus()
         self.master.grab_set()
         self.master['padx'] = 10
@@ -335,7 +335,6 @@ class runningAppGUI:
         self.master = master
         self.master.title("Running app")
         # self.master.geometry('300x200')
-        center(self.master)
         self.master.focus()
         self.master.grab_set()
         self.master['padx'] = 10
@@ -386,6 +385,7 @@ class runningAppGUI:
     def kill(self):
         window_killApp = Toplevel()
         killAppGUI(window_killApp, self.buff)
+        center(window_killApp)
         window_killApp.mainloop()
     def show(self):
         pass
@@ -394,6 +394,7 @@ class runningAppGUI:
     def start(self):
         window_startApp = Toplevel()
         startAppGUI(window_startApp, self.buff)
+        center(window_startApp)
         window_startApp.mainloop()
 
 class killAppGUI:
@@ -402,7 +403,6 @@ class killAppGUI:
         self.master = master
         self.master.title("Kill")
         # self.master.geometry('400x200')
-        center(self.master)
         self.master.focus()
         self.master.grab_set()
         self.master['padx'] = 10
@@ -431,7 +431,6 @@ class startAppGUI:
         self.master = master
         self.master.title("Start")
         # self.master.geometry('400x200')
-        center(self.master)
         self.master.focus()
         self.master.grab_set()
         self.master['padx'] = 10
@@ -460,7 +459,6 @@ class keystrokeGUI:
         self.master = master
         self.master.title("Keystroke")
         # self.master.geometry('300x200')
-        center(self.master)
         self.master.focus()
         self.master.grab_set()
         self.master['padx'] = 10
@@ -522,7 +520,6 @@ class editRegistryGUI:
         self.master = master
         self.master.title("Edit registry")
         self.master.geometry('430x637')
-        center(self.master)
         self.master.resizable(0, 0)
         self.master.focus()
         self.master.grab_set()
