@@ -8,6 +8,18 @@ import client
 from tkinter.filedialog import asksaveasfilename, askopenfilename
 from functools import partial
 
+def center(toplevel):
+    toplevel.update_idletasks()
+
+    screen_width = toplevel.winfo_screenwidth()
+    screen_height = toplevel.winfo_screenheight()
+
+    size = tuple(int(_) for _ in toplevel.geometry().split('+')[0].split('x'))
+    x = screen_width/2 - size[0]/2
+    y = screen_height/2 - size[1]/2
+
+    toplevel.geometry("+%d+%d" % (x, y))
+
 class ClientGUI:
     def __init__(self, master):
         self.services = None
@@ -77,8 +89,9 @@ class ClientGUI:
             showerror(title = 'Error', message = 'Not connected to the server.')
             return
 
-        window_screenshot = Toplevel()
+        window_screenshot = Toplevel(self.master)
         screenshotGUI(window_screenshot, self.services)
+        center(window_screenshot)
         window_screenshot.mainloop()
 
     def runningProcess(self):
@@ -86,8 +99,9 @@ class ClientGUI:
             showerror(title = 'Error', message = 'Not connected to the server.')
             return        
 
-        window_runningProcess = Toplevel()
+        window_runningProcess = Toplevel(self.master)
         runningProcessGUI(window_runningProcess, self.services)
+        center(window_runningProcess)
         window_runningProcess.mainloop()
 
     def runningApp(self):
@@ -96,6 +110,7 @@ class ClientGUI:
             return        
         window_runningApp = Toplevel()
         runningAppGUI(window_runningApp, self.services)
+        center(window_runningApp)
         window_runningApp.mainloop()
 
     def keystroke(self):
@@ -104,6 +119,7 @@ class ClientGUI:
             return        
         window_keystroke = Toplevel()
         keystrokeGUI(window_keystroke, self.services)
+        center(window_keystroke)
         window_keystroke.mainloop()
 
     def editRegistry(self):
@@ -112,6 +128,7 @@ class ClientGUI:
         #     return        
         window_editRegistry = Toplevel()
         editRegistryGUI(window_editRegistry, self.services)
+        center(window_editRegistry)
         window_editRegistry.mainloop()
     def shutdown(self):
         showinfo(title='Shutdown', message='Shutdown request sent.')
@@ -196,7 +213,7 @@ class runningProcessGUI:
         self.tree.heading('#2', text='Process ID')
         self.tree.heading('#3', text='Thread Count')
 
-        # generate sample data
+        # add data
         self.insert(self.services.getProcessList())
 
         self.tree.grid(row = 1, rowspan = 1, column = 0, padx = 0, pady = 5, columnspan = 4, sticky='nsew')
@@ -237,7 +254,7 @@ class killProcessGUI:
         self.services = services
         self.master = master
         self.master.title("Kill")
-        
+        center(self.master)
         self.master.focus()
         self.master.grab_set()
         self.master['padx'] = 10
@@ -278,6 +295,7 @@ class startProcessGUI:
         self.master = master
         self.master.title("Start")
         # self.master.geometry('400x200')
+        center(self.master)
         self.master.focus()
         self.master.grab_set()
         self.master['padx'] = 10
@@ -317,6 +335,7 @@ class runningAppGUI:
         self.master = master
         self.master.title("Running app")
         # self.master.geometry('300x200')
+        center(self.master)
         self.master.focus()
         self.master.grab_set()
         self.master['padx'] = 10
@@ -383,6 +402,7 @@ class killAppGUI:
         self.master = master
         self.master.title("Kill")
         # self.master.geometry('400x200')
+        center(self.master)
         self.master.focus()
         self.master.grab_set()
         self.master['padx'] = 10
@@ -411,6 +431,7 @@ class startAppGUI:
         self.master = master
         self.master.title("Start")
         # self.master.geometry('400x200')
+        center(self.master)
         self.master.focus()
         self.master.grab_set()
         self.master['padx'] = 10
@@ -439,6 +460,7 @@ class keystrokeGUI:
         self.master = master
         self.master.title("Keystroke")
         # self.master.geometry('300x200')
+        center(self.master)
         self.master.focus()
         self.master.grab_set()
         self.master['padx'] = 10
@@ -500,6 +522,7 @@ class editRegistryGUI:
         self.master = master
         self.master.title("Edit registry")
         self.master.geometry('430x637')
+        center(self.master)
         self.master.resizable(0, 0)
         self.master.focus()
         self.master.grab_set()
@@ -542,10 +565,10 @@ class editRegistryGUI:
         self.lbl_option.grid(column = 0, row = 0, padx = 2, pady = 0, sticky = tk.SW)
 
         self.options = ('Get value', 'Set value', 'Delete value', 'Create key', 'Delete key')
-        selected_option = tk.StringVar()
-        self.cbb_option = ttk.Combobox(self.frame_editDirectly, width = 61, textvariable = selected_option)
+        self.selected_option = tk.StringVar()
+        self.cbb_option = ttk.Combobox(self.frame_editDirectly, width = 61, textvariable = self.selected_option)
         self.cbb_option['values'] = self.options
-        self.cbb_option.current(1)
+        self.cbb_option.current(0)
         self.cbb_option['state'] = 'readonly'  # normal
         self.cbb_option.grid(column = 0, row = 1, columnspan = 4, padx = 5, pady = 0)
 
@@ -566,14 +589,16 @@ class editRegistryGUI:
                 self.lbl_nameValue.grid()
                 self.txt_nameValue.grid()
 
-                self.lbl_value.grid()
-                self.txt_value.grid()
+                self.lbl_value.grid(column = 1, row = 4, padx = 2, pady = 0, sticky = tk.SW)
+                self.txt_value.grid(column = 1, columnspan = 2, row = 5, padx = 5, pady = 0)
 
-                self.lbl_dataType.grid()
-                self.cbb_dataType.grid()
+                self.lbl_dataType.grid(column = 3, row = 4, padx = 2, pady = 0, sticky = tk.SW)
+                self.cbb_dataType.grid(column = 3, row = 5, padx = 5, pady = 0)
 
                 if(self.cbb_dataType.get() == self.dataTypes[4]):
                     self.txt_value.config(width = 19)
+                    self.txt_value.grid_remove()
+                    self.txt_value.grid(column = 1, columnspan = 1, row = 5, padx = 5, pady = 0)
                     self.txt_seperator.grid(column = 2, row = 5, padx = 5, pady = 0)
 
             if(self.cbb_option.get() == self.options[2]):
@@ -627,26 +652,26 @@ class editRegistryGUI:
         self.txt_nameValue.grid(column = 0, row = 5, padx = 5, pady = 0, sticky = tk.W)
 
         self.lbl_value = Label(self.frame_editDirectly, text = "Value")
-        self.lbl_value.grid(column = 1, row = 4, padx = 2, pady = 0, sticky = tk.SW)
+        # self.lbl_value.grid(column = 1, row = 4, padx = 2, pady = 0, sticky = tk.SW)
 
         self.txt_value = Entry(self.frame_editDirectly, width = 25)
-        self.txt_value.grid(column = 1, columnspan = 2, row = 5, padx = 5, pady = 0)
+        # self.txt_value.grid(column = 1, columnspan = 2, row = 5, padx = 5, pady = 0)
 
         self.txt_seperator = Entry(self.frame_editDirectly, width = 3)
         self.txt_seperator.insert(-1, ';')
         # self.txt_seperator.grid(column = 2, row = 5, padx = 5, pady = 0)
 
         self.lbl_dataType = Label(self.frame_editDirectly, text = "Data type")
-        self.lbl_dataType.grid(column = 3, row = 4, padx = 2, pady = 0, sticky = tk.SW)
+        # self.lbl_dataType.grid(column = 3, row = 4, padx = 2, pady = 0, sticky = tk.SW)
 
         self.dataTypes = ('String', 'Binary', 'DWORD', 'QWORD', 'Multi-String', 'Expandable String')
-        selected_dataType = tk.StringVar()
-        self.cbb_dataType = ttk.Combobox(self.frame_editDirectly, width = 15, textvariable = selected_dataType)
+        self.selected_dataType = tk.StringVar()
+        self.cbb_dataType = ttk.Combobox(self.frame_editDirectly, width = 16, textvariable = self.selected_dataType)
         self.cbb_dataType.set('default') # chưa hiện đc chữ default
         self.cbb_dataType['values'] = self.dataTypes
-        self.cbb_dataType.current(1)
+        self.cbb_dataType.current(0)
         self.cbb_dataType['state'] = 'readonly'  # normal
-        self.cbb_dataType.grid(column = 3, row = 5, padx = 5, pady = 0)
+        # self.cbb_dataType.grid(column = 3, row = 5, padx = 5, pady = 0)
 
         def dataTypeChanged(event):
             if(self.cbb_dataType.get() == self.dataTypes[0]):
@@ -817,4 +842,5 @@ class editRegistryGUI:
 
 window_client = Tk()
 a = ClientGUI(window_client)
+center(window_client)
 window_client.mainloop()
