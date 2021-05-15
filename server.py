@@ -31,16 +31,23 @@ class ServerServices:
 
     def stopServices(self):
         print('STOP SERVER')
-        for client in self.clients:
-            if client.conn != None:
-                client.closeConnection()
+        
+        try:
+            for client in self.clients:
+                if client.conn != None:
+                    client.closeConnection()
+        except:
+            pass
         
         # tránh lỗi trên cell
-        server = self.server
-        self.server = None
-        server.close()
+        try:
+            server = self.server
+            self.server = None
+            server.close()
 
-        self.server_thread.join()
+            self.server_thread.join()
+        except:
+            self.server = None
 
 
     # create socket
@@ -65,9 +72,10 @@ class ServerServices:
                 if self.server == None:
                     print('Server stopped. Exit thread')
                 else:
+                    self.server = None
                     print('Server have unexpected error. Exit thread')
-                    # self.stopServices()
                 break
+
             
     
 

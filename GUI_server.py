@@ -21,11 +21,12 @@ class Server_GUI:
             try:
                 self.services = server.ServerServices()
                 self.services.startServices()
-
-                self.btn_start.config(text = "Stop Server")
             except:
                 print('Cannot create server')
                 self.services = None
+            finally:
+                self.btn_start.config(text = f"Stop Server")
+
         else:
             self.services.stopServices()
             self.services = None

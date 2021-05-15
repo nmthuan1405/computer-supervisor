@@ -8,6 +8,8 @@ import client
 from tkinter.filedialog import asksaveasfilename, askopenfilename
 from functools import partial
 
+windowsGlo = list()
+
 def center(toplevel):
     toplevel.update_idletasks()
 
@@ -22,6 +24,7 @@ def center(toplevel):
 
 class ClientGUI:
     def __init__(self, master):
+        master.report_callback_exception = self.report_callback_exception
         self.services = None
         self.master = master
         self.master.title("Client")
@@ -66,6 +69,15 @@ class ClientGUI:
 
         self.btn_exit = Button(self.master, text = "Exit", width = 10, command = self.exit)
         self.btn_exit.grid(column = 1, row = 8, sticky = tk.N, pady = 5, ipadx = 20, ipady = 8)
+    
+    def report_callback_exception(self, *args):
+        self.services = None
+        for windows in windowsGlo:
+            windows.destroy()
+
+        self.txt_IP_input.config(state = 'normal')
+        self.btn_connect.config(text = 'Connect')
+        showerror(title = 'Error', message = 'Lost connection')
     
     def connect(self):
         if self.services == None:
@@ -136,7 +148,7 @@ class ClientGUI:
         editRegistryGUI(window_editRegistry, self.services)
         center(window_editRegistry)
         window_editRegistry.mainloop()
-        
+
     def shutdown(self):
         self.services.sendShutdown()
         showinfo(title='Shutdown', message='Shutdown request sent.', parent = self.master)
@@ -146,6 +158,7 @@ class ClientGUI:
     
 class screenshotGUI:
     def __init__(self, master, services):
+        windowsGlo.append(master)
         self.master = master
         self.services = services
         self.image = None
