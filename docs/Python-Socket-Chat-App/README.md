@@ -1,2 +1,0 @@
-# Python-Socket-Chat-App
-

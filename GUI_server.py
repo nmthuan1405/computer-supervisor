@@ -1,5 +1,5 @@
 from tkinter import *
-from tkinter.messagebox import askokcancel
+from tkinter.messagebox import askokcancel, showerror
 import server
 
 
@@ -22,12 +22,16 @@ class Server_GUI:
                 self.services = server.ServerServices()
                 self.services.startServices()
             except:
-                print('Cannot create server')
                 self.services = None
-            finally:
-                self.btn_start.config(text = f"Stop Server")
+                showerror('Error', 'Cannot create server', parent = self.master)
+            else:
+                self.btn_start.config(text = "Stop Server")
 
         else:
+            count = self.services.clientCount()
+            if count > 0 and not askokcancel("Stop", f"{count} client(s) is connecting.\nDo you really want to stop server?"):
+                return
+
             self.services.stopServices()
             self.services = None
 
@@ -36,6 +40,11 @@ class Server_GUI:
     def on_closing(self):
         if self.services != None:
             if askokcancel("Quit", "Server is running.\nDo you want to quit?"):
+                count = self.services.clientCount()
+                
+                if count > 0 and not askokcancel("Stop", f"{count} client(s) is connecting.\nDo you really want to exit?"):
+                    return
+
                 self.services.stopServices()
             else:
                 return

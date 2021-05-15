@@ -21,6 +21,12 @@ class ServerServices:
         self.server = None
         self.server_thread = None
 
+    def clientCount(self):
+        count = 0
+        for client in self.clients:
+                if client.conn != None:
+                    count += 1
+        return count
 
     def startServices(self):
         print('START SERVER')
@@ -43,6 +49,7 @@ class ServerServices:
         try:
             server = self.server
             self.server = None
+            server.shutdown(socket.SHUT_RDWR)
             server.close()
 
             self.server_thread.join()
@@ -101,6 +108,7 @@ class Client:
 
         conn = self.conn
         self.conn = None
+        conn.shutdown(socket.SHUT_RDWR)
         conn.close()
 
         self.client_thread.join()
@@ -142,15 +150,15 @@ class Client:
                     self.getShutdown() 
                 elif flag == 'close':
                     self.closeConnection()
-            except socketutils.ConnectionClosed:
+
+            except:
                 if self.conn == None:
                     print(f'{self.addr} \tClient closed. Exit thread')
                 else:
-                    print(f'{self.addr} \tClient have unexpected error. Exit thread')
                     self.conn = None
+                    print(f'{self.addr} \tClient have unexpected error. Exit thread')
                 break
-            except:
-                continue
+
 
 
     # dump func

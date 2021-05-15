@@ -1,11 +1,10 @@
-from curses import window
+import client
 import tkinter as tk
 from tkinter import ttk
 from tkinter import *
-from tkinter.messagebox import showerror, showinfo
+from tkinter.messagebox import showerror, showinfo, askokcancel
 from tkinter import scrolledtext
 from PIL import ImageTk, Image
-import client
 from tkinter.filedialog import asksaveasfilename, askopenfilename
 from functools import partial
 
@@ -13,6 +12,7 @@ windowsGlo = list()
 
 def center(toplevel):
     toplevel.update_idletasks()
+
 
     screen_width = toplevel.winfo_screenwidth()
     screen_height = toplevel.winfo_screenheight()
@@ -70,6 +70,8 @@ class ClientGUI:
 
         self.btn_exit = Button(self.master, text = "Exit", width = 10, command = self.exit)
         self.btn_exit.grid(column = 1, row = 8, sticky = tk.N, pady = 5, ipadx = 20, ipady = 8)
+
+        self.master.protocol("WM_DELETE_WINDOW", self.exit)
     
     def report_callback_exception(self, *args):
         self.services = None
@@ -155,6 +157,12 @@ class ClientGUI:
         showinfo(title='Shutdown', message='Shutdown request sent.', parent = self.master)
 
     def exit(self):
+        if self.services != None:
+            if not askokcancel("Exit", "Client is connecting.\nDo you want to disconnect?"):
+                return
+            
+            self.services.sendCloseConection()
+            
         self.master.destroy()
     
 class screenshotGUI:
