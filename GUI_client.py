@@ -110,7 +110,7 @@ class ClientGUI:
         window_runningProcess.mainloop()
 
     def runningApp(self):
-        if self.buff == None:
+        if self.services == None:
             showerror(title = 'Error', message = 'Not connected to the server.', parent = self.master)
             return        
         window_runningApp = Toplevel()
@@ -370,16 +370,16 @@ class runningAppGUI:
         self.master['padx'] = 10
         self.master['pady'] = 10
 
-        self.btn_kill = Button(self.master, text = "Kill", width = 10, command = self.kill)
+        self.btn_kill = Button(self.master, text = "Kill", width = 10, command = partial(self.kill, self.master))
         self.btn_kill.grid(column = 0, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
 
-        self.btn_show = Button(self.master, text = "Show", width = 10, command = self.show)
+        self.btn_show = Button(self.master, text = "Refresh", width = 10, command = self.refresh)
         self.btn_show.grid(column = 1, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
 
-        self.btn_hide = Button(self.master, text = "Hide", width = 10, command = self.hide)
+        self.btn_hide = Button(self.master, text = "Clear", width = 10, command = self.clear)
         self.btn_hide.grid(column = 2, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
 
-        self.btn_start = Button(self.master, text = "Start", width = 10, command = self.start)
+        self.btn_start = Button(self.master, text = "Start", width = 10, command = partial(self.start, self.master))
         self.btn_start.grid(column = 3, row = 0, sticky = tk.N, padx = 5, pady = 5, ipady = 10)
 
         # columns
@@ -387,8 +387,8 @@ class runningAppGUI:
         self.tree = ttk.Treeview(self.master, columns = columns, show = 'headings', height = 20)
 
         #config column width
-        self.tree.column("#1", minwidth = 50, width = 200)
-        self.tree.column("#2", minwidth = 50, width = 70)
+        self.tree.column("#1", minwidth = 50, width = 180)
+        self.tree.column("#2", minwidth = 50, width = 90)
         self.tree.column("#3", minwidth = 50, width = 90)
 
         # define headings
@@ -396,40 +396,49 @@ class runningAppGUI:
         self.tree.heading('#2', text='Application ID')
         self.tree.heading('#3', text='Thread Count')
 
-        # generate sample data
-        contacts = []
-        for n in range(1, 100):
-            contacts.append((f'Application {n}', f'ID {n}', f'{n}'))
-        
-        # adding data to the treeview
-        for contact in contacts:
-            self.tree.insert('', tk.END, values = contact)
-
         self.tree.grid(row = 1, rowspan = 1, column = 0, padx = 0, pady = 5, columnspan = 4, sticky='nsew')
-
         # add a scrollbar
         self.scrollbar = ttk.Scrollbar(self.master, orient = tk.VERTICAL, command = self.tree.yview)
         self.tree.configure(yscroll = self.scrollbar.set)
         self.scrollbar.grid(row = 1, column = 4, padx = 0, pady = 5, sticky = 'ns')
+        
+        # add data
+        self.insert(self.services.getAppList())
 
-    def kill(self):
+    def insert(self, data):
+        try:
+            for line in data:
+                self.tree.insert('', tk.END, values = line)
+        except:
+            print('Error: Unable to get app list')
+            self.clear()
+
+    def kill(self, parent):
+        uid = self.tree.item(self.tree.focus())['values']
+        if uid != '':
+            uid = uid[1]
+
         window_killApp = Toplevel()
-        killAppGUI(window_killApp, self.buff)
+        killAppGUI(window_killApp, parent, self.services, uid)
         center(window_killApp)
         window_killApp.mainloop()
-    def show(self):
-        pass
-    def hide(self):
-        pass
-    def start(self):
+    def refresh(self):
+        self.clear()
+        self.insert(self.services.getAppList())
+
+    def clear(self):
+        for row in self.tree.get_children():
+            self.tree.delete(row)
+
+    def start(self, parent):
         window_startApp = Toplevel()
-        startAppGUI(window_startApp, self.buff)
+        startAppGUI(window_startApp, parent, self.services)
         center(window_startApp)
         window_startApp.mainloop()
 
 class killAppGUI:
-    def __init__(self, master, buff):
-        self.buff = buff
+    def __init__(self, master, parent, services, uid):
+        self.services = services
         self.master = master
         self.master.title("Kill")
         # self.master.geometry('400x200')
@@ -437,6 +446,8 @@ class killAppGUI:
         self.master.grab_set()
         self.master['padx'] = 10
         self.master['pady'] = 10
+
+        self.parent = parent
 
         self.master.columnconfigure(0, weight=1)
         self.master.columnconfigure(1, weight=2)
@@ -446,6 +457,7 @@ class killAppGUI:
         self.lbl_ID_input.grid(column = 0, row = 0, sticky = tk.W, padx = 0, pady = 0)
 
         self.txt_ID_input = Entry(self.master)
+        self.txt_ID_input.insert(-1, uid)
         self.txt_ID_input.focus()
         self.txt_ID_input.grid(column = 1, row = 0, sticky = tk.W, padx = 10, pady = 0)
 
@@ -454,15 +466,25 @@ class killAppGUI:
 
         self.master.bind('<Return>', self.callback)
 
+        self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+    def on_closing(self):
+        self.master.destroy()
+        self.parent.focus()
+        self.parent.grab_set()
+
     def killApp(self):
-        pass
+        if (self.services.sendKillApp(self.txt_ID_input.get()) == 'OK'):
+            showinfo("Sucess", "Kill application successful !", parent = self.master)
+        else:
+            showerror("Error", "Unable to kill this application", parent = self.master)
 
     def callback(self, event):
         self.killApp()
 
 class startAppGUI:
-    def __init__(self, master, buff):
-        self.buff = buff
+    def __init__(self, master, parent, services):
+        self.services = services
         self.master = master
         self.master.title("Start")
         # self.master.geometry('400x200')
@@ -470,6 +492,8 @@ class startAppGUI:
         self.master.grab_set()
         self.master['padx'] = 10
         self.master['pady'] = 10
+
+        self.parent = parent
 
         self.master.columnconfigure(0, weight=1)
         self.master.columnconfigure(1, weight=2)
@@ -487,8 +511,18 @@ class startAppGUI:
 
         self.master.bind('<Return>', self.callback)
 
+        self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+    def on_closing(self):
+        self.master.destroy()
+        self.parent.focus()
+        self.parent.grab_set()
+
     def startApp(self):
-        pass
+        if (self.services.sendStartApp(self.txt_ID_input.get()) == 'OK'):
+            showinfo("Sucess", "Start application successful !", parent = self.master)
+        else:
+            showerror("Error", "Unable to start this application", parent = self.master)
 
     def callback(self, event):
         self.startApp()
