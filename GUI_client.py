@@ -72,13 +72,14 @@ class ClientGUI:
             try:
                 self.services = client.ClientServices(self.txt_IP_input.get())
                 self.services.connectServer()
-
-                self.txt_IP_input.config(state = 'disabled')
-                self.btn_connect.config(text = 'Disconnect')
-                showinfo("Sucess", "Connect to server sucessfully", parent = self.master)
             except:
                 showerror(title = 'Error', message = 'Cannot connect to server.', parent = self.master)
                 self.services = None
+            else:
+                self.txt_IP_input.config(state = 'disabled')
+                self.btn_connect.config(text = 'Disconnect')
+                showinfo("Sucess", "Connect to server sucessfully", parent = self.master)
+        
         else:
             self.services.sendCloseConection()
             self.services = None
@@ -135,7 +136,9 @@ class ClientGUI:
         editRegistryGUI(window_editRegistry, self.services)
         center(window_editRegistry)
         window_editRegistry.mainloop()
+        
     def shutdown(self):
+        self.services.sendShutdown()
         showinfo(title='Shutdown', message='Shutdown request sent.', parent = self.master)
 
     def exit(self):
@@ -403,12 +406,17 @@ class runningAppGUI:
         self.scrollbar.grid(row = 1, column = 4, padx = 0, pady = 5, sticky = 'ns')
         
         # add data
-        self.insert(self.services.getAppList())
+        self.insert()
 
-    def insert(self, data):
+    def insert(self):
+        uidApp = self.services.getAppList()
+        process = self.services.getProcessList()
+
         try:
-            for line in data:
-                self.tree.insert('', tk.END, values = line)
+            for line in process:
+                if line[1] in uidApp:
+                    self.tree.insert('', tk.END, values = line)
+
         except:
             print('Error: Unable to get app list')
             self.clear()
@@ -418,13 +426,18 @@ class runningAppGUI:
         if uid != '':
             uid = uid[1]
 
+        listApp = []
+        for line in self.tree.get_children():
+            listApp.append(str(self.tree.item(line)['values'][1]))
+
         window_killApp = Toplevel()
-        killAppGUI(window_killApp, parent, self.services, uid)
+        killAppGUI(window_killApp, parent, self.services, uid, listApp)
         center(window_killApp)
         window_killApp.mainloop()
+
     def refresh(self):
         self.clear()
-        self.insert(self.services.getAppList())
+        self.insert()
 
     def clear(self):
         for row in self.tree.get_children():
@@ -437,9 +450,10 @@ class runningAppGUI:
         window_startApp.mainloop()
 
 class killAppGUI:
-    def __init__(self, master, parent, services, uid):
+    def __init__(self, master, parent, services, uid, listApp):
         self.services = services
         self.master = master
+        self.listApp = listApp
         self.master.title("Kill")
         # self.master.geometry('400x200')
         self.master.focus()
@@ -474,7 +488,12 @@ class killAppGUI:
         self.parent.grab_set()
 
     def killApp(self):
-        if (self.services.sendKillApp(self.txt_ID_input.get()) == 'OK'):
+        print(self.listApp)
+        uid = self.txt_ID_input.get()
+        if uid not in self.listApp:
+            uid = ''
+
+        if (self.services.sendKillProcess(uid) == 'OK'):
             showinfo("Sucess", "Kill application successful !", parent = self.master)
         else:
             showerror("Error", "Unable to kill this application", parent = self.master)
@@ -519,7 +538,7 @@ class startAppGUI:
         self.parent.grab_set()
 
     def startApp(self):
-        if (self.services.sendStartApp(self.txt_ID_input.get()) == 'OK'):
+        if (self.services.sendStartProcess(self.txt_ID_input.get()) == 'OK'):
             showinfo("Sucess", "Start application successful !", parent = self.master)
         else:
             showerror("Error", "Unable to start this application", parent = self.master)
@@ -559,14 +578,14 @@ class keystrokeGUI:
         self.services.keylogger_Start()
 
     def hook(self):
-        self.services.keylogger_Command('hook')
-
-        self.btn_hook.config(state = 'disabled')
-        self.btn_unhook.config(state = 'normal')
+        if self.services.keylogger_CommandHook() == 'OK':
+            self.btn_hook.config(state = 'disabled')
+            self.btn_unhook.config(state = 'normal')
+        else:
+            showerror("Error", "Unable to hook key", parent = self.master)
 
     def unhook(self):
         self.services.keylogger_Command('unhook')
-
         self.btn_hook.config(state = 'normal')
         self.btn_unhook.config(state = 'disabled')
 
@@ -919,7 +938,6 @@ class editRegistryGUI:
             else:
                 self.writeLog('Unable to delete key')
             
-
     def clearLog(self):
         self.result_area.config(state = 'normal')
         self.result_area.delete(1.0, END)
@@ -931,7 +949,9 @@ class editRegistryGUI:
         self.result_area.config(state='disabled')
         self.result_area.see('end')
 
+
+
 window_client = Tk()
-a = ClientGUI(window_client)
+ClientGUI(window_client)
 center(window_client)
 window_client.mainloop()

