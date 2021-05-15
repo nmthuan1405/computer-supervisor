@@ -1,3 +1,4 @@
+from curses import window
 import tkinter as tk
 from tkinter import ttk
 from tkinter import *
@@ -186,6 +187,11 @@ class screenshotGUI:
         self.btn_save.grid(column = 2, row = 1, sticky = tk.W, padx = 5, pady = 5, ipadx = 8, ipady = 40)
         
         self.capture()
+        self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+    def on_closing(self):
+        self.master.destroy()
+        windowsGlo.remove(self.master)
 
     def capture(self):
         self.image = self.services.getScreenShot()
@@ -209,6 +215,7 @@ class screenshotGUI:
 
 class runningProcessGUI:
     def __init__(self, master, services):
+        windowsGlo.append(master)
         self.master = master
         self.services = services
         self.master.title("Running process")
@@ -253,6 +260,12 @@ class runningProcessGUI:
         # add data
         self.insert(self.services.getProcessList())
 
+        self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+    def on_closing(self):
+        self.master.destroy()
+        windowsGlo.remove(self.master)
+
     def insert(self, data):
         try:
             for line in data:
@@ -287,6 +300,7 @@ class runningProcessGUI:
 
 class killProcessGUI:
     def __init__(self, master, parent, services, uid):
+        windowsGlo.append(master)
         self.services = services
         self.master = master
         self.master.title("Kill")
@@ -320,6 +334,7 @@ class killProcessGUI:
         self.master.destroy()
         self.parent.focus()
         self.parent.grab_set()
+        windowsGlo.remove(self.master)
 
     def killProcess(self):
         if (self.services.sendKillProcess(self.txt_ID_input.get()) == 'OK'):
@@ -332,6 +347,7 @@ class killProcessGUI:
 
 class startProcessGUI:
     def __init__(self, master, parent, services):
+        windowsGlo.append(master)
         self.services = services
         self.master = master
         self.master.title("Start")
@@ -365,6 +381,7 @@ class startProcessGUI:
         self.master.destroy()
         self.parent.focus()
         self.parent.grab_set()
+        windowsGlo.remove(self.master)
 
     def startProcess(self):
         if (self.services.sendStartProcess(self.txt_ID_input.get()) == 'OK'):
@@ -377,6 +394,7 @@ class startProcessGUI:
 
 class runningAppGUI:
     def __init__(self, master, services):
+        windowsGlo.append(master)
         self.services = services
         self.master = master
         self.master.title("Running app")
@@ -421,6 +439,12 @@ class runningAppGUI:
         # add data
         self.insert()
 
+        self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+    def on_closing(self):
+        self.master.destroy()
+        windowsGlo.remove(self.master)
+
     def insert(self):
         uidApp = self.services.getAppList()
         process = self.services.getProcessList()
@@ -464,6 +488,7 @@ class runningAppGUI:
 
 class killAppGUI:
     def __init__(self, master, parent, services, uid, listApp):
+        windowsGlo.append(master)
         self.services = services
         self.master = master
         self.listApp = listApp
@@ -499,6 +524,7 @@ class killAppGUI:
         self.master.destroy()
         self.parent.focus()
         self.parent.grab_set()
+        windowsGlo.remove(self.master)
 
     def killApp(self):
         print(self.listApp)
@@ -516,6 +542,7 @@ class killAppGUI:
 
 class startAppGUI:
     def __init__(self, master, parent, services):
+        windowsGlo.append(master)
         self.services = services
         self.master = master
         self.master.title("Start")
@@ -549,6 +576,7 @@ class startAppGUI:
         self.master.destroy()
         self.parent.focus()
         self.parent.grab_set()
+        windowsGlo.remove(self.master)
 
     def startApp(self):
         if (self.services.sendStartProcess(self.txt_ID_input.get()) == 'OK'):
@@ -561,6 +589,7 @@ class startAppGUI:
 
 class keystrokeGUI:
     def __init__(self, master, services):
+        windowsGlo.append(master)
         self.services = services
         self.master = master
         self.master.title("Keystroke")
@@ -587,8 +616,14 @@ class keystrokeGUI:
         self.text_area.grid(column = 0, row = 1, columnspan = 4, pady = 10)
         self.text_area['state'] = 'disabled'
 
-        self.master.protocol("WM_DELETE_WINDOW", self.exit)
         self.services.keylogger_Start()
+
+        self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+    def on_closing(self):
+        self.services.keylogger_Command('exit')
+        self.master.destroy()
+        windowsGlo.remove(self.master)
 
     def hook(self):
         if self.services.keylogger_CommandHook() == 'OK':
@@ -614,14 +649,10 @@ class keystrokeGUI:
         self.text_area.config(state = 'normal')
         self.text_area.delete(1.0, END)
         self.text_area.config(state = 'disabled')
-    
-    def exit(self):
-        self.services.keylogger_Command('exit')
-        self.master.destroy()
-
 
 class editRegistryGUI:
     def __init__(self, master, services):
+        windowsGlo.append(master)
         self.service = services
         self.master = master
         self.master.title("Edit registry")
@@ -872,6 +903,12 @@ class editRegistryGUI:
         self.button2.place(x = 220, y = 320)
         # self.button2.grid(row=8, column=1, pady = 5, sticky = W)
 
+        self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+    def on_closing(self):
+        self.master.destroy()
+        windowsGlo.remove(self.master)
+
     def browse(self):
         try:
             filename = askopenfilename(defaultextension=".reg", filetypes=[("Registry Files", "*.reg"), ("All Files", "*.*")], parent = self.master)
@@ -961,7 +998,6 @@ class editRegistryGUI:
         self.result_area.insert(INSERT, data + '\n')
         self.result_area.config(state='disabled')
         self.result_area.see('end')
-
 
 
 window_client = Tk()
