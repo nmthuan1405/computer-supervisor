@@ -49,13 +49,10 @@ class ServerServices:
         try:
             server = self.server
             self.server = None
-            server.shutdown(socket.SHUT_RDWR)
+            # server.shutdown(socket.SHUT_RDWR)
             server.close()
-
+        finally:
             self.server_thread.join()
-        except:
-            self.server = None
-
 
     # create socket
     def createSocket(self):
@@ -106,12 +103,13 @@ class Client:
     def closeConnection(self):
         print(f'{self.addr} \tCLOSE CONNECTION')
 
-        conn = self.conn
-        self.conn = None
-        conn.shutdown(socket.SHUT_RDWR)
-        conn.close()
-
-        self.client_thread.join()
+        try:
+            conn = self.conn
+            self.conn = None
+            conn.shutdown(socket.SHUT_RDWR)
+            conn.close()
+        finally:
+            self.client_thread.join()
 
 
     def services(self):
