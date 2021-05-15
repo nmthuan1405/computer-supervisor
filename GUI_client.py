@@ -711,7 +711,7 @@ class editRegistryGUI:
                 self.lbl_nameValue.grid()
                 self.txt_nameValue.grid()
 
-                self.lbl_value.grid_remove()
+                self.lbl_value.place_forget()
                 self.txt_value.grid_remove()
 
                 self.txt_seperator.grid_remove()
@@ -723,7 +723,8 @@ class editRegistryGUI:
                 self.lbl_nameValue.grid()
                 self.txt_nameValue.grid()
 
-                self.lbl_value.grid(column = 1, row = 4, padx = 2, pady = 0, sticky = tk.SW)
+                # self.lbl_value.grid(column = 1, row = 4, padx = 2, pady = 0, sticky = tk.SW)
+                self.lbl_value.place(x = 108, y = 82)
                 self.txt_value.grid(column = 1, columnspan = 2, row = 5, padx = 5, pady = 0)
 
                 self.lbl_dataType.grid(column = 3, row = 4, padx = 2, pady = 0, sticky = tk.SW)
@@ -739,7 +740,7 @@ class editRegistryGUI:
                 self.lbl_nameValue.grid()
                 self.txt_nameValue.grid()
 
-                self.lbl_value.grid_remove()
+                self.lbl_value.place_forget()
                 self.txt_value.grid_remove()
 
                 self.txt_seperator.grid_remove()
@@ -751,7 +752,7 @@ class editRegistryGUI:
                 self.lbl_nameValue.grid_remove()
                 self.txt_nameValue.grid_remove()
 
-                self.lbl_value.grid_remove()
+                self.lbl_value.place_forget()
                 self.txt_value.grid_remove()
 
                 self.txt_seperator.grid_remove()
@@ -763,7 +764,7 @@ class editRegistryGUI:
                 self.lbl_nameValue.grid_remove()
                 self.txt_nameValue.grid_remove()
 
-                self.lbl_value.grid_remove()
+                self.lbl_value.place_forget()
                 self.txt_value.grid_remove()
 
                 self.txt_seperator.grid_remove()
@@ -812,7 +813,7 @@ class editRegistryGUI:
                 self.lbl_nameValue.grid()
                 self.txt_nameValue.grid()
 
-                self.lbl_value.grid()
+                self.lbl_value.place(x = 108, y = 82)
                 self.txt_value.config(width = 25)
                 self.txt_value.grid(column = 1, columnspan = 2, row = 5, padx = 5, pady = 0)
 
@@ -825,7 +826,7 @@ class editRegistryGUI:
                 self.lbl_nameValue.grid()
                 self.txt_nameValue.grid()
 
-                self.lbl_value.grid()
+                self.lbl_value.place(x = 108, y = 82)
                 self.txt_value.config(width = 25)
                 self.txt_value.grid(column = 1, columnspan = 2, row = 5, padx = 5, pady = 0)
 
@@ -838,7 +839,7 @@ class editRegistryGUI:
                 self.lbl_nameValue.grid()
                 self.txt_nameValue.grid()
 
-                self.lbl_value.grid()
+                self.lbl_value.place(x = 108, y = 82)
                 self.txt_value.config(width = 25)
                 self.txt_value.grid(column = 1, columnspan = 2, row = 5, padx = 5, pady = 0)
 
@@ -851,7 +852,7 @@ class editRegistryGUI:
                 self.lbl_nameValue.grid()
                 self.txt_nameValue.grid()
 
-                self.lbl_value.grid()
+                self.lbl_value.place(x = 108, y = 82)
                 self.txt_value.config(width = 25)
                 self.txt_value.grid(column = 1, columnspan = 2, row = 5, padx = 5, pady = 0)
 
@@ -864,7 +865,7 @@ class editRegistryGUI:
                 self.lbl_nameValue.grid()
                 self.txt_nameValue.grid()
 
-                self.lbl_value.grid()
+                self.lbl_value.place(x = 108, y = 82)
                 self.txt_value.config(width = 19)
                 self.txt_value.grid(column = 1, columnspan = 1, row = 5, padx = 5, pady = 0)
 
@@ -877,7 +878,7 @@ class editRegistryGUI:
                 self.lbl_nameValue.grid()
                 self.txt_nameValue.grid()
 
-                self.lbl_value.grid()
+                self.lbl_value.place(x = 108, y = 82)
                 self.txt_value.config(width = 25)
                 self.txt_value.grid(column = 1, columnspan = 2, row = 5, padx = 5, pady = 0)
 
