@@ -44,6 +44,8 @@ class ClientGUI:
         self.btn_connect = Button(self.master, text="Connect", width = 10, command = self.connect)
         self.btn_connect.grid(column=2, row=0, sticky = tk.W, padx = 10, pady = 10)
 
+        self.master.bind('<Return>', self.callback)
+
         self.btn_screenshot = Button(self.master, text = "Screenshot", width = 10, command = self.screenshot)
         self.btn_screenshot.grid(column = 1, row = 2, sticky = tk.N, pady = 5, ipadx = 20, ipady = 8)
 
@@ -83,6 +85,9 @@ class ClientGUI:
 
             self.txt_IP_input.config(state = 'normal')
             self.btn_connect.config(text = 'Connect')
+
+    def callback(self, event):
+        self.connect()
 
     def screenshot(self):
         if self.services == None:
@@ -213,9 +218,9 @@ class runningProcessGUI:
         self.tree = ttk.Treeview(self.master, columns = columns, show = 'headings', height = 20)
 
         #config column width
-        self.tree.column("#1", minwidth = 0, width = 10)
-        self.tree.column("#2", minwidth = 0, width = 10)
-        self.tree.column("#3", minwidth = 0, width = 10)
+        self.tree.column("#1", minwidth = 50, width = 200)
+        self.tree.column("#2", minwidth = 50, width = 70)
+        self.tree.column("#3", minwidth = 50, width = 90)
 
         # define headings
         self.tree.heading('#1', text='Process Name')
@@ -291,6 +296,8 @@ class killProcessGUI:
         self.btn_kill = Button(self.master, text="Kill", command = self.killProcess)
         self.btn_kill.grid(column=2, row=0, sticky = tk.W, padx = 0, pady = 0, ipadx = 10)
 
+        self.master.bind('<Return>', self.callback)
+
         self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
 
     def on_closing(self):
@@ -303,6 +310,9 @@ class killProcessGUI:
             showinfo("Sucess", "Kill process successful !", parent = self.master)
         else:
             showerror("Error", "Unable to kill this process", parent = self.master)
+
+    def callback(self, event):
+        self.killProcess()
 
 class startProcessGUI:
     def __init__(self, master, parent, services):
@@ -331,6 +341,8 @@ class startProcessGUI:
         self.btn_start = Button(self.master, text="Start", command = self.startProcess)
         self.btn_start.grid(column=2, row=0, sticky = tk.W, padx = 0, pady = 0, ipadx = 10)
 
+        self.master.bind('<Return>', self.callback)
+
         self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
 
     def on_closing(self):
@@ -343,6 +355,9 @@ class startProcessGUI:
             showinfo("Sucess", "Start process successful !", parent = self.master)
         else:
             showerror("Error", "Unable to start this process", parent = self.master)
+
+    def callback(self, event):
+        self.startProcess()
 
 class runningAppGUI:
     def __init__(self, master, services):
@@ -372,9 +387,9 @@ class runningAppGUI:
         self.tree = ttk.Treeview(self.master, columns = columns, show = 'headings', height = 20)
 
         #config column width
-        self.tree.column("#1", minwidth = 0, width = 10)
-        self.tree.column("#2", minwidth = 0, width = 10)
-        self.tree.column("#3", minwidth = 0, width = 10)
+        self.tree.column("#1", minwidth = 50, width = 200)
+        self.tree.column("#2", minwidth = 50, width = 70)
+        self.tree.column("#3", minwidth = 50, width = 90)
 
         # define headings
         self.tree.heading('#1', text='Application Name')
@@ -437,8 +452,13 @@ class killAppGUI:
         self.btn_kill = Button(self.master, text="Kill", command = self.killApp)
         self.btn_kill.grid(column=2, row=0, sticky = tk.W, padx = 0, pady = 0, ipadx = 10)
 
+        self.master.bind('<Return>', self.callback)
+
     def killApp(self):
         pass
+
+    def callback(self, event):
+        self.killApp()
 
 class startAppGUI:
     def __init__(self, master, buff):
@@ -465,8 +485,13 @@ class startAppGUI:
         self.btn_start = Button(self.master, text="Start", command = self.startApp)
         self.btn_start.grid(column=2, row=0, sticky = tk.W, padx = 0, pady = 0, ipadx = 10)
 
+        self.master.bind('<Return>', self.callback)
+
     def startApp(self):
         pass
+
+    def callback(self, event):
+        self.startApp()
 
 class keystrokeGUI:
     def __init__(self, master, services):
