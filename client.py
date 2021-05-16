@@ -1,5 +1,6 @@
 import socket
 import pickle
+from tkinter import EXCEPTION
 from boltons import socketutils
 from PIL import ImageGrab
 import os
@@ -27,11 +28,21 @@ class ClientServices:
 
         self.buff.send('close!F!'.encode())
         try:
+            self.client.shutdown(socket.SHUT_RDWR)
             self.client.close()
         finally:
             self.client = None
             self.buff = None
     
+    #ping func
+    def ping(self):
+        self.buff.send('ping!F!'.encode())
+        if self.buff.recv_until(self.DELIM).decode() == 'OK':
+            return True
+        else:
+            raise Exception
+
+
     # dump func
     def sendDump(self, var):
         dump = pickle.dumps(var)
@@ -159,4 +170,4 @@ class ClientServices:
     # shutdown func
     def sendShutdown(self):
         print('SEND SHUTDOWN SIGNAL')
-        self.buff.send('shutdown!F!'.encode())
+        self.buff.sendall('shutdown!F!'.encode())

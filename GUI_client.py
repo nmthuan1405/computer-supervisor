@@ -153,8 +153,13 @@ class ClientGUI:
         window_editRegistry.mainloop()
 
     def shutdown(self):
-        self.services.sendShutdown()
-        showinfo(title='Shutdown', message='Shutdown request sent.', parent = self.master)
+        if self.services == None:
+            showerror(title = 'Error', message = 'Not connected to the server.', parent = self.master)
+            return        
+
+        if self.services.ping():
+            self.services.sendShutdown()
+            showinfo(title='Shutdown', message='Shutdown request sent.', parent = self.master)
 
     def exit(self):
         if self.services != None:
@@ -535,7 +540,6 @@ class killAppGUI:
         windowsGlo.remove(self.master)
 
     def killApp(self):
-        print(self.listApp)
         uid = self.txt_ID_input.get()
         if uid not in self.listApp:
             uid = ''

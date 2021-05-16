@@ -128,8 +128,6 @@ class Client:
                     self.getStartProcess()
                 elif flag == 'applist':
                     self.sendAppList()
-                elif flag == 'command':
-                    self.getCommand()
                 elif flag == 'keylogger':
                     self.keylogger_Server()
                 elif flag == 'regfile':
@@ -148,6 +146,8 @@ class Client:
                     self.getShutdown() 
                 elif flag == 'close':
                     self.closeConnection()
+                elif flag == 'ping':
+                    self.sendOK()
 
             except:
                 if self.conn == None:
@@ -157,7 +157,9 @@ class Client:
                     print(f'{self.addr} \tClient have unexpected error. Exit thread')
                 break
 
-
+    # ping func
+    def sendOK(self):
+        self.buff.send('OK'.encode() + self.DELIM)
 
     # dump func
     def sendDump(self, var):
