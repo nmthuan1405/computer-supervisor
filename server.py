@@ -320,9 +320,11 @@ class Client:
                     listener.stop()
                 finally:
                     listener = None
+                    self.buff.send('OK'.encode() + self.DELIM)
 
             elif flag == 'clear':
                 string = ''
+                self.buff.send('OK'.encode() + self.DELIM)
 
             elif flag == 'send':
                 self.buff.send(string.encode() + self.DELIM)
@@ -333,7 +335,10 @@ class Client:
                         listener.stop()
                     except:
                         pass
+                self.buff.send('OK'.encode() + self.DELIM)
                 break
+
+           
 
 
     def getRegFile(self):
