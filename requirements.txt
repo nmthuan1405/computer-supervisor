@@ -2,3 +2,14 @@ boltons
 Pillow
 wmi
 pynput
+tkinter
+functools
+socket
+pickle
+os
+threading
+subprocess
+winreg
+tempfile
+win32gui
+win32process

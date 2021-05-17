@@ -178,9 +178,11 @@ class screenshotGUI:
         self.image = None
         self.render = None
         self.master.title("Screenshot")
-        self.master.geometry('800x500')
+        self.master.resizable(0, 0)
         self.master.focus()
         self.master.grab_set()
+        self.master['padx'] = 30
+        self.master['pady'] = 30
 
         # configure the grid
         self.master.columnconfigure(0, weight=1)
@@ -232,6 +234,7 @@ class runningProcessGUI:
         self.master = master
         self.services = services
         self.master.title("Running process")
+        self.master.resizable(0, 0)
         self.master.focus()
         self.master.grab_set()
         self.master['padx'] = 10
@@ -317,6 +320,7 @@ class killProcessGUI:
         self.services = services
         self.master = master
         self.master.title("Kill")
+        self.master.resizable(0, 0)
         self.master.focus()
         self.master.grab_set()
         self.master['padx'] = 10
@@ -364,7 +368,7 @@ class startProcessGUI:
         self.services = services
         self.master = master
         self.master.title("Start")
-        # self.master.geometry('400x200')
+        self.master.resizable(0, 0)
         self.master.focus()
         self.master.grab_set()
         self.master['padx'] = 10
@@ -411,7 +415,7 @@ class runningAppGUI:
         self.services = services
         self.master = master
         self.master.title("Running app")
-        # self.master.geometry('300x200')
+        self.master.resizable(0, 0)
         self.master.focus()
         self.master.grab_set()
         self.master['padx'] = 10
@@ -506,7 +510,7 @@ class killAppGUI:
         self.master = master
         self.listApp = listApp
         self.master.title("Kill")
-        # self.master.geometry('400x200')
+        self.master.resizable(0, 0)
         self.master.focus()
         self.master.grab_set()
         self.master['padx'] = 10
@@ -558,7 +562,7 @@ class startAppGUI:
         self.services = services
         self.master = master
         self.master.title("Start")
-        # self.master.geometry('400x200')
+        self.master.resizable(0, 0)
         self.master.focus()
         self.master.grab_set()
         self.master['padx'] = 10
@@ -605,7 +609,7 @@ class keystrokeGUI:
         self.services = services
         self.master = master
         self.master.title("Keystroke")
-        # self.master.geometry('300x200')
+        self.master.resizable(0, 0)
         self.master.focus()
         self.master.grab_set()
         self.master['padx'] = 10
@@ -675,12 +679,6 @@ class editRegistryGUI:
 
         self.master.columnconfigure(0, weight=1)
         self.master.columnconfigure(1, weight=1)
-        # self.master.columnconfigure(2, weight=1)
-        # self.master.columnconfigure(3, weight=1)
-        # self.master.rowconfigure(0, weight=1)
-        # self.master.rowconfigure(1, weight=1)
-        # self.master.rowconfigure(2, weight=1)  
-        # self.master.rowconfigure(3, weight=1)
         self.master['padx'] = 10
         self.master['pady'] = 10
 
@@ -704,7 +702,6 @@ class editRegistryGUI:
         self.btn_send.grid(column = 1, row = 3, padx = 4, ipadx = 15, ipady = 70, sticky = E)
 
         self.frame_editDirectly = ttk.LabelFrame(self.master, text = "Edit value directly", relief = tk.RIDGE)
-        # self.frame_editDirectly.grid(row = 4, columnspan = 2, column = 0, sticky = tk.E + tk.W + tk.N + tk.S, padx = 0, pady = 4)
         self.frame_editDirectly.place(x = 3, y = 245, height = 370)
 
         self.lbl_option = Label(self.frame_editDirectly, text = "Select option")
@@ -735,7 +732,6 @@ class editRegistryGUI:
                 self.lbl_nameValue.grid()
                 self.txt_nameValue.grid()
 
-                # self.lbl_value.grid(column = 1, row = 4, padx = 2, pady = 0, sticky = tk.SW)
                 self.lbl_value.place(x = 108, y = 82)
                 self.txt_value.grid(column = 1, columnspan = 2, row = 5, padx = 5, pady = 0)
 
@@ -799,26 +795,20 @@ class editRegistryGUI:
         self.txt_nameValue.grid(column = 0, row = 5, padx = 5, pady = 0, sticky = tk.W)
 
         self.lbl_value = Label(self.frame_editDirectly, text = "Value")
-        # self.lbl_value.grid(column = 1, row = 4, padx = 2, pady = 0, sticky = tk.SW)
 
         self.txt_value = Entry(self.frame_editDirectly, width = 25)
-        # self.txt_value.grid(column = 1, columnspan = 2, row = 5, padx = 5, pady = 0)
 
         self.txt_seperator = Entry(self.frame_editDirectly, width = 3, justify = 'center')
         self.txt_seperator.insert(-1, '\\0')
-        # self.txt_seperator.grid(column = 2, row = 5, padx = 5, pady = 0)
 
         self.lbl_dataType = Label(self.frame_editDirectly, text = "Data type")
-        # self.lbl_dataType.grid(column = 3, row = 4, padx = 2, pady = 0, sticky = tk.SW)
 
         self.dataTypes = ('String', 'Binary', 'DWORD', 'QWORD', 'Multi-String', 'Expandable String')
         self.selected_dataType = tk.StringVar()
         self.cbb_dataType = ttk.Combobox(self.frame_editDirectly, width = 16, textvariable = self.selected_dataType)
-        self.cbb_dataType.set('default') # chưa hiện đc chữ default
         self.cbb_dataType['values'] = self.dataTypes
         self.cbb_dataType.current(0)
         self.cbb_dataType['state'] = 'readonly'  # normal
-        # self.cbb_dataType.grid(column = 3, row = 5, padx = 5, pady = 0)
 
         def dataTypeChanged(event):
             if(self.cbb_dataType.get() == self.dataTypes[0]):
@@ -903,18 +893,14 @@ class editRegistryGUI:
 
         self.lbl_result = Label(self.frame_editDirectly, text = "Result")
         self.lbl_result.place(x = 4, y = 130)
-        # self.lbl_result.grid(column = 0, row = 6, padx = 2, pady = 0, sticky = tk.SW)
 
         self.result_area = scrolledtext.ScrolledText(self.frame_editDirectly, wrap = tk.WORD, width = 46, height = 10, bg = "gray92", state = tk.DISABLED)
         self.result_area.place(x = 4, y = 150)
-        # self.result_area.grid(column = 0, row = 7, columnspan = 4, padx = 5, pady = 0)
 
         self.button1 = ttk.Button(self.frame_editDirectly, text="Send", command = self.sendCommand)
         self.button1.place(x = 100, y = 320)
-        # self.button1.grid(row=8, column=0, pady = 5, sticky = W)
         self.button2 = ttk.Button(self.frame_editDirectly, text="Clear log", command = self.clearLog)
         self.button2.place(x = 220, y = 320)
-        # self.button2.grid(row=8, column=1, pady = 5, sticky = W)
 
         self.master.protocol("WM_DELETE_WINDOW", self.on_closing)
 
