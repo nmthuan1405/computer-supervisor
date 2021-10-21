@@ -121,9 +121,12 @@ venv.bak/
 /site
 
 # mypy
-.mypy_cache/
+.mypy_cache/project
 .dmypy.json
 dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# PyCharm project
+.idea/
