@@ -4,7 +4,7 @@ import pickle
 # socket wrapper
 class Socket():
     def __init__(self, socket = None, DELIM=b'\x00'):
-        self.socket = socket;
+        self.socket = socket
         self.DELIM = DELIM
         self.buff = b''
 
