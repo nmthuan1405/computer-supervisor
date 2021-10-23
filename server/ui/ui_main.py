@@ -1,4 +1,3 @@
-from socket import socket
 from tkinter.messagebox import askokcancel, showerror
 import tkinter as tk
 import ui.label as lb
