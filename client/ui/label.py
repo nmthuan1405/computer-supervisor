@@ -57,3 +57,5 @@ FILE_EXP_TRV_NAME = "Name"
 FILE_EXP_TRV_DATEMOD = "Date Modified"
 FILE_EXP_TRV_TYPE = "Type"
 FILE_EXP_TRV_SIZE = "Size"
+# ----------------------------------------------------------------------------------------------------------------------
+REGISTRY_TITLE = "Edit Registry"
