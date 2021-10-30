@@ -36,3 +36,9 @@ LOGOUT_SUCCESS = "Server logout successfully"
 
 ABOUT_US = "About Us"
 ABOUT_US_TEXT = "Compter Supervisor is a remote desktop application that allows you to remotely control a computer.\n\n"
+
+# ----------------------------------------------------------------------------------------------------------------------
+SCREEN_STREAM_TITLE = "Screen Stream"
+PAUSE = "Pause"
+RESUME = "Resume"
+CAPTURE = "Capture"
