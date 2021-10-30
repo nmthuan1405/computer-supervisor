@@ -48,3 +48,12 @@ KEYLOGGER_UNHOOK = "Unhook"
 KEYLOGGER_CLEAR = "Clear"
 KEYLOGGER_BLOCK = "Block\nKeyboard"
 KEYLOGGER_UNBLOCK = "Unblock\nKeyboard"
+# ----------------------------------------------------------------------------------------------------------------------
+FILE_EXPLORER_TITLE = "File Explorer"
+FILE_EXP_COPY = "Copy"
+FILE_EXP_DELETE = "Delete"
+
+FILE_EXP_TRV_NAME = "Name"
+FILE_EXP_TRV_DATEMOD = "Date Modified"
+FILE_EXP_TRV_TYPE = "Type"
+FILE_EXP_TRV_SIZE = "Size"
