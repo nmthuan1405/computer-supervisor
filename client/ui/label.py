@@ -59,3 +59,19 @@ FILE_EXP_TRV_TYPE = "Type"
 FILE_EXP_TRV_SIZE = "Size"
 # ----------------------------------------------------------------------------------------------------------------------
 REGISTRY_TITLE = "Edit Registry"
+# ----------------------------------------------------------------------------------------------------------------------
+PROCESS_TITLE = "Running Processes"
+PROCESS_START = "Start"
+PROCESS_KILL = "Kill"
+
+PROCESS_NAME = "Process Name"
+PROCESS_ID = "Process ID"
+PROCESS_THREAD_COUNT = "Thread Count"
+
+START_PROCESS_TITLE = "Start Process"
+START_PROCESS_NAME = "Process Name:"
+START_PROCESS_START = "Start"
+
+KILL_PROCESS_TITLE = "Kill Process"
+KILL_PROCESS_ID = "Process ID:"
+KILL_PROCESS_KILL = "Kill"

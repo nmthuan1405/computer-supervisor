@@ -32,6 +32,11 @@ class UI_fileExplorer(tk.Toplevel):
 
         self.trv_fileExp.grid(row = 0, column = 0, rowspan = 10, sticky = tk.NSEW)
 
+        # add a scrollbar
+        self.scrollbar = ttk.Scrollbar(self, orient = tk.VERTICAL, command = self.trv_fileExp.yview)
+        self.trv_fileExp.configure(yscroll = self.scrollbar.set)
+        self.scrollbar.grid(row = 0, column = 1, rowspan = 10, sticky = 'ns')
+
         # adding data
         self.trv_fileExp.insert('', tk.END, text = "Folder 1", values = ('1/1/2020 1:30 AM','File folder',), iid = 0, open = True)
         self.trv_fileExp.insert('', tk.END, text = "Folder 2", values = ('1/1/2020 1:30 AM','File folder',''), iid = 1, open = False)
@@ -46,10 +51,10 @@ class UI_fileExplorer(tk.Toplevel):
         self.trv_fileExp.move(5, 1, 0)
 
         self.btn_copy = tk.Button(self, text = lb.FILE_EXP_COPY, width = 10, height = 6, command = self.copyFile)
-        self.btn_copy.grid(row = 0, column = 1, padx = (10,0))
+        self.btn_copy.grid(row = 0, column = 2, padx = (10,0))
 
         self.btn_delete = tk.Button(self, text = lb.FILE_EXP_DELETE, width = 10, height = 6, command = self.deleteFile)
-        self.btn_delete.grid(row = 1, column = 1, padx = (10,0))
+        self.btn_delete.grid(row = 1, column = 2, padx = (10,0))
 
         self.after(200, self.periodic_call)
 
