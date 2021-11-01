@@ -54,6 +54,7 @@ KEYLOGGER_BLOCK = "Block\nKeyboard"
 KEYLOGGER_UNBLOCK = "Unblock\nKeyboard"
 # ----------------------------------------------------------------------------------------------------------------------
 FILE_EXPLORER_TITLE = "File Explorer"
+FILE_EXP_UP = "\u2191 Up Folder"
 FILE_EXP_COPY = "Copy"
 FILE_EXP_DELETE = "Delete"
 
