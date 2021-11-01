@@ -1,6 +1,7 @@
 from tkinter.messagebox import askokcancel, showerror, showinfo
 import tkinter as tk
 import ui.label as lb
+import ui.constraints as const
 import queue
 
 import ui.ui_screenStream as sc
@@ -19,7 +20,6 @@ class UI_main(tk.Tk):
         super().__init__()
         self.title(lb.MAIN_TITLE)
         self.protocol("WM_DELETE_WINDOW", self.close)
-        #self.geometry("{}x{}".format(lb.MAIN_WIDTH, lb.MAIN_HEIGHT))
         self.resizable(False, False)
 
         self.lbl_app_name = tk.Label(text = lb.THIS_APP_NAME, font = ("Arial", 16))
@@ -71,7 +71,7 @@ class UI_main(tk.Tk):
         self.lbl_about_us.grid(row = 6, column = 0, columnspan = 3, padx = 10, pady = 10)
         self.lbl_about_us.bind("<Button-1>", self.onClickAboutUs)
         
-        self.after(200, self.periodic_call)
+        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def close(self):
         if self.btn_connect_stt.get() == lb.DISCONNECT:
@@ -168,7 +168,7 @@ class UI_main(tk.Tk):
             except queue.Empty:
                 break
         
-        self.after(200, self.periodic_call)
+        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def add_socket_queue(self, socket_queue):
         self.socket_queue = socket_queue

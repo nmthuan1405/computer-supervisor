@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 
 import ui.label as lb
+import ui.constraints as const
 import queue
 
 class UI_fileExplorer(tk.Toplevel):
@@ -12,8 +13,8 @@ class UI_fileExplorer(tk.Toplevel):
         super().__init__(parent)
         self.title = lb.FILE_EXPLORER_TITLE
         self.resizable(False, False)
-        self['padx'] = 10
-        self['pady'] = 10
+        self['padx'] = const.WINDOW_BORDER_PADDING
+        self['pady'] = const.WINDOW_BORDER_PADDING
 
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=30)
@@ -61,7 +62,7 @@ class UI_fileExplorer(tk.Toplevel):
         self.btn_delete = tk.Button(self, text = lb.FILE_EXP_DELETE, width = 10, height = 6, command = self.deleteFile)
         self.btn_delete.grid(row = 2, column = 3, padx = (10,0))
 
-        self.after(200, self.periodic_call)
+        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def upFolder(self):
         return
@@ -85,7 +86,7 @@ class UI_fileExplorer(tk.Toplevel):
             except queue.Empty:
                 break
         
-        self.after(200, self.periodic_call)
+        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def add_socket_queue(self, socket_queue):
         self.socket_queue = socket_queue

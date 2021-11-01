@@ -1,11 +1,6 @@
 MAIN_TITLE = "Client"
 THIS_APP_NAME = "Computer Supervisor"
 
-MAIN_WIDTH = 400
-MAIN_HEIGHT = 600
-MAIN_PADX = 10
-MAIN_PADY = 10
-
 ERR = "Error"
 WARN = "Warning"
 INFO = "Info"

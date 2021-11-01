@@ -1,8 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter.messagebox import askokcancel, showerror, showinfo
-from turtle import st
+
 import ui.label as lb
+import ui.constraints as const
 import queue
 
 class UI_runningApps(tk.Toplevel):
@@ -13,8 +14,8 @@ class UI_runningApps(tk.Toplevel):
         super().__init__(parent)
         self.title = lb.APP_TITLE
         self.resizable(False, False)
-        self['padx'] = 10
-        self['pady'] = 10
+        self['padx'] = const.WINDOW_BORDER_PADDING
+        self['pady'] = const.WINDOW_BORDER_PADDING
 
         self.btn_start = tk.Button(self, text = lb.APP_START, width = 15, height = 2, command = self.start)
         self.btn_start.grid(row = 0, column = 0)
@@ -46,7 +47,7 @@ class UI_runningApps(tk.Toplevel):
         # add data
         # self.insert()
 
-        self.after(200, self.periodic_call)
+        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def insert(self, data):
         try:
@@ -81,7 +82,7 @@ class UI_runningApps(tk.Toplevel):
             except queue.Empty:
                 break
         
-        self.after(200, self.periodic_call)
+        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def add_socket_queue(self, socket_queue):
         self.socket_queue = socket_queue
@@ -97,8 +98,8 @@ class UI_startAvailApp(tk.Toplevel):
         super().__init__(parent)
         self.title = lb.START_APP_TITLE
         self.resizable(False, False)
-        self['padx'] = 10
-        self['pady'] = 10
+        self['padx'] = const.WINDOW_BORDER_PADDING
+        self['pady'] = const.WINDOW_BORDER_PADDING
 
         self.lbl_avail_apps = tk.Label(self, text = lb.START_APP_AVAIL_APPS)
         self.lbl_avail_apps.grid(row = 0, column = 0, sticky = tk.W)
@@ -131,7 +132,7 @@ class UI_startAvailApp(tk.Toplevel):
         self.btn_custom = tk.Button(self, text=lb.START_APP_CUSTOM, width = 8, command = self.customApp)
         self.btn_custom.grid(row = 2, column = 0, sticky = tk.W, pady = (10,0))
 
-        self.after(200, self.periodic_call)
+        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def startApp(self):
         # if (self.services.sendStartProcess(self.txt_name_input.get()) == 'OK'):
@@ -157,7 +158,7 @@ class UI_startAvailApp(tk.Toplevel):
             except queue.Empty:
                 break
         
-        self.after(200, self.periodic_call)
+        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def add_socket_queue(self, socket_queue):
         self.socket_queue = socket_queue
@@ -173,8 +174,8 @@ class UI_startCustomApp(tk.Toplevel):
         super().__init__(parent)
         self.title = lb.START_APP_TITLE
         self.resizable(False, False)
-        self['padx'] = 10
-        self['pady'] = 10
+        self['padx'] = const.WINDOW_BORDER_PADDING
+        self['pady'] = const.WINDOW_BORDER_PADDING
 
         self.lbl_app_name = tk.Label(self, text = lb.START_APP_NAME)
         self.lbl_app_name.grid(column = 0, row = 0)
@@ -186,7 +187,7 @@ class UI_startCustomApp(tk.Toplevel):
         self.btn_start = tk.Button(self, text=lb.START_APP_START, command = self.startApp)
         self.btn_start.grid(column=2, row=0, sticky = tk.W, padx = 0, pady = 0, ipadx = 10)
 
-        self.after(200, self.periodic_call)
+        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def startApp(self):
         # if (self.services.sendStartProcess(self.txt_name_input.get()) == 'OK'):
@@ -207,7 +208,7 @@ class UI_startCustomApp(tk.Toplevel):
             except queue.Empty:
                 break
         
-        self.after(200, self.periodic_call)
+        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def add_socket_queue(self, socket_queue):
         self.socket_queue = socket_queue
