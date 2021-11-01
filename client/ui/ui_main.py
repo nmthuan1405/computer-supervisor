@@ -16,7 +16,7 @@ class UI_main(tk.Tk):
 
         super().__init__()
         self.title(lb.MAIN_TITLE)
-        # self.protocol("WM_DELETE_WINDOW", self.close)
+        self.protocol("WM_DELETE_WINDOW", self.close)
         #self.geometry("{}x{}".format(lb.MAIN_WIDTH, lb.MAIN_HEIGHT))
         self.resizable(False, False)
 
@@ -71,15 +71,25 @@ class UI_main(tk.Tk):
         
         self.after(200, self.periodic_call)
 
+    def close(self):
+        if self.btn_connect_stt.get() == lb.DISCONNECT:
+            if askokcancel(lb.QUIT, lb.ASK_QUIT):
+                self.socket_cmd("stop")
+            else:
+                return
+        
+        self.socket_cmd('exit')
+        self.destroy()
+
     def connect(self):
         if self.btn_connect_stt.get() == lb.CONNECT:
             ip = self.txt_IP_input.get()
-            if not ip:
-                showerror(lb.ERR, lb.CANNOT_CONNECT)
-                return
-            self.socket_cmd("connect", ip)
-        else:
-            self.socket_cmd("disconnect")
+            self.socket_cmd("start", ip)
+        elif self.btn_connect_stt.get() == lb.DISCONNECT:
+            self.socket_cmd("stop")
+
+        self.btn_connect_stt.set(lb.WAIT)
+    
 
     def onClickMACAddress(self, event):
         if self.lbl_MAC_address_stt.get() == lb.MAC_ADDRESS:
@@ -133,12 +143,15 @@ class UI_main(tk.Tk):
     def update_ui(self, task):
         DEBUG("task", task)
         cmd, ext = task
-        if cmd == "connect":
-            self.btn_connect_stt.set(lb.DISCONNECT)
-            self.txt_IP_input.config(state = tk.DISABLED)
-        if cmd == "disconnect":
+        if cmd == "start":
             self.btn_connect_stt.set(lb.CONNECT)
             self.txt_IP_input.config(state = tk.NORMAL)
+        elif cmd == "stop":
+            self.btn_connect_stt.set(lb.DISCONNECT)
+            self.txt_IP_input.config(state = tk.DISABLED)
+        elif cmd == "err":
+            if ext == "cannot start":
+                showerror(lb.ERR, lb.CANNOT_CONNECT)
 
     def periodic_call(self):
         while True:

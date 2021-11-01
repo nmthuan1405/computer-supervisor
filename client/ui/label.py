@@ -9,12 +9,15 @@ MAIN_PADY = 10
 ERR = "Error"
 WARN = "Warning"
 INFO = "Info"
+WAIT = "Waiting..."
+QUIT  = "Quit"
 
 LBL_SERVER_IP = "Server IP Address:"
-DEFAULT_IP = "local host"
+DEFAULT_IP = "localhost"
 CONNECT = "Connect"
 DISCONNECT = "Disconnect"
 CANNOT_CONNECT = "Cannot connect to server"
+ASK_QUIT = "Client is connecting.\nDo you want to quit?"
 
 MAC_ADDRESS = "Server MAC Address:"
 

@@ -24,7 +24,7 @@ class UI_main(tk.Tk):
     def start(self):
         if self.btn_start_stt.get() == lb.START:
             self.socket_cmd('start')
-        else:
+        elif self.btn_start_stt.get() == lb.STOP:
             self.socket_cmd('stop')
 
         self.btn_start_stt.set(lb.WAIT)

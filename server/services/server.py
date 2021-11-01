@@ -36,7 +36,7 @@ class Server(threading.Thread):
     def stop_socket(self):
         for client in self.clients:
             if client.is_alive():
-                client.close()
+                client.stop()
 
         self.socket.close()
         self.add_client_thread.join()
@@ -98,16 +98,24 @@ class Client(Socket, threading.Thread):
     def __init__(self, socket, addr, DELIM=b'\x00'):
         Socket.__init__(self, socket=socket, DELIM=DELIM)
         threading.Thread.__init__(self, name=addr)
+        DEBUG("new client", addr)
 
-    def close(self):
-        self.socket.shutdown(socket.SHUT_RDWR)
-        self.socket.close()
-
+    def stop(self):
+        try:
+            self.socket.shutdown(socket.SHUT_RDWR)
+            self.socket.close()
+        except:
+            DEBUG("ERR when stop", self.name)
+        finally:
+            DEBUG("remove client", self.name)
+    
     def run(self):
         while True:
             flag = self.recv_str()
+            DEBUG("received flag", flag)
 
             if flag == 'close':
+                self.stop()
                 break
 
 
