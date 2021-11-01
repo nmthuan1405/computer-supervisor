@@ -108,7 +108,9 @@ class UI_main(tk.Tk):
         window.focus()
 
     def keylogger(self):
-        window = kl.UI_keylogger(self)
+        window = kl.UI_keylogger(self, self.socket_queue)
+        self.ui_queues['keyboard'] = window.ui_queue
+
         window.grab_set()
         window.focus()
 
