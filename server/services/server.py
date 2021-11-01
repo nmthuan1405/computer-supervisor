@@ -114,6 +114,10 @@ class Client(Socket, threading.Thread):
         size = self.recv_obj()
         self.send_obj(utils.take_screenshot(size))
         DEBUG("sent screenshot")
+
+    def task_screen_capture(self):
+        self.send_obj(utils.take_screenshot())
+        DEBUG("sent screenshot")
     
     def run(self):
         while True:
@@ -125,8 +129,9 @@ class Client(Socket, threading.Thread):
                 break
             elif flag == 'screen-stream':
                 self.task_screen_stream()
+            elif flag == 'screen-capture':
+                self.task_screen_capture()
 
-
-
+    
 def DEBUG(*args,**kwargs):
     print("Server:", *args,**kwargs)

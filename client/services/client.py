@@ -53,8 +53,14 @@ class Client(Socket, threading.Thread):
         self.send_obj(size)
 
         img = self.recv_obj()
-        DEBUG("received image")
-        self.ui_cmd("update-stream",img,'screen')
+        self.ui_cmd("update-stream", img,'screen')
+
+    def task_capture_stream(self):
+        self.send_str("screen-capture")
+
+        img = self.recv_obj()
+        DEBUG("received screenshot")
+        self.ui_cmd("save-image", img,'screen')
 
     def run(self):
         while True:
@@ -70,6 +76,8 @@ class Client(Socket, threading.Thread):
                 self.task_stop()
             elif cmd == "update-stream":
                 self.task_update_stream(ext)
+            elif cmd == "capture-stream":
+                self.task_capture_stream()
     
 
 def DEBUG(*args,**kwargs):

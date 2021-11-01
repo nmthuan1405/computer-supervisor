@@ -44,6 +44,7 @@ SCREEN_STREAM_TITLE = "Screen Stream"
 PAUSE = "Pause"
 RESUME = "Resume"
 CAPTURE = "Capture"
+ERROR_SAVE_FILE = "Unable to save screenshot"
 # ----------------------------------------------------------------------------------------------------------------------
 KEYLOGGER_TITLE = "Keylogger"
 KEYLOGGER_HOOK = "Hook"
