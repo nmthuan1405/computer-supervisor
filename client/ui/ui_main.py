@@ -7,6 +7,7 @@ import ui.ui_screenStream as sc
 import ui.ui_keylogger as kl
 import ui.ui_fileExplorer as fe
 import ui.ui_registry as reg
+import ui.ui_runningApps as ra
 import ui.ui_runningProcesses as rp
 
 class UI_main(tk.Tk):
@@ -21,7 +22,7 @@ class UI_main(tk.Tk):
         #self.geometry("{}x{}".format(lb.MAIN_WIDTH, lb.MAIN_HEIGHT))
         self.resizable(False, False)
 
-        self.lbl_app_name = tk.Label(text = lb.APP_NAME, font = ("Arial", 16))
+        self.lbl_app_name = tk.Label(text = lb.THIS_APP_NAME, font = ("Arial", 16))
         self.lbl_app_name.grid(row = 0, column = 0, columnspan = 3, padx = 10, pady = 10)
 
         self.lbl_IP_input = tk.Label(text = lb.LBL_SERVER_IP)
@@ -123,7 +124,9 @@ class UI_main(tk.Tk):
         window.focus()
 
     def runningApps(self):
-        self.socket_cmd("runningApps")
+        window = ra.UI_runningApps(self)
+        window.grab_set()
+        window.focus()
 
     def runningProcesses(self):
         window = rp.UI_runningProcesses(self)
