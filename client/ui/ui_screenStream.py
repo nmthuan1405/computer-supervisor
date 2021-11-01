@@ -1,14 +1,16 @@
 import tkinter as tk
 import ui.label as lb
+from PIL import ImageTk
 import queue
 
 class UI_screenStream(tk.Toplevel):
-    def __init__(self, parent):
+    def __init__(self, parent, socket_queue):
         self.ui_queue = queue.Queue()
-        self.socket_queue = None
+        self.socket_queue = socket_queue
 
         super().__init__(parent)
         self.title = lb.SCREEN_STREAM_TITLE
+        self.protocol("WM_DELETE_WINDOW", self.close)
         self.resizable(False, False)
 
         self.canvas = tk.Canvas(self, width = 600, height = 400, bg = 'black')
@@ -22,6 +24,7 @@ class UI_screenStream(tk.Toplevel):
         self.btn_capture = tk.Button(self, text = lb.CAPTURE, width = 10, height = 2, command = self.captureStream)
         self.btn_capture.grid(row = 1, column = 1, padx = 10, pady = 10)
         
+        self.socket_cmd('update-stream', (600, 400))
         self.after(200, self.periodic_call)
 
     def pauseStream(self):
@@ -31,13 +34,23 @@ class UI_screenStream(tk.Toplevel):
             self.btn_pause_stt.set(lb.PAUSE)
 
     def captureStream(self):
-        return
+        self.socket_cmd('update-stream')
+
+    def close(self):
+        self.destroy()
 
     def update_ui(self, task):
         DEBUG("task", task)
         cmd, ext = task
 
+        if cmd == 'update-stream':
+            self.render = ImageTk.PhotoImage(ext)
+            self.canvas.itemconfig(self.imgOnCanvas, image = self.render)
+
     def periodic_call(self):
+        if self.btn_pause_stt.get() == lb.PAUSE:
+            self.socket_cmd('update-stream', (600, 400))
+
         while True:
             try:
                 task = self.ui_queue.get_nowait()
@@ -48,9 +61,6 @@ class UI_screenStream(tk.Toplevel):
         
         self.after(200, self.periodic_call)
 
-    def add_socket_queue(self, socket_queue):
-        self.socket_queue = socket_queue
-    
     def socket_cmd(self, cmd, ext = None):
         self.socket_queue.put((cmd, ext))
 

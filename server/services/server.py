@@ -1,4 +1,5 @@
 from services.Socket import Socket
+import services.utils as utils
 import socket
 import threading
 import queue
@@ -109,6 +110,11 @@ class Client(Socket, threading.Thread):
         finally:
             DEBUG("remove client", self.name)
     
+    def task_screen_stream(self):
+        size = self.recv_obj()
+        self.send_obj(utils.take_screenshot(size))
+        DEBUG("sent screenshot")
+    
     def run(self):
         while True:
             flag = self.recv_str()
@@ -117,6 +123,9 @@ class Client(Socket, threading.Thread):
             if flag == 'close':
                 self.stop()
                 break
+            elif flag == 'screen-stream':
+                self.task_screen_stream()
+
 
 
 def DEBUG(*args,**kwargs):

@@ -12,6 +12,7 @@ import ui.ui_runningProcesses as rp
 class UI_main(tk.Tk):
     def __init__(self):
         self.ui_queue = queue.Queue()
+        self.ui_queues = {'main': self.ui_queue}
         self.socket_queue = None
 
         super().__init__()
@@ -100,7 +101,9 @@ class UI_main(tk.Tk):
 
 
     def screenStream(self):
-        window = sc.UI_screenStream(self)
+        window = sc.UI_screenStream(self, self.socket_queue)
+        self.ui_queues['screen'] = window.ui_queue
+
         window.grab_set()
         window.focus()
 

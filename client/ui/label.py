@@ -1,5 +1,5 @@
 MAIN_TITLE = "Client"
-APP_NAME = "Compter Supervisor"
+APP_NAME = "Computer Supervisor"
 
 MAIN_WIDTH = 400
 MAIN_HEIGHT = 600

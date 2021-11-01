@@ -6,7 +6,7 @@ if __name__ == "__main__":
     client = Client()
 
     root_ui.add_socket_queue(client.socket_queue)
-    client.add_ui_queue(root_ui.ui_queue)
+    client.add_ui_queue(root_ui.ui_queues)
 
     client.start()
     root_ui.mainloop()

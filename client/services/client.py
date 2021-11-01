@@ -16,8 +16,8 @@ class Client(Socket, threading.Thread):
     def add_ui_queue(self, ui_queue):
         self.ui_queue = ui_queue
     
-    def ui_cmd(self, cmd, ext = None):
-        self.ui_queue.put((cmd, ext))
+    def ui_cmd(self, cmd, ext = None, ui='main'):
+        self.ui_queue[ui].put((cmd, ext))
 
     def start_socket(self, SERVER):
         self.socket = socket.socket()
@@ -47,6 +47,14 @@ class Client(Socket, threading.Thread):
             DEBUG("ERR when stop socket")
         finally:
             self.ui_cmd("start")
+    
+    def task_update_stream(self, size):
+        self.send_str("screen-stream")
+        self.send_obj(size)
+
+        img = self.recv_obj()
+        DEBUG("received image")
+        self.ui_cmd("update-stream",img,'screen')
 
     def run(self):
         while True:
@@ -60,7 +68,9 @@ class Client(Socket, threading.Thread):
                 self.task_start(ext)
             elif cmd == "stop":    
                 self.task_stop()
-
+            elif cmd == "update-stream":
+                self.task_update_stream(ext)
+    
 
 def DEBUG(*args,**kwargs):
     print("Client:", *args,**kwargs)
