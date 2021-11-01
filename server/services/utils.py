@@ -3,7 +3,7 @@ import win32api
 
 def take_screenshot(size=None):
     image = ImageGrab.grab()
-    if size:
+    if size is not None:
         image = image.resize(size, Image.ANTIALIAS)
     
     return image
