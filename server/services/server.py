@@ -26,6 +26,7 @@ class Server(threading.Thread):
     def start_socket(self):
         self.socket = socket.socket()
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.socket.settimeout(1)
         self.socket.bind((ADDRESS, PORT))
         self.socket.listen()
 
@@ -37,10 +38,7 @@ class Server(threading.Thread):
             if client.is_alive():
                 client.close()
 
-        self.socket.shutdown(socket.SHUT_RDWR)
         self.socket.close()
-        self.socket = None
-
         self.add_client_thread.join()
 
     def task_start(self):
@@ -88,6 +86,10 @@ class add_client(threading.Thread):
                 self.clients.append(client)
                 client.start()
 
+            except socket.timeout:
+                # DEBUG("add_client timeout")
+                pass
+            
             except:
                 DEBUG("end add_client thread")
                 break
