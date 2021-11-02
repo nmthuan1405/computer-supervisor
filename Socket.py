@@ -1,4 +1,3 @@
-from socket import *
 import pickle
 
 # socket wrapper
@@ -10,7 +9,7 @@ class Socket():
 
     # pure send & recv
     def send(self, data):
-        return self.socket.send(data)
+        return self.socket.sendall(data)
 
     def recv(self, buff_size):
         return self.socket.recv(buff_size)
