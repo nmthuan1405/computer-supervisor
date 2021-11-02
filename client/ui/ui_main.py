@@ -123,17 +123,23 @@ class UI_main(tk.Tk):
         window.focus()
 
     def editRegistry(self):
-        window = reg.UI_Registry(self)
+        window = reg.UI_Registry(self, self.socket_queue)
+        self.ui_queues['registry'] = window.ui_queue
+
         window.grab_set()
         window.focus()
 
     def runningApps(self):
-        window = ra.UI_runningApps(self)
+        window = ra.UI_runningApps(self, self.socket_queue)
+        self.ui_queues['apps'] = window.ui_queue
+
         window.grab_set()
         window.focus()
 
     def runningProcesses(self):
-        window = rp.UI_runningProcesses(self)
+        window = rp.UI_runningProcesses(self, self.socket_queue)
+        self.ui_queues['processes'] = window.ui_queue
+
         window.grab_set()
         window.focus()
 

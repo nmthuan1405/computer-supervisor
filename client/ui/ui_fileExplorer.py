@@ -59,10 +59,12 @@ class UI_fileExplorer(tk.Toplevel):
         # self.trv_fileExp.insert('', tk.END, values = ('file3.pdf','1/1/2020 1:30 AM','Foxit Reader PDF Document','20340 KB'))
         self.trv_fileExp.bind("<Double-Button-1>", self.choose_in_tree)  
 
-        self.btn_copy = tk.Button(self, text = lb.FILE_EXP_COPY, width = 10, height = 6, command = self.copyFile)
+        self.btn_copy_stt = tk.StringVar(self, lb.FILE_EXP_COPY)
+        self.btn_copy = tk.Button(self, textvariable = self.btn_copy_stt, width = 10, height = 6, command = self.copyFile)
         self.btn_copy.grid(row = 1, column = 3, padx = (10,0))
 
-        self.btn_delete = tk.Button(self, text = lb.FILE_EXP_DELETE, width = 10, height = 6, command = self.deleteFile)
+        self.btn_delete_stt = tk.StringVar(self, lb.FILE_EXP_DELETE)
+        self.btn_delete = tk.Button(self, textvariable = self.btn_delete_stt, width = 10, height = 6, command = self.deleteFile)
         self.btn_delete.grid(row = 2, column = 3, padx = (10,0))
 
         self.goto_dir("")

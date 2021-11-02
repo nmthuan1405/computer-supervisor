@@ -7,9 +7,9 @@ import ui.constraints as const
 import queue
 
 class UI_runningProcesses(tk.Toplevel):
-    def __init__(self, parent):
+    def __init__(self, parent, socket_queue):
         self.ui_queue = queue.Queue()
-        self.socket_queue = None
+        self.socket_queue = socket_queue
 
         super().__init__(parent)
         self.title = lb.PROCESS_TITLE
