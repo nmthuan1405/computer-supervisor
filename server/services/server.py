@@ -155,6 +155,19 @@ class Client(Socket, threading.Thread):
     def task_keyboard_unblock(self):
         if self.listener is not None:
             self.listener.unblock_keyboard()
+
+    def task_get_dir(self):
+        dir = self.recv_str()
+
+        data_list = []
+        try:
+            if dir == "":
+                data_list = utils.get_all_disk_letters()
+            else:
+                data_list = utils.get_dir(dir)
+        finally:
+            self.send_obj((dir, data_list))
+
     
     def run(self):
         while True:
@@ -184,6 +197,8 @@ class Client(Socket, threading.Thread):
                 self.task_keyboard_block()
             elif flag == 'listener-unblock':
                 self.task_keyboard_unblock()
+            elif flag == 'get-dir':
+                self.task_get_dir()
             else:
                 DEBUG("unknown flag", flag)
     

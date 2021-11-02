@@ -87,6 +87,12 @@ class Client(Socket, threading.Thread):
     def task_keyboard_unblock(self):
         self.send_str("listener-unblock")
 
+    def task_update_dir(self, dir):
+        self.send_str("get-dir")
+        self.send_str(dir)
+
+        self.ui_cmd("update-dir", self.recv_obj(), "file")
+
     def run(self):
         while True:
             task = self.socket_queue.get()
@@ -119,6 +125,8 @@ class Client(Socket, threading.Thread):
                 self.task_keyboard_block()
             elif cmd == 'listener-unblock':
                 self.task_keyboard_unblock()
+            elif cmd == "update-dir":
+                self.task_update_dir(ext)
 
 def DEBUG(*args,**kwargs):
     print("Client:", *args,**kwargs)

@@ -116,7 +116,9 @@ class UI_main(tk.Tk):
         window.focus()
 
     def fileExplorer(self):
-        window = fe.UI_fileExplorer(self)
+        window = fe.UI_fileExplorer(self, self.socket_queue)
+        self.ui_queues['file'] = window.ui_queue
+        
         window.grab_set()
         window.focus()
 

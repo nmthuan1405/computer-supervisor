@@ -4,11 +4,12 @@ from tkinter import ttk
 import ui.label as lb
 import ui.constraints as const
 import queue
+import os
 
 class UI_fileExplorer(tk.Toplevel):
-    def __init__(self, parent):
+    def __init__(self, parent, socket_queue):
         self.ui_queue = queue.Queue()
-        self.socket_queue = None
+        self.socket_queue = socket_queue
 
         super().__init__(parent)
         self.title = lb.FILE_EXPLORER_TITLE
@@ -24,6 +25,7 @@ class UI_fileExplorer(tk.Toplevel):
 
         self.txt_path_input = tk.Entry(self)
         self.txt_path_input.grid(row = 0, column = 1, pady = (0,5), sticky = tk.EW)
+        self.txt_path_input['state'] = 'readonly'
 
         # create a treeview
         columns = ('#1', '#2', '#3', '#4')
@@ -49,12 +51,13 @@ class UI_fileExplorer(tk.Toplevel):
         self.scrollbar.grid(row = 1, column = 2, rowspan = 10, sticky = 'ns')
 
         # adding data
-        self.trv_fileExp.insert('', tk.END, values = ('Folder 1','1/1/2020 1:30 AM','File folder',''))
-        self.trv_fileExp.insert('', tk.END, values = ('Folder 2','1/1/2020 1:30 AM','File folder',''))
-        self.trv_fileExp.insert('', tk.END, values = ('Folder 3','1/1/2020 1:30 AM','File folder',''))
-        self.trv_fileExp.insert('', tk.END, values = ('file1.txt','1/1/2020 1:30 AM','Text Document','400 B'))
-        self.trv_fileExp.insert('', tk.END, values = ('file1.docx','1/1/2020 1:30 AM','Microsoft Word Document','10 KB'))
-        self.trv_fileExp.insert('', tk.END, values = ('file3.pdf','1/1/2020 1:30 AM','Foxit Reader PDF Document','20340 KB'))
+        # self.trv_fileExp.insert('', tk.END, values = ('Folder 1','1/1/2020 1:30 AM','File folder',''))
+        # self.trv_fileExp.insert('', tk.END, values = ('Folder 2','1/1/2020 1:30 AM','File folder',''))
+        # self.trv_fileExp.insert('', tk.END, values = ('Folder 3','1/1/2020 1:30 AM','File folder',''))
+        # self.trv_fileExp.insert('', tk.END, values = ('file1.txt','1/1/2020 1:30 AM','Text Document','400 B'))
+        # self.trv_fileExp.insert('', tk.END, values = ('file1.docx','1/1/2020 1:30 AM','Microsoft Word Document','10 KB'))
+        # self.trv_fileExp.insert('', tk.END, values = ('file3.pdf','1/1/2020 1:30 AM','Foxit Reader PDF Document','20340 KB'))
+        self.trv_fileExp.bind("<Double-Button-1>", self.choose_in_tree)  
 
         self.btn_copy = tk.Button(self, text = lb.FILE_EXP_COPY, width = 10, height = 6, command = self.copyFile)
         self.btn_copy.grid(row = 1, column = 3, padx = (10,0))
@@ -62,20 +65,56 @@ class UI_fileExplorer(tk.Toplevel):
         self.btn_delete = tk.Button(self, text = lb.FILE_EXP_DELETE, width = 10, height = 6, command = self.deleteFile)
         self.btn_delete.grid(row = 2, column = 3, padx = (10,0))
 
+        self.goto_dir("")
         self.after(const.UPDATE_TIME, self.periodic_call)
 
     def upFolder(self):
-        return
+        dir = self.txt_path_input.get()
+        if dir != lb.WAIT:
+            parent_dir = os.path.dirname(dir)
+            if parent_dir == dir:
+                parent_dir = ''
+                
+            self.goto_dir(parent_dir)
 
     def copyFile(self):
         return
 
     def deleteFile(self):
         return
+    
+    def update_dir(self, path):
+        self.txt_path_input.configure(state = 'normal')
+        self.txt_path_input.delete(0, tk.END)
+        self.txt_path_input.insert(0, path)
+        self.txt_path_input.configure(state = 'readonly')
+
+    def update_tree(self, list_file):
+        for file in list_file:
+            self.trv_fileExp.insert('', tk.END, values = file)
+
+    def clear_dir(self):
+        self.update_dir(lb.WAIT)
+        self.trv_fileExp.delete(*self.trv_fileExp.get_children())
+
+    def goto_dir(self, dir):
+        self.clear_dir()
+        self.socket_cmd("update-dir", dir)
+
+    def choose_in_tree(self, event):
+        item = self.trv_fileExp.selection()[0]
+        if self.trv_fileExp.item(item, "values")[2] in ("File folder", "Disk drive"):
+            next_dir = os.path.join(self.txt_path_input.get(), self.trv_fileExp.item(item, "values")[0])
+            self.goto_dir(next_dir)
 
     def update_ui(self, task):
         DEBUG("task", task)
         cmd, ext = task
+
+        if cmd == "update-dir":
+            path, list_file = ext
+            self.update_dir(path)
+            self.update_tree(list_file)
 
     def periodic_call(self):
         while True:
@@ -87,12 +126,9 @@ class UI_fileExplorer(tk.Toplevel):
                 break
         
         self.after(const.UPDATE_TIME, self.periodic_call)
-
-    def add_socket_queue(self, socket_queue):
-        self.socket_queue = socket_queue
     
     def socket_cmd(self, cmd, ext = None):
         self.socket_queue.put((cmd, ext))
 
 def DEBUG(*args,**kwargs):
-    print("UI:", *args,**kwargs)
+    print("File:", *args,**kwargs)
