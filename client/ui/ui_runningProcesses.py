@@ -1,7 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter.messagebox import askokcancel, showerror, showinfo
+
 import ui.label as lb
+import ui.constraints as const
 import queue
 
 class UI_runningProcesses(tk.Toplevel):
@@ -12,8 +14,8 @@ class UI_runningProcesses(tk.Toplevel):
         super().__init__(parent)
         self.title = lb.PROCESS_TITLE
         self.resizable(False, False)
-        self['padx'] = 10
-        self['pady'] = 10
+        self['padx'] = const.WINDOW_BORDER_PADDING
+        self['pady'] = const.WINDOW_BORDER_PADDING
 
         self.btn_start = tk.Button(self, text = lb.PROCESS_START, width = 15, height = 2, command = self.start)
         self.btn_start.grid(row = 0, column = 0)
@@ -45,7 +47,7 @@ class UI_runningProcesses(tk.Toplevel):
         # add data
         # self.insert(self.services.getProcessList())
 
-        self.after(200, self.periodic_call)
+        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def insert(self, data):
         try:
@@ -82,7 +84,7 @@ class UI_runningProcesses(tk.Toplevel):
             except queue.Empty:
                 break
         
-        self.after(200, self.periodic_call)
+        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def add_socket_queue(self, socket_queue):
         self.socket_queue = socket_queue
@@ -98,8 +100,8 @@ class UI_startProcess(tk.Toplevel):
         super().__init__(parent)
         self.title = lb.START_PROCESS_TITLE
         self.resizable(False, False)
-        self['padx'] = 10
-        self['pady'] = 10
+        self['padx'] = const.WINDOW_BORDER_PADDING
+        self['pady'] = const.WINDOW_BORDER_PADDING
 
         self.lbl_process_name = tk.Label(self, text = lb.START_PROCESS_NAME)
         self.lbl_process_name.grid(column = 0, row = 0)
@@ -111,7 +113,7 @@ class UI_startProcess(tk.Toplevel):
         self.btn_start = tk.Button(self, text=lb.START_PROCESS_START, command = self.startProcess)
         self.btn_start.grid(column=2, row=0, sticky = tk.W, padx = 0, pady = 0, ipadx = 10)
 
-        self.after(200, self.periodic_call)
+        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def startProcess(self):
         # if (self.services.sendStartProcess(self.txt_name_input.get()) == 'OK'):
@@ -132,7 +134,7 @@ class UI_startProcess(tk.Toplevel):
             except queue.Empty:
                 break
         
-        self.after(200, self.periodic_call)
+        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def add_socket_queue(self, socket_queue):
         self.socket_queue = socket_queue
@@ -148,8 +150,8 @@ class UI_killProcess(tk.Toplevel):
         super().__init__(parent)
         self.title = lb.KILL_PROCESS_TITLE
         self.resizable(False, False)
-        self['padx'] = 10
-        self['pady'] = 10
+        self['padx'] = const.WINDOW_BORDER_PADDING
+        self['pady'] = const.WINDOW_BORDER_PADDING
 
         self.lbl_process_id = tk.Label(self, text = lb.KILL_PROCESS_ID)
         self.lbl_process_id.grid(column = 0, row = 0)
@@ -161,7 +163,7 @@ class UI_killProcess(tk.Toplevel):
         self.btn_kill = tk.Button(self, text=lb.KILL_PROCESS_KILL, command = self.killProcess)
         self.btn_kill.grid(column=2, row=0, sticky = tk.W, padx = 0, pady = 0, ipadx = 10)
 
-        self.after(200, self.periodic_call)
+        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def killProcess(self):
         # if (self.services.sendKillProcess(self.txt_ID_input.get()) == 'OK'):
@@ -182,7 +184,7 @@ class UI_killProcess(tk.Toplevel):
             except queue.Empty:
                 break
         
-        self.after(200, self.periodic_call)
+        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def add_socket_queue(self, socket_queue):
         self.socket_queue = socket_queue

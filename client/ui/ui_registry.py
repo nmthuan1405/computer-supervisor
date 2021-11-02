@@ -5,6 +5,7 @@ from tkinter.filedialog import asksaveasfilename, askopenfilename
 from tkinter.messagebox import showerror, showinfo
 
 import ui.label as lb
+import ui.constraints as const
 import queue
 
 class UI_Registry(tk.Toplevel):
@@ -16,12 +17,10 @@ class UI_Registry(tk.Toplevel):
         self.title = lb.REGISTRY_TITLE
         self.geometry('430x637')
         self.resizable(False, False)
-        self['padx'] = 10
-        self['pady'] = 10
+        self['padx'] = const.WINDOW_BORDER_PADDING
+        self['pady'] = const.WINDOW_BORDER_PADDING
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
-        self['padx'] = 10
-        self['pady'] = 10
 
         self.lbl_pathInput = tk.Label(self, text = "Path")
         self.lbl_pathInput.grid(column = 0, row = 0, sticky = tk.SW)
@@ -243,7 +242,7 @@ class UI_Registry(tk.Toplevel):
         self.button2 = ttk.Button(self.frame_editDirectly, text="Clear log", command = self.clearLog)
         self.button2.place(x = 220, y = 320)
 
-        self.after(200, self.periodic_call)
+        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def browse(self):
         try:
@@ -348,7 +347,7 @@ class UI_Registry(tk.Toplevel):
             except queue.Empty:
                 break
         
-        self.after(200, self.periodic_call)
+        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def add_socket_queue(self, socket_queue):
         self.socket_queue = socket_queue

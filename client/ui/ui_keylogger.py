@@ -1,6 +1,7 @@
 import tkinter as tk
 import tkinter.scrolledtext as st
 import ui.label as lb
+import ui.constraints as const
 import queue
 
 class UI_keylogger(tk.Toplevel):
@@ -12,8 +13,8 @@ class UI_keylogger(tk.Toplevel):
         self.title = lb.KEYLOGGER_TITLE
         self.protocol("WM_DELETE_WINDOW", self.close)
         self.resizable(False, False)
-        self['padx'] = 10
-        self['pady'] = 10
+        self['padx'] = const.WINDOW_BORDER_PADDING
+        self['pady'] = const.WINDOW_BORDER_PADDING
 
         self.btn_hook_stt = tk.StringVar(self, lb.KEYLOGGER_HOOK)
         self.btn_hook = tk.Button(self, textvariable = self.btn_hook_stt, width = 15, height = 2, command = self.hook)
@@ -31,7 +32,7 @@ class UI_keylogger(tk.Toplevel):
         self.text_log['state'] = 'disabled'
 
         self.socket_cmd("listener-start")
-        self.after(200, self.periodic_call)
+        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def hook(self):
         if self.btn_hook_stt.get() == lb.KEYLOGGER_HOOK:
@@ -83,7 +84,7 @@ class UI_keylogger(tk.Toplevel):
             except queue.Empty:
                 break
         
-        self.after(200, self.periodic_call)
+        self.after(const.UPDATE_TIME, self.periodic_call)
     
     def socket_cmd(self, cmd, ext = None):
         self.socket_queue.put((cmd, ext))

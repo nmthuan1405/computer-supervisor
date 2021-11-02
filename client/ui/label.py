@@ -1,10 +1,5 @@
 MAIN_TITLE = "Client"
-APP_NAME = "Computer Supervisor"
-
-MAIN_WIDTH = 400
-MAIN_HEIGHT = 600
-MAIN_PADX = 10
-MAIN_PADY = 10
+THIS_APP_NAME = "Computer Supervisor"
 
 ERR = "Error"
 WARN = "Warning"
@@ -54,6 +49,7 @@ KEYLOGGER_BLOCK = "Block\nKeyboard"
 KEYLOGGER_UNBLOCK = "Unblock\nKeyboard"
 # ----------------------------------------------------------------------------------------------------------------------
 FILE_EXPLORER_TITLE = "File Explorer"
+FILE_EXP_UP = "\u2191 Up Folder"
 FILE_EXP_COPY = "Copy"
 FILE_EXP_DELETE = "Delete"
 
@@ -63,6 +59,22 @@ FILE_EXP_TRV_TYPE = "Type"
 FILE_EXP_TRV_SIZE = "Size"
 # ----------------------------------------------------------------------------------------------------------------------
 REGISTRY_TITLE = "Edit Registry"
+# ----------------------------------------------------------------------------------------------------------------------
+APP_TITLE = "Running Apps"
+APP_START = "Start"
+APP_KILL = "Kill"
+
+APP_NAME = "Application Name"
+APP_ID = "Application ID"
+APP_THREAD_COUNT = "Thread Count"
+
+START_APP_AVAIL_APPS = "Available Applications:"
+APP_ICON = "Icon"
+START_APP_START = "Start"
+START_APP_CUSTOM = "Custom"
+
+START_APP_TITLE = "Start Application"
+START_APP_NAME = "Application Name:"
 # ----------------------------------------------------------------------------------------------------------------------
 PROCESS_TITLE = "Running Processes"
 PROCESS_START = "Start"

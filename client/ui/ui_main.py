@@ -1,12 +1,14 @@
 from tkinter.messagebox import askokcancel, showerror, showinfo
 import tkinter as tk
 import ui.label as lb
+import ui.constraints as const
 import queue
 
 import ui.ui_screenStream as sc
 import ui.ui_keylogger as kl
 import ui.ui_fileExplorer as fe
 import ui.ui_registry as reg
+import ui.ui_runningApps as ra
 import ui.ui_runningProcesses as rp
 
 class UI_main(tk.Tk):
@@ -18,10 +20,9 @@ class UI_main(tk.Tk):
         super().__init__()
         self.title(lb.MAIN_TITLE)
         self.protocol("WM_DELETE_WINDOW", self.close)
-        #self.geometry("{}x{}".format(lb.MAIN_WIDTH, lb.MAIN_HEIGHT))
         self.resizable(False, False)
 
-        self.lbl_app_name = tk.Label(text = lb.APP_NAME, font = ("Arial", 16))
+        self.lbl_app_name = tk.Label(text = lb.THIS_APP_NAME, font = ("Arial", 16))
         self.lbl_app_name.grid(row = 0, column = 0, columnspan = 3, padx = 10, pady = 10)
 
         self.lbl_IP_input = tk.Label(text = lb.LBL_SERVER_IP)
@@ -70,7 +71,7 @@ class UI_main(tk.Tk):
         self.lbl_about_us.grid(row = 6, column = 0, columnspan = 3, padx = 10, pady = 10)
         self.lbl_about_us.bind("<Button-1>", self.onClickAboutUs)
         
-        self.after(200, self.periodic_call)
+        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def close(self):
         if self.btn_connect_stt.get() == lb.DISCONNECT:
@@ -125,7 +126,9 @@ class UI_main(tk.Tk):
         window.focus()
 
     def runningApps(self):
-        self.socket_cmd("runningApps")
+        window = ra.UI_runningApps(self)
+        window.grab_set()
+        window.focus()
 
     def runningProcesses(self):
         window = rp.UI_runningProcesses(self)
@@ -167,7 +170,7 @@ class UI_main(tk.Tk):
             except queue.Empty:
                 break
         
-        self.after(200, self.periodic_call)
+        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def add_socket_queue(self, socket_queue):
         self.socket_queue = socket_queue
