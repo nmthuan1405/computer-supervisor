@@ -14,7 +14,8 @@ DISCONNECT = "Disconnect"
 CANNOT_CONNECT = "Cannot connect to server"
 ASK_QUIT = "Client is connecting.\nDo you want to quit?"
 
-MAC_ADDRESS = "Server MAC Address:"
+LBL_MAC_ADDRESS = "Server MAC Address:"
+MAC_ADDRESS = ""
 
 SCREEN_STREAM = "Screen Stream"
 KEYLOGGER = "Keylogger"
