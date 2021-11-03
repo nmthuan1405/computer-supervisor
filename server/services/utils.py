@@ -4,6 +4,7 @@ import humanize
 import win32api
 import os
 import magic
+from getmac import get_mac_address as gma
 
 def take_screenshot(size=None):
     image = ImageGrab.grab()
@@ -43,3 +44,7 @@ def get_dir(path):
 
     data_list.sort(key=lambda x: (x[2] != 'File folder', x[0].lower()))
     return data_list
+
+def get_MAC():
+    print(gma())
+    return gma()

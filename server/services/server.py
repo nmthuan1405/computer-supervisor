@@ -168,7 +168,9 @@ class Client(Socket, threading.Thread):
         finally:
             self.send_obj((dir, data_list))
 
-    
+    def task_get_MAC(self):
+        self.send_str(utils.get_MAC())
+
     def run(self):
         while True:
             flag = self.recv_str()
@@ -199,6 +201,8 @@ class Client(Socket, threading.Thread):
                 self.task_keyboard_unblock()
             elif flag == 'get-dir':
                 self.task_get_dir()
+            elif flag == 'get-MAC':
+                self.task_get_MAC()
             else:
                 DEBUG("unknown flag", flag)
     

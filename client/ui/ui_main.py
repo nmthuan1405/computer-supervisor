@@ -95,10 +95,10 @@ class UI_main(tk.Tk):
 
     def onClickMACAddress(self, event):
         if self.lbl_MAC_address_stt.get() == lb.MAC_ADDRESS:
-            self.lbl_MAC_address_stt.set(lb.MAC_ADDRESS +" default MAC address")
+            self.socket_cmd("get-MAC")
+            # self.lbl_MAC_address_stt.set(lb.MAC_ADDRESS +" default MAC address")
         else:
             self.lbl_MAC_address_stt.set(lb.MAC_ADDRESS)
-        self.socket_cmd("getMACAddress")
 
 
     def screenStream(self):
@@ -165,6 +165,8 @@ class UI_main(tk.Tk):
         elif cmd == "stop":
             self.btn_connect_stt.set(lb.DISCONNECT)
             self.txt_IP_input.config(state = tk.DISABLED)
+        elif cmd == "update-MAC":
+            self.lbl_MAC_address_stt.set(lb.MAC_ADDRESS + " " + ext)
         elif cmd == "err":
             if ext == "cannot start":
                 showerror(lb.ERR, lb.CANNOT_CONNECT)
