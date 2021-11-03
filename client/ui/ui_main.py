@@ -22,52 +22,52 @@ class UI_main(tk.Tk):
         self.protocol("WM_DELETE_WINDOW", self.close)
         self.resizable(False, False)
 
-        self.lbl_app_name = tk.Label(text = lb.THIS_APP_NAME, font = ("Arial", 16))
+        self.lbl_app_name = tk.Label(self, text = lb.THIS_APP_NAME, font = ("Arial", 16))
         self.lbl_app_name.grid(row = 0, column = 0, columnspan = 3, padx = 10, pady = 10)
 
-        self.lbl_IP_input = tk.Label(text = lb.LBL_SERVER_IP)
+        self.lbl_IP_input = tk.Label(self, text = lb.LBL_SERVER_IP)
         self.lbl_IP_input.grid(row= 1, column = 0, sticky = tk.W, padx = 10, pady = 10)
 
-        self.txt_IP_input = tk.Entry()
+        self.txt_IP_input = tk.Entry(self)
         self.txt_IP_input.insert(-1, lb.DEFAULT_IP)
         self.txt_IP_input.focus()
         self.txt_IP_input.grid(row = 1, column = 1)
 
         self.btn_connect_stt = tk.StringVar(self, lb.CONNECT)
-        self.btn_connect = tk.Button(textvariable = self.btn_connect_stt, width = 10, command = self.connect)
+        self.btn_connect = tk.Button(self, textvariable = self.btn_connect_stt, width = 10, command = self.connect)
         self.btn_connect.grid(row = 1, column=2, sticky = tk.W, padx = 10, pady = 10)
 
         self.lbl_MAC_address_stt = tk.StringVar(self, lb.MAC_ADDRESS)
-        self.lbl_MAC_address = tk.Label(textvariable = self.lbl_MAC_address_stt, cursor = "hand2")
+        self.lbl_MAC_address = tk.Label(self, textvariable = self.lbl_MAC_address_stt, cursor = "hand2")
         self.lbl_MAC_address.grid(row = 2, column = 0, columnspan = 3, sticky = tk.W, padx = 10)
         # bind mouse click event
         self.lbl_MAC_address.bind("<Button-1>", self.onClickMACAddress)
 
-        self.btn_screen_stream = tk.Button(text = lb.SCREEN_STREAM, width = 15, height = 2, command = self.screenStream)
+        self.btn_screen_stream = tk.Button(self, text = lb.SCREEN_STREAM, width = 15, height = 2, command = self.screenStream)
         self.btn_screen_stream.grid(row = 3, column=0, sticky = tk.W, padx = 10, pady = 10)
 
-        self.btn_keylogger = tk.Button(text = lb.KEYLOGGER, width = 15, height = 2, command = self.keylogger)
+        self.btn_keylogger = tk.Button(self, text = lb.KEYLOGGER, width = 15, height = 2, command = self.keylogger)
         self.btn_keylogger.grid(row = 3, column=1, sticky = tk.W, padx = 10, pady = 10)
 
-        self.btn_file_explorer = tk.Button(text = lb.FILE_EXPLORER, width = 15, height = 2, command = self.fileExplorer)
+        self.btn_file_explorer = tk.Button(self, text = lb.FILE_EXPLORER, width = 15, height = 2, command = self.fileExplorer)
         self.btn_file_explorer.grid(row = 3, column=2, sticky = tk.W, padx = 10, pady = 10)
 
-        self.btn_edit_registry = tk.Button(text = lb.EDIT_REGISTRY, width = 15, height = 2, command = self.editRegistry)
+        self.btn_edit_registry = tk.Button(self, text = lb.EDIT_REGISTRY, width = 15, height = 2, command = self.editRegistry)
         self.btn_edit_registry.grid(row = 4, column=0, sticky = tk.W, padx = 10, pady = 10)
 
-        self.btn_running_apps = tk.Button(text = lb.RUNNING_APPS, width = 15, height = 2, command = self.runningApps)
+        self.btn_running_apps = tk.Button(self, text = lb.RUNNING_APPS, width = 15, height = 2, command = self.runningApps)
         self.btn_running_apps.grid(row = 4, column=1, sticky = tk.W, padx = 10, pady = 10)
 
-        self.btn_running_processes = tk.Button(text = lb.RUNNING_PROCESSES, width = 15, height = 2, command = self.runningProcesses)
+        self.btn_running_processes = tk.Button(self, text = lb.RUNNING_PROCESSES, width = 15, height = 2, command = self.runningProcesses)
         self.btn_running_processes.grid(row = 4, column=2, sticky = tk.W, padx = 10, pady = 10)
 
-        self.btn_shutdown = tk.Button(text = lb.SHUTDOWN, width = 15, height = 2, command = self.shutdown)
+        self.btn_shutdown = tk.Button(self, text = lb.SHUTDOWN, width = 15, height = 2, command = self.shutdown)
         self.btn_shutdown.grid(row = 5, column=0, columnspan = 2, sticky = tk.NS, padx = 10, pady = 10)
 
-        self.btn_logout = tk.Button(text = lb.LOGOUT, width = 15, height = 2, command = self.logout)
+        self.btn_logout = tk.Button(self, text = lb.LOGOUT, width = 15, height = 2, command = self.logout)
         self.btn_logout.grid(row = 5, column=1, columnspan = 2, sticky = tk.NS, padx = 10, pady = 10)
 
-        self.lbl_about_us = tk.Label(text = lb.ABOUT_US, cursor = "hand2")
+        self.lbl_about_us = tk.Label(self, text = lb.ABOUT_US, cursor = "hand2")
         self.lbl_about_us.grid(row = 6, column = 0, columnspan = 3, padx = 10, pady = 10)
         self.lbl_about_us.bind("<Button-1>", self.onClickAboutUs)
         
