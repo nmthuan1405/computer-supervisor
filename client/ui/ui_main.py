@@ -174,9 +174,11 @@ class UI_main(tk.Tk):
         if cmd == "start":
             self.btn_connect_stt.set(lb.CONNECT)
             self.txt_IP_input.config(state = tk.NORMAL)
+            self.MAC_address_stt.set("")
         elif cmd == "stop":
             self.btn_connect_stt.set(lb.DISCONNECT)
             self.txt_IP_input.config(state = tk.DISABLED)
+            self.socket_cmd("get-MAC")
         elif cmd == "update-MAC":
             self.MAC_address_stt.set(ext)
         elif cmd == "err":
