@@ -20,12 +20,14 @@ class UI_fileExplorer(tk.Toplevel):
 
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=30)
+        self.columnconfigure(2, weight=1)
+        self.columnconfigure(3, weight=1)
 
         self.btn_up = tk.Button(self, text = lb.FILE_EXP_UP, width = 10, command = self.upFolder)
-        self.btn_up.grid(row = 0, column = 0, pady = (0,5), sticky = tk.W)
+        self.btn_up.grid(row = 0, column = 0, sticky = tk.W)
 
         self.txt_path_input = tk.Entry(self)
-        self.txt_path_input.grid(row = 0, column = 1, pady = (0,5), sticky = tk.EW)
+        self.txt_path_input.grid(row = 0, column = 1, sticky = tk.EW)
         self.txt_path_input['state'] = 'readonly'
 
         # create a treeview
@@ -44,12 +46,12 @@ class UI_fileExplorer(tk.Toplevel):
         self.trv_fileExp.heading('#3', text = lb.FILE_EXP_TRV_TYPE)
         self.trv_fileExp.heading('#4', text = lb.FILE_EXP_TRV_SIZE)
 
-        self.trv_fileExp.grid(row = 1, column = 0, rowspan = 10, columnspan = 2, sticky = tk.NSEW)
+        self.trv_fileExp.grid(row = 1, column = 0, columnspan = 4, pady = (5,0), sticky = tk.NSEW)
 
         # add a scrollbar
         self.scrollbar = ttk.Scrollbar(self, orient = tk.VERTICAL, command = self.trv_fileExp.yview)
         self.trv_fileExp.configure(yscroll = self.scrollbar.set)
-        self.scrollbar.grid(row = 1, column = 2, rowspan = 10, sticky = 'ns')
+        self.scrollbar.grid(row = 1, column = 4, pady = (5,0), sticky = 'ns')
 
         # adding data
         # self.trv_fileExp.insert('', tk.END, values = ('Folder 1','1/1/2020 1:30 AM','File folder',''))
@@ -61,12 +63,12 @@ class UI_fileExplorer(tk.Toplevel):
         self.trv_fileExp.bind("<Double-Button-1>", self.choose_in_tree)  
 
         self.btn_copy_stt = tk.StringVar(self, lb.FILE_EXP_COPY)
-        self.btn_copy = tk.Button(self, textvariable = self.btn_copy_stt, width = 10, height = 6, command = self.copyFile)
-        self.btn_copy.grid(row = 1, column = 3, padx = (10,0))
+        self.btn_copy = tk.Button(self, textvariable = self.btn_copy_stt, width = 8, command = self.copyFile)
+        self.btn_copy.grid(row = 0, column = 2, sticky = tk.E)
 
         self.btn_delete_stt = tk.StringVar(self, lb.FILE_EXP_DELETE)
-        self.btn_delete = tk.Button(self, textvariable = self.btn_delete_stt, width = 10, height = 6, command = self.deleteFile)
-        self.btn_delete.grid(row = 2, column = 3, padx = (10,0))
+        self.btn_delete = tk.Button(self, textvariable = self.btn_delete_stt, width = 8, command = self.deleteFile)
+        self.btn_delete.grid(row = 0, column = 3, sticky=tk.E)
 
         self.goto_dir("")
         self.after(const.UPDATE_TIME, self.periodic_call)
