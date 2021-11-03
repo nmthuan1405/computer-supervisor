@@ -82,7 +82,7 @@ APP_ID = "Application ID"
 APP_THREAD_COUNT = "Thread Count"
 
 START_APP_AVAIL_APPS = "Available Applications:"
-APP_ICON = "Icon"
+APP_LOCATION = "Location"
 START_APP_START = "Start"
 START_APP_CUSTOM = "Custom"
 
