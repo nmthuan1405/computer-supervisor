@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter.messagebox import askokcancel, showerror
 
 import ui.label as lb
 import ui.constraints as const
@@ -80,7 +81,11 @@ class UI_fileExplorer(tk.Toplevel):
             self.goto_dir(parent_dir)
 
     def copyFile(self):
-        return
+        window = UI_copyFile(self, self.socket_queue)
+        self.ui_queue = window.ui_queue
+
+        window.grab_set()
+        window.focus()
 
     def deleteFile(self):
         return
@@ -131,6 +136,63 @@ class UI_fileExplorer(tk.Toplevel):
     
     def socket_cmd(self, cmd, ext = None):
         self.socket_queue.put((cmd, ext))
+
+class UI_copyFile(tk.Toplevel):
+    def __init__(self, parent, socket_queue):
+        self.ui_queue = queue.Queue()
+        self.socket_queue = socket_queue
+
+        super().__init__(parent)
+        self.title = lb.COPY_FILE_TITLE
+        self.protocol("WM_DELETE_WINDOW", self.cancel)
+        self.resizable(False, False)
+        self['padx'] = const.WINDOW_BORDER_PADDING
+        self['pady'] = const.WINDOW_BORDER_PADDING
+
+        self.lbl_file_name_stt = tk.StringVar(self, lb.FILE_NAME)
+        self.lbl_file_name = tk.Label(self, textvariable = self.lbl_file_name_stt)
+        self.lbl_file_name.grid(row = 0, column = 0, sticky = tk.W)
+
+        self.lbl_file_size_stt = tk.StringVar(self, lb.FILE_SIZE)
+        self.lbl_file_size = tk.Label(self, textvariable = self.lbl_file_size_stt)
+        self.lbl_file_size.grid(row = 0, column = 1, sticky = tk.E)
+
+        self.progress_bar = ttk.Progressbar(self, orient = tk.HORIZONTAL, length = 300, mode = 'indeterminate')
+        self.progress_bar.grid(row = 1, column = 0, columnspan = 2, sticky = tk.EW, pady = (5,0))
+        # update progress bar
+        # self.progress_bar['value'] += 20
+ 
+
+        self.btn_cancel = tk.Button(self, text = lb.CANCEL, command = self.cancel)
+        self.btn_cancel.grid(row = 1, column = 2, sticky = tk.W, padx = (5,0), pady = (5,0), ipadx = 10)
+
+        self.after(const.UPDATE_TIME, self.periodic_call)
+
+    def cancel(self):
+        if(askokcancel(lb.CANCEL, lb.CANCEL_CONFIRM, parent = self)):
+            self.destroy()
+
+    def update_ui(self, task):
+        DEBUG("task", task)
+        cmd, ext = task
+
+    def periodic_call(self):
+        while True:
+            try:
+                task = self.ui_queue.get_nowait()
+                self.update_ui(task)
+                
+            except queue.Empty:
+                break
+        
+        self.after(const.UPDATE_TIME, self.periodic_call)
+
+    def add_socket_queue(self, socket_queue):
+        self.socket_queue = socket_queue
+    
+    def socket_cmd(self, cmd, ext = None):
+        self.socket_queue.put((cmd, ext))
+
 
 def DEBUG(*args,**kwargs):
     print("File:", *args,**kwargs)

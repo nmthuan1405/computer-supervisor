@@ -70,8 +70,11 @@ class UI_main(tk.Tk):
         self.btn_restart = tk.Button(self, text = lb.RESTART, width = 15, height = 2, command = self.restart)
         self.btn_restart.grid(row = 5, column = 2, sticky = tk.W, padx = 10, pady = 10)
 
+        self.btn_exit = tk.Button(self, text = lb.EXIT, width = 15, height = 2, command = self.close)
+        self.btn_exit.grid(row = 6, column = 0, columnspan = 3, padx = 10, pady = 10)
+
         self.lbl_about_us = tk.Label(self, text = lb.ABOUT_US, cursor = "hand2")
-        self.lbl_about_us.grid(row = 6, column = 0, columnspan = 3, padx = 10, pady = 10)
+        self.lbl_about_us.grid(row = 7, column = 0, columnspan = 3, padx = 10, pady = 10)
         self.lbl_about_us.bind("<Button-1>", self.onClickAboutUs)
         
         self.after(const.UPDATE_TIME, self.periodic_call)

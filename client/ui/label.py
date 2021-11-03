@@ -36,6 +36,8 @@ RESTART = "Restart"
 RESTART_CONFIRM = "Are you sure you want to restart server?"
 RESTART_SUCCESS = "Server restart successfully"
 
+EXIT = "Exit"
+
 ABOUT_US = "About Us"
 ABOUT_US_TEXT = "Compter Supervisor is a remote desktop application that allows you to remotely control a computer.\n\n"
 # ----------------------------------------------------------------------------------------------------------------------
@@ -61,6 +63,12 @@ FILE_EXP_TRV_NAME = "Name"
 FILE_EXP_TRV_DATEMOD = "Date Modified"
 FILE_EXP_TRV_TYPE = "Type"
 FILE_EXP_TRV_SIZE = "Size"
+
+COPY_FILE_TITLE = "Copy File"
+FILE_NAME = "default name"
+FILE_SIZE = "default size"
+CANCEL = "Cancel"
+CANCEL_CONFIRM = "Are you sure you want to cancel copy progress?"
 # ----------------------------------------------------------------------------------------------------------------------
 REGISTRY_TITLE = "Edit Registry"
 # ----------------------------------------------------------------------------------------------------------------------
