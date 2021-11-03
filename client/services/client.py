@@ -97,6 +97,9 @@ class Client(Socket, threading.Thread):
         self.send_str("get-MAC")
         self.ui_cmd("update-MAC", self.recv_str(), "main")
 
+    def task_send_shutdown(self):
+        self.send_str("shutdown")
+
     def run(self):
         while True:
             task = self.socket_queue.get()
@@ -133,6 +136,8 @@ class Client(Socket, threading.Thread):
                 self.task_update_dir(ext)
             elif cmd == "get-MAC":
                 self.task_get_MAC()
+            elif cmd == "shutdown":
+                self.task_send_shutdown()
 
 def DEBUG(*args,**kwargs):
     print("Client:", *args,**kwargs)

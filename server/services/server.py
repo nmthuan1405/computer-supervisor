@@ -171,6 +171,9 @@ class Client(Socket, threading.Thread):
     def task_get_MAC(self):
         self.send_str(utils.get_MAC())
 
+    def task_shutdown(self):
+        utils.shutdown()
+
     def run(self):
         while True:
             flag = self.recv_str()
@@ -203,6 +206,8 @@ class Client(Socket, threading.Thread):
                 self.task_get_dir()
             elif flag == 'get-MAC':
                 self.task_get_MAC()
+            elif flag == 'shutdown':
+                self.task_shutdown()
             else:
                 DEBUG("unknown flag", flag)
     
