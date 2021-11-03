@@ -50,8 +50,20 @@ def get_MAC():
     print(gma())
     return gma()
 
+def logout():
+    try:
+        os.system("shutdown -l")
+    except:
+        pass
+
 def shutdown():
     try:
         subprocess.run(['shutdown', '-s', '-t', '0'])
+    except:
+        pass
+
+def restart():
+    try:
+        os.system("shutdown /r /t 1")
     except:
         pass

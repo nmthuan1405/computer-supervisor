@@ -35,7 +35,7 @@ class UI_main(tk.Tk):
 
         self.btn_connect_stt = tk.StringVar(self, lb.CONNECT)
         self.btn_connect = tk.Button(self, textvariable = self.btn_connect_stt, width = 10, command = self.connect)
-        self.btn_connect.grid(row = 1, column=2, sticky = tk.W, padx = 10, pady = 10)
+        self.btn_connect.grid(row = 1, column = 2, sticky = tk.W, padx = 10, pady = 10)
 
         self.lbl_MAC_address_stt = tk.StringVar(self, lb.MAC_ADDRESS)
         self.lbl_MAC_address = tk.Label(self, textvariable = self.lbl_MAC_address_stt, cursor = "hand2")
@@ -44,28 +44,31 @@ class UI_main(tk.Tk):
         self.lbl_MAC_address.bind("<Button-1>", self.onClickMACAddress)
 
         self.btn_screen_stream = tk.Button(self, text = lb.SCREEN_STREAM, width = 15, height = 2, command = self.screenStream)
-        self.btn_screen_stream.grid(row = 3, column=0, sticky = tk.W, padx = 10, pady = 10)
+        self.btn_screen_stream.grid(row = 3, column = 0, sticky = tk.W, padx = 10, pady = 10)
 
         self.btn_keylogger = tk.Button(self, text = lb.KEYLOGGER, width = 15, height = 2, command = self.keylogger)
-        self.btn_keylogger.grid(row = 3, column=1, sticky = tk.W, padx = 10, pady = 10)
+        self.btn_keylogger.grid(row = 3, column = 1, sticky = tk.W, padx = 10, pady = 10)
 
         self.btn_file_explorer = tk.Button(self, text = lb.FILE_EXPLORER, width = 15, height = 2, command = self.fileExplorer)
-        self.btn_file_explorer.grid(row = 3, column=2, sticky = tk.W, padx = 10, pady = 10)
+        self.btn_file_explorer.grid(row = 3, column = 2, sticky = tk.W, padx = 10, pady = 10)
 
         self.btn_edit_registry = tk.Button(self, text = lb.EDIT_REGISTRY, width = 15, height = 2, command = self.editRegistry)
-        self.btn_edit_registry.grid(row = 4, column=0, sticky = tk.W, padx = 10, pady = 10)
+        self.btn_edit_registry.grid(row = 4, column = 0, sticky = tk.W, padx = 10, pady = 10)
 
         self.btn_running_apps = tk.Button(self, text = lb.RUNNING_APPS, width = 15, height = 2, command = self.runningApps)
-        self.btn_running_apps.grid(row = 4, column=1, sticky = tk.W, padx = 10, pady = 10)
+        self.btn_running_apps.grid(row = 4, column = 1, sticky = tk.W, padx = 10, pady = 10)
 
         self.btn_running_processes = tk.Button(self, text = lb.RUNNING_PROCESSES, width = 15, height = 2, command = self.runningProcesses)
-        self.btn_running_processes.grid(row = 4, column=2, sticky = tk.W, padx = 10, pady = 10)
-
-        self.btn_shutdown = tk.Button(self, text = lb.SHUTDOWN, width = 15, height = 2, command = self.shutdown)
-        self.btn_shutdown.grid(row = 5, column=0, columnspan = 2, sticky = tk.NS, padx = 10, pady = 10)
+        self.btn_running_processes.grid(row = 4, column = 2, sticky = tk.W, padx = 10, pady = 10)
 
         self.btn_logout = tk.Button(self, text = lb.LOGOUT, width = 15, height = 2, command = self.logout)
-        self.btn_logout.grid(row = 5, column=1, columnspan = 2, sticky = tk.NS, padx = 10, pady = 10)
+        self.btn_logout.grid(row = 5, column = 0, sticky = tk.W, padx = 10, pady = 10)
+
+        self.btn_shutdown = tk.Button(self, text = lb.SHUTDOWN, width = 15, height = 2, command = self.shutdown)
+        self.btn_shutdown.grid(row = 5, column = 1, sticky = tk.W, padx = 10, pady = 10)
+
+        self.btn_restart = tk.Button(self, text = lb.RESTART, width = 15, height = 2, command = self.restart)
+        self.btn_restart.grid(row = 5, column = 2, sticky = tk.W, padx = 10, pady = 10)
 
         self.lbl_about_us = tk.Label(self, text = lb.ABOUT_US, cursor = "hand2")
         self.lbl_about_us.grid(row = 6, column = 0, columnspan = 3, padx = 10, pady = 10)
@@ -143,15 +146,20 @@ class UI_main(tk.Tk):
         window.grab_set()
         window.focus()
 
+    def logout(self):
+        if askokcancel(lb.LOGOUT, lb.LOGOUT_CONFIRM):
+            self.socket_cmd("logout")
+            showinfo(lb.LOGOUT, lb.LOGOUT_SUCCESS)
+
     def shutdown(self):
         if askokcancel(lb.SHUTDOWN, lb.SHUTDOWN_CONFIRM):
             self.socket_cmd("shutdown")
             showinfo(lb.SHUTDOWN, lb.SHUTDOWN_SUCCESS)
 
-    def logout(self):
-        if askokcancel(lb.LOGOUT, lb.LOGOUT_CONFIRM):
-            self.socket_cmd("logout")
-            showinfo(lb.LOGOUT, lb.LOGOUT_SUCCESS)
+    def restart(self):
+        if askokcancel(lb.RESTART, lb.RESTART_CONFIRM):
+            self.socket_cmd("restart")
+            showinfo(lb.RESTART, lb.RESTART_SUCCESS)
 
     def onClickAboutUs(self, event):
         showinfo(lb.ABOUT_US, lb.ABOUT_US_TEXT)

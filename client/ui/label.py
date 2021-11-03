@@ -24,13 +24,17 @@ EDIT_REGISTRY = "Edit Registry"
 RUNNING_APPS = "Running Apps"
 RUNNING_PROCESSES = "Running Processes"
 
+LOGOUT = "Logout"
+LOGOUT_CONFIRM = "Are you sure you want to logout server?"
+LOGOUT_SUCCESS = "Server logout successfully"
+
 SHUTDOWN = "Shutdown"
 SHUTDOWN_CONFIRM = "Are you sure you want to shutdown server?"
 SHUTDOWN_SUCCESS = "Server shutdown successfully"
 
-LOGOUT = "Logout"
-LOGOUT_CONFIRM = "Are you sure you want to logout server?"
-LOGOUT_SUCCESS = "Server logout successfully"
+RESTART = "Restart"
+RESTART_CONFIRM = "Are you sure you want to restart server?"
+RESTART_SUCCESS = "Server restart successfully"
 
 ABOUT_US = "About Us"
 ABOUT_US_TEXT = "Compter Supervisor is a remote desktop application that allows you to remotely control a computer.\n\n"

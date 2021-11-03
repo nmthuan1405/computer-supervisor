@@ -174,6 +174,12 @@ class Client(Socket, threading.Thread):
     def task_shutdown(self):
         utils.shutdown()
 
+    def task_logout(self):
+        utils.logout()
+
+    def task_restart(self):
+        utils.restart()
+
     def run(self):
         while True:
             flag = self.recv_str()
@@ -208,6 +214,10 @@ class Client(Socket, threading.Thread):
                 self.task_get_MAC()
             elif flag == 'shutdown':
                 self.task_shutdown()
+            elif flag == 'logout':
+                self.task_logout()
+            elif flag == 'restart':
+                self.task_restart()
             else:
                 DEBUG("unknown flag", flag)
     
