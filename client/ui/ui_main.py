@@ -38,11 +38,15 @@ class UI_main(tk.Tk):
         self.btn_connect = tk.Button(self, textvariable = self.btn_connect_stt, width = 10, command = self.connect)
         self.btn_connect.grid(row = 1, column = 2, sticky = tk.W, padx = 10, pady = 10)
 
-        self.lbl_MAC_address_stt = tk.StringVar(self, lb.MAC_ADDRESS)
+        self.lbl_MAC_address_stt = tk.StringVar(self, lb.LBL_MAC_ADDRESS)
         self.lbl_MAC_address = tk.Label(self, textvariable = self.lbl_MAC_address_stt, cursor = "hand2")
-        self.lbl_MAC_address.grid(row = 2, column = 0, columnspan = 3, sticky = tk.W, padx = 10)
+        self.lbl_MAC_address.grid(row = 2, column = 0, sticky = tk.W, padx = 10)
         # bind mouse click event
         self.lbl_MAC_address.bind("<Button-1>", self.onClickMACAddress)
+
+        self.MAC_address_stt = tk.StringVar(self, lb.MAC_ADDRESS)
+        self.MAC_address = tk.Label(self, textvariable = self.MAC_address_stt)
+        self.MAC_address.grid(row = 2, column = 1, columnspan = 2, sticky = tk.W)
 
         self.btn_screen_stream = tk.Button(self, text = lb.SCREEN_STREAM, width = 15, height = 2, command = self.screenStream)
         self.btn_screen_stream.grid(row = 3, column = 0, sticky = tk.W, padx = 10, pady = 10)
@@ -71,8 +75,11 @@ class UI_main(tk.Tk):
         self.btn_restart = tk.Button(self, text = lb.RESTART, width = 15, height = 2, command = self.restart)
         self.btn_restart.grid(row = 5, column = 2, sticky = tk.W, padx = 10, pady = 10)
 
+        self.btn_exit = tk.Button(self, text = lb.EXIT, width = 15, height = 2, command = self.close)
+        self.btn_exit.grid(row = 6, column = 0, columnspan = 3, padx = 10, pady = 10)
+
         self.lbl_about_us = tk.Label(self, text = lb.ABOUT_US, cursor = "hand2")
-        self.lbl_about_us.grid(row = 6, column = 0, columnspan = 3, padx = 10, pady = 10)
+        self.lbl_about_us.grid(row = 7, column = 0, columnspan = 3, padx = 10, pady = 10)
         self.lbl_about_us.bind("<Button-1>", self.onClickAboutUs)
         
         self.after(const.UPDATE_TIME, self.periodic_call)
@@ -98,11 +105,8 @@ class UI_main(tk.Tk):
     
 
     def onClickMACAddress(self, event):
-        if self.lbl_MAC_address_stt.get() == lb.MAC_ADDRESS:
-            self.socket_cmd("get-MAC")
-            # self.lbl_MAC_address_stt.set(lb.MAC_ADDRESS +" default MAC address")
-        else:
-            self.lbl_MAC_address_stt.set(lb.MAC_ADDRESS)
+        self.socket_cmd("get-MAC")
+
 
 
     def screenStream(self):
@@ -159,11 +163,13 @@ class UI_main(tk.Tk):
         if cmd == "start":
             self.btn_connect_stt.set(lb.CONNECT)
             self.txt_IP_input.config(state = tk.NORMAL)
+            self.MAC_address_stt.set("")
         elif cmd == "stop":
             self.btn_connect_stt.set(lb.DISCONNECT)
             self.txt_IP_input.config(state = tk.DISABLED)
+            self.socket_cmd("get-MAC")
         elif cmd == "update-MAC":
-            self.lbl_MAC_address_stt.set(lb.MAC_ADDRESS + " " + ext)
+            self.MAC_address_stt.set(ext)
         elif cmd == "err":
             if ext == "cannot start":
                 showerror(lb.ERR, lb.CANNOT_CONNECT)

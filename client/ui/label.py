@@ -14,7 +14,8 @@ DISCONNECT = "Disconnect"
 CANNOT_CONNECT = "Cannot connect to server"
 ASK_QUIT = "Client is connecting.\nDo you want to quit?"
 
-MAC_ADDRESS = "Server MAC Address:"
+LBL_MAC_ADDRESS = "Server MAC Address:"
+MAC_ADDRESS = ""
 
 SCREEN_STREAM = "Screen Stream"
 KEYLOGGER = "Keylogger"
@@ -35,6 +36,8 @@ SHUTDOWN_SUCCESS = "Server shutdown successfully"
 RESTART = "Restart"
 RESTART_CONFIRM = "Are you sure you want to restart server?"
 RESTART_SUCCESS = "Server restart successfully"
+
+EXIT = "Exit"
 
 ABOUT_US = "About Us"
 ABOUT_US_TEXT = "Compter Supervisor is a remote desktop application that allows you to remotely control a computer.\n\n"
@@ -61,6 +64,12 @@ FILE_EXP_TRV_NAME = "Name"
 FILE_EXP_TRV_DATEMOD = "Date Modified"
 FILE_EXP_TRV_TYPE = "Type"
 FILE_EXP_TRV_SIZE = "Size"
+
+COPY_FILE_TITLE = "Copy File"
+FILE_NAME = "default name"
+FILE_SIZE = "default size"
+CANCEL = "Cancel"
+CANCEL_CONFIRM = "Are you sure you want to cancel copy progress?"
 # ----------------------------------------------------------------------------------------------------------------------
 REGISTRY_TITLE = "Edit Registry"
 # ----------------------------------------------------------------------------------------------------------------------
@@ -73,7 +82,7 @@ APP_ID = "Application ID"
 APP_THREAD_COUNT = "Thread Count"
 
 START_APP_AVAIL_APPS = "Available Applications:"
-APP_ICON = "Icon"
+APP_LOCATION = "Location"
 START_APP_START = "Start"
 START_APP_CUSTOM = "Custom"
 

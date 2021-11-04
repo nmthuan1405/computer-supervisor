@@ -20,10 +20,10 @@ class UI_runningApps(tk.Toplevel):
         self['pady'] = const.WINDOW_BORDER_PADDING
 
         self.btn_start = tk.Button(self, text = lb.APP_START, width = 15, height = 2, command = self.start)
-        self.btn_start.grid(row = 0, column = 0)
+        self.btn_start.grid(row = 0, column = 0, sticky = tk.EW)
 
         self.btn_kill = tk.Button(self, text = lb.APP_KILL, width = 15, height = 2, command = self.kill)
-        self.btn_kill.grid(row = 0, column = 1)
+        self.btn_kill.grid(row = 0, column = 1, sticky = tk.EW)
 
         # columns
         columns = ('#1', '#2', '#3')
@@ -39,12 +39,12 @@ class UI_runningApps(tk.Toplevel):
         self.trv_apps.heading('#2', text=lb.APP_ID)
         self.trv_apps.heading('#3', text=lb.APP_THREAD_COUNT)
 
-        self.trv_apps.grid(row = 1, column = 0, pady = (10,0), columnspan = 2, sticky='nsew')
+        self.trv_apps.grid(row = 1, column = 0, pady = (5,0), columnspan = 2, sticky='nsew')
 
         # add a scrollbar
         self.scrollbar = ttk.Scrollbar(self, orient = tk.VERTICAL, command = self.trv_apps.yview)
         self.trv_apps.configure(yscroll = self.scrollbar.set)
-        self.scrollbar.grid(row = 1, column = 2, padx = 0, pady = (10,0), sticky = 'ns')
+        self.scrollbar.grid(row = 1, column = 2, padx = 0, pady = (5,0), sticky = 'ns')
 
         self.socket_cmd('get-running-app')
         self.after(const.UPDATE_TIME, self.periodic_call)
@@ -107,28 +107,30 @@ class UI_startAvailApp(tk.Toplevel):
         self.trv_apps = ttk.Treeview(self, columns = columns, show = 'headings', height = 15)
 
         #config column width
-        self.trv_apps.column("#1", minwidth = 50, width = 50)
+        self.trv_apps.column("#1", minwidth = 50, width = 200)
         self.trv_apps.column("#2", minwidth = 50, width = 300)
 
         # define headings
-        self.trv_apps.heading('#1', text=lb.APP_ICON)
-        self.trv_apps.heading('#2', text=lb.APP_NAME)
+        self.trv_apps.heading('#1', text=lb.APP_NAME)
+        self.trv_apps.heading('#2', text=lb.APP_LOCATION)
 
-        self.trv_apps.grid(row = 1, column = 0, pady = (5,0), columnspan = 2, sticky='nsew')
+        self.trv_apps.grid(row = 1, column = 0, pady = (5,0), sticky='nsew')
 
         # add a scrollbar
         self.scrollbar = ttk.Scrollbar(self, orient = tk.VERTICAL, command = self.trv_apps.yview)
         self.trv_apps.configure(yscroll = self.scrollbar.set)
-        self.scrollbar.grid(row = 1, column = 2, padx = 0, pady = (10,0), sticky = 'ns')
+        self.scrollbar.grid(row = 1, column = 1, padx = 0, pady = (10,0), sticky = 'ns')
 
         # add data
         # self.insert()
 
-        self.btn_start = tk.Button(self, text=lb.START_APP_START, width = 15, height = 2, command = self.startApp)
-        self.btn_start.grid(row = 2, column = 0, columnspan = 2, pady = (10,0))
+        self.frame = tk.Frame(self)
+        self.btn_start = tk.Button(self.frame, text=lb.START_APP_START, width = 8, height = 2, command = self.startApp)
+        self.btn_start.grid(row = 0, column = 0, padx = (0,5))
 
-        self.btn_custom = tk.Button(self, text=lb.START_APP_CUSTOM, width = 8, command = self.customApp)
-        self.btn_custom.grid(row = 2, column = 0, sticky = tk.W, pady = (10,0))
+        self.btn_custom = tk.Button(self.frame, text=lb.START_APP_CUSTOM, width = 8, height = 2, command = self.customApp)
+        self.btn_custom.grid(row = 0, column = 1)
+        self.frame.grid(row = 2, column = 0, pady = (5,0), sticky= tk.E)
 
         self.after(const.UPDATE_TIME, self.periodic_call)
 

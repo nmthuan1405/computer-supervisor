@@ -18,10 +18,10 @@ class UI_runningProcesses(tk.Toplevel):
         self['pady'] = const.WINDOW_BORDER_PADDING
 
         self.btn_start = tk.Button(self, text = lb.PROCESS_START, width = 15, height = 2, command = self.start)
-        self.btn_start.grid(row = 0, column = 0)
+        self.btn_start.grid(row = 0, column = 0, sticky = tk.EW)
 
         self.btn_kill = tk.Button(self, text = lb.PROCESS_KILL, width = 15, height = 2, command = self.kill)
-        self.btn_kill.grid(row = 0, column = 1)
+        self.btn_kill.grid(row = 0, column = 1, sticky = tk.EW)
 
         # columns
         columns = ('#1', '#2', '#3')
@@ -37,12 +37,12 @@ class UI_runningProcesses(tk.Toplevel):
         self.trv_processes.heading('#2', text=lb.PROCESS_ID)
         self.trv_processes.heading('#3', text=lb.PROCESS_THREAD_COUNT)
 
-        self.trv_processes.grid(row = 1, column = 0, pady = (10,0), columnspan = 2, sticky='nsew')
+        self.trv_processes.grid(row = 1, column = 0, pady = (5,0), columnspan = 2, sticky='nsew')
 
         # add a scrollbar
         self.scrollbar = ttk.Scrollbar(self, orient = tk.VERTICAL, command = self.trv_processes.yview)
         self.trv_processes.configure(yscroll = self.scrollbar.set)
-        self.scrollbar.grid(row = 1, column = 2, padx = 0, pady = (10,0), sticky = 'ns')
+        self.scrollbar.grid(row = 1, column = 2, padx = 0, pady = (5,0), sticky = 'ns')
 
         # add data
         # self.insert(self.services.getProcessList())
