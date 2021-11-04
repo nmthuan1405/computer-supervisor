@@ -1,15 +1,17 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter.messagebox import askokcancel, showerror, showinfo
-
+from services.count import Count
 import ui.label as lb
 import ui.constraints as const
 import queue
 
 class UI_runningProcesses(tk.Toplevel):
-    def __init__(self, parent, socket_queue):
+    def __init__(self, parent, socket_queue, ui_queues):
         self.ui_queue = queue.Queue()
         self.socket_queue = socket_queue
+        self.ui_queues = ui_queues
+        ui_queues['process'] = self.ui_queue
 
         super().__init__(parent)
         self.title = lb.PROCESS_TITLE
@@ -44,38 +46,52 @@ class UI_runningProcesses(tk.Toplevel):
         self.trv_processes.configure(yscroll = self.scrollbar.set)
         self.scrollbar.grid(row = 1, column = 2, padx = 0, pady = (5,0), sticky = 'ns')
 
-        # add data
-        # self.insert(self.services.getProcessList())
-
+        self.update_counting = Count(10, self.socket_cmd, 'get-running-process')
+        self.update_counting.count_up(-1)
         self.after(const.UPDATE_TIME, self.periodic_call)
 
-    def insert(self, data):
-        try:
-            for line in data:
-                self.trv_processes.insert('', tk.END, values = line)
-        except:
-            print('Error: Unable to get process list')
-            self.clear()
+    def update(self, data):
+        selected =  self.trv_processes.item(self.trv_processes.focus())['values']
+        self.clear()
+        for line in data:
+            self.trv_processes.insert('', tk.END, values = line)
+            
+            if selected != '' and str(selected[1]) == str(line[1]):
+                last_element = self.trv_processes.get_children()[-1]
+                self.trv_processes.focus(last_element)
+                self.trv_processes.selection_set(last_element)
 
     def clear(self):
-        for row in self.trv_processes.get_children():
-            self.trv_processes.delete(row)
+        self.trv_processes.delete(*self.trv_processes.get_children())
 
     def start(self):
-        window = UI_startProcess(self)
+        window = UI_startProcess(self, self.socket_queue, self.ui_queues)
         window.grab_set()
         window.focus()
 
     def kill(self):
-        window = UI_killProcess(self)
-        window.grab_set()
-        window.focus()
+        selected = self.trv_processes.item(self.trv_processes.focus())['values']
+        if selected == '':
+            showinfo(lb.ERR, lb.PROCESS_SELECT_PROCESS, parent = self)
+            return
+
+        if askokcancel(lb.PROCESS_KILL, lb.APP_KILL_CONFIRM, parent = self):
+            self.socket_cmd('kill-process', (selected[1], 'process'))
 
     def update_ui(self, task):
         DEBUG("task", task)
         cmd, ext = task
 
+        if cmd == 'update-running':
+            self.update(ext)
+        elif cmd == 'ok':
+            showinfo(lb.PROCESS_KILL, lb.PROCESS_KILL_OK, parent = self)
+        elif cmd == 'err':
+            showerror(lb.PROCESS_KILL, lb.PROCESS_KILL_ERR, parent = self)
+
     def periodic_call(self):
+        self.update_counting.count_up()
+
         while True:
             try:
                 task = self.ui_queue.get_nowait()
@@ -93,9 +109,10 @@ class UI_runningProcesses(tk.Toplevel):
         self.socket_queue.put((cmd, ext))
 
 class UI_startProcess(tk.Toplevel):
-    def __init__(self, parent):
+    def __init__(self, parent, socket_queue, ui_queues):
         self.ui_queue = queue.Queue()
-        self.socket_queue = None
+        self.socket_queue = socket_queue
+        ui_queues['start-process'] = self.ui_queue
 
         super().__init__(parent)
         self.title = lb.START_PROCESS_TITLE
@@ -116,14 +133,18 @@ class UI_startProcess(tk.Toplevel):
         self.after(const.UPDATE_TIME, self.periodic_call)
 
     def startProcess(self):
-        # if (self.services.sendStartProcess(self.txt_name_input.get()) == 'OK'):
-        #     showinfo("Sucess", "Start process successful!", parent = self)
-        # else:
-            showerror("Error", "Unable to start this process", parent = self)
+         self.socket_cmd('start-process', (self.txt_name_input.get(), 'start-process'))
 
     def update_ui(self, task):
         DEBUG("task", task)
         cmd, ext = task
+
+        if cmd == 'ok':
+            showinfo(lb.START_PROCESS_TITLE, lb.START_PROCESS_START_OK, parent = self)
+            self.destroy()
+        elif cmd == 'err':
+            showerror(lb.START_PROCESS_TITLE, lb.START_PROCESS_START_ERR, parent = self)
+
 
     def periodic_call(self):
         while True:
@@ -135,59 +156,6 @@ class UI_startProcess(tk.Toplevel):
                 break
         
         self.after(const.UPDATE_TIME, self.periodic_call)
-
-    def add_socket_queue(self, socket_queue):
-        self.socket_queue = socket_queue
-    
-    def socket_cmd(self, cmd, ext = None):
-        self.socket_queue.put((cmd, ext))
-
-class UI_killProcess(tk.Toplevel):
-    def __init__(self, parent):
-        self.ui_queue = queue.Queue()
-        self.socket_queue = None
-
-        super().__init__(parent)
-        self.title = lb.KILL_PROCESS_TITLE
-        self.resizable(False, False)
-        self['padx'] = const.WINDOW_BORDER_PADDING
-        self['pady'] = const.WINDOW_BORDER_PADDING
-
-        self.lbl_process_id = tk.Label(self, text = lb.KILL_PROCESS_ID)
-        self.lbl_process_id.grid(column = 0, row = 0)
-
-        self.txt_id_input = tk.Entry(self)
-        self.txt_id_input.focus()
-        self.txt_id_input.grid(column = 1, row = 0, padx = 10)
-
-        self.btn_kill = tk.Button(self, text=lb.KILL_PROCESS_KILL, command = self.killProcess)
-        self.btn_kill.grid(column=2, row=0, sticky = tk.W, padx = 0, pady = 0, ipadx = 10)
-
-        self.after(const.UPDATE_TIME, self.periodic_call)
-
-    def killProcess(self):
-        # if (self.services.sendKillProcess(self.txt_ID_input.get()) == 'OK'):
-        #     showinfo("Sucess", "Kill process successful!", parent = self)
-        # else:
-            showerror("Error", "Unable to kill this process", parent = self)
-
-    def update_ui(self, task):
-        DEBUG("task", task)
-        cmd, ext = task
-
-    def periodic_call(self):
-        while True:
-            try:
-                task = self.ui_queue.get_nowait()
-                self.update_ui(task)
-                
-            except queue.Empty:
-                break
-        
-        self.after(const.UPDATE_TIME, self.periodic_call)
-
-    def add_socket_queue(self, socket_queue):
-        self.socket_queue = socket_queue
     
     def socket_cmd(self, cmd, ext = None):
         self.socket_queue.put((cmd, ext))
