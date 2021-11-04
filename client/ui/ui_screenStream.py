@@ -19,16 +19,18 @@ class UI_screenStream(tk.Toplevel):
         self['pady'] = const.WINDOW_BORDER_PADDING
 
         self.canvas = tk.Canvas(self, width = const.FRAME_WIDTH, height = const.FRAME_HEIGHT, bg = 'black')
-        self.canvas.grid(row = 0, column = 0, columnspan = 2)
+        self.canvas.grid(row = 0, column = 0)
         self.imgOnCanvas = self.canvas.create_image(0, 0, anchor = tk.NW)
 
-        self.btn_pause_stt = tk.StringVar(self, lb.PAUSE)
-        self.btn_pause = tk.Button(self, textvariable = self.btn_pause_stt, width = 10, height = 2, command = self.pauseStream)
-        self.btn_pause.grid(row = 1, column = 0, pady = (10,0))
+        self.frame = tk.Frame(self)
+        self.btn_pause_stt = tk.StringVar(self.frame, lb.PAUSE)
+        self.btn_pause = tk.Button(self.frame, textvariable = self.btn_pause_stt, width = 10, height = 2, command = self.pauseStream)
+        self.btn_pause.grid(row = 0, column = 0, padx = (0,5))
 
-        self.btn_capture_stt = tk.StringVar(self, lb.CAPTURE)
-        self.btn_capture = tk.Button(self, textvariable=self.btn_capture_stt, width = 10, height = 2, command = self.captureStream)
-        self.btn_capture.grid(row = 1, column = 1, pady = (10,0))
+        self.btn_capture_stt = tk.StringVar(self.frame, lb.CAPTURE)
+        self.btn_capture = tk.Button(self.frame, textvariable=self.btn_capture_stt, width = 10, height = 2, command = self.captureStream)
+        self.btn_capture.grid(row = 0, column = 1)
+        self.frame.grid(row = 1, column = 0, pady = (5,0), sticky = tk.E)
         
         self.socket_cmd('update-stream', (const.FRAME_WIDTH, const.FRAME_HEIGHT))
         self.after(const.UPDATE_TIME, self.periodic_call)
