@@ -100,7 +100,7 @@ def create_key(path):
     except:
         return False
 
-def detele_key(path):
+def delete_key(path):
     try:
         hkey, key = path.split('\\', 1)
         reg.DeleteKeyEx(getHKEY(hkey), key)

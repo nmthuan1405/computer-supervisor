@@ -6,14 +6,14 @@ import ui.label as lb
 import ui.constraints as const
 import queue
 
-class UI_runningApps(tk.Toplevel):
+class UI_running_apps(tk.Toplevel):
     def __init__(self, parent, socket_queue, ui_queues):
+        super().__init__(parent)
         self.ui_queue = queue.Queue()
         self.socket_queue = socket_queue
         self.ui_queues = ui_queues
         ui_queues['app'] = self.ui_queue
 
-        super().__init__(parent)
         self.title = lb.APP_TITLE
         self.resizable(False, False)
         self['padx'] = const.WINDOW_BORDER_PADDING
@@ -65,7 +65,7 @@ class UI_runningApps(tk.Toplevel):
         self.trv_apps.delete(*self.trv_apps.get_children())
 
     def start(self):
-        window = UI_startAvailApp(self, self.socket_queue, self.ui_queues)
+        window = UI_start_avail_app(self, self.socket_queue, self.ui_queues)
         
         window.grab_set()
         window.focus()
@@ -106,14 +106,14 @@ class UI_runningApps(tk.Toplevel):
     def socket_cmd(self, cmd, ext = None):
         self.socket_queue.put((cmd, ext))
 
-class UI_startAvailApp(tk.Toplevel):
+class UI_start_avail_app(tk.Toplevel):
     def __init__(self, parent, socket_queue, ui_queues):
+        super().__init__(parent)
         self.ui_queue = queue.Queue()
         self.socket_queue = socket_queue
         self.ui_queues = ui_queues
         ui_queues['start-app'] = self.ui_queue
 
-        super().__init__(parent)
         self.title = lb.START_APP_TITLE
         self.resizable(False, False)
         self['padx'] = const.WINDOW_BORDER_PADDING
@@ -142,17 +142,17 @@ class UI_startAvailApp(tk.Toplevel):
         self.scrollbar.grid(row = 1, column = 1, padx = 0, pady = (10,0), sticky = 'ns')
 
         self.frame = tk.Frame(self)
-        self.btn_custom = tk.Button(self.frame, text=lb.START_APP_CUSTOM, width = 10, height = 2, command = self.customApp)
+        self.btn_custom = tk.Button(self.frame, text=lb.START_APP_CUSTOM, width = 10, height = 2, command = self.custom_app)
         self.btn_custom.grid(row = 0, column = 0)
 
-        self.btn_start = tk.Button(self.frame, text=lb.START_APP_START, width = 15, height = 2, command = self.startApp)
+        self.btn_start = tk.Button(self.frame, text=lb.START_APP_START, width = 15, height = 2, command = self.start_app)
         self.btn_start.grid(row = 0, column = 1, padx = (5,0))
         self.frame.grid(row = 2, column = 0, pady = (5,0), sticky= tk.E)
 
         self.socket_cmd('get-app-list')
         self.after(const.UPDATE_TIME, self.periodic_call)
 
-    def startApp(self):
+    def start_app(self):
         selected = self.trv_apps.item(self.trv_apps.focus())['values']
         if selected == '':
             showinfo(lb.ERR, lb.START_APP_SELECT_APP, parent = self)
@@ -160,8 +160,8 @@ class UI_startAvailApp(tk.Toplevel):
 
         self.socket_cmd('start-process', (selected[1], 'start-app'))
 
-    def customApp(self):
-        window = UI_startCustomApp(self, self.socket_queue, self.ui_queues)
+    def custom_app(self):
+        window = UI_start_custom_app(self, self.socket_queue, self.ui_queues)
         window.grab_set()
         window.focus()
 
@@ -198,13 +198,13 @@ class UI_startAvailApp(tk.Toplevel):
     def socket_cmd(self, cmd, ext = None):
         self.socket_queue.put((cmd, ext))
 
-class UI_startCustomApp(tk.Toplevel):
+class UI_start_custom_app(tk.Toplevel):
     def __init__(self, parent, socket_queue, ui_queues):
+        super().__init__(parent)
         self.ui_queue = queue.Queue()
         self.socket_queue = socket_queue
         ui_queues['start-custom-app'] = self.ui_queue
 
-        super().__init__(parent)
         self.title = lb.START_APP_TITLE
         self.resizable(False, False)
         self['padx'] = const.WINDOW_BORDER_PADDING
@@ -217,12 +217,12 @@ class UI_startCustomApp(tk.Toplevel):
         self.txt_name_input.focus()
         self.txt_name_input.grid(column = 1, row = 0, padx = 10)
 
-        self.btn_start = tk.Button(self, text=lb.START_APP_START, command = self.startApp)
+        self.btn_start = tk.Button(self, text=lb.START_APP_START, command = self.start_app)
         self.btn_start.grid(column=2, row=0, sticky = tk.W, padx = 0, pady = 0, ipadx = 10)
 
         self.after(const.UPDATE_TIME, self.periodic_call)
 
-    def startApp(self):
+    def start_app(self):
         self.socket_cmd('start-process', (self.txt_name_input.get(), 'start-custom-app'))
 
     def update_ui(self, task):

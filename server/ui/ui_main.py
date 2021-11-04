@@ -6,10 +6,10 @@ import queue
 
 class UI_main(tk.Tk):
     def __init__(self):
+        super().__init__()
         self.ui_queue = queue.Queue()
         self.socket_queue = None
 
-        super().__init__()
         self.title(lb.MAIN_TITLE)
         self.resizable(False, False)
         self['padx'] = 10
