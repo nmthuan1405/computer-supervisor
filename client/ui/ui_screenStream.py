@@ -4,6 +4,7 @@ import ui.constraints as const
 from PIL import ImageTk
 from tkinter.filedialog import asksaveasfilename
 from tkinter.messagebox import showerror, showinfo, askokcancel
+from services.count import Count
 import queue
 
 class UI_screenStream(tk.Toplevel):
@@ -29,11 +30,13 @@ class UI_screenStream(tk.Toplevel):
         self.btn_pause.grid(row = 0, column = 0, padx = (0,5))
 
         self.btn_capture_stt = tk.StringVar(self.frame, lb.CAPTURE)
-        self.btn_capture = tk.Button(self.frame, textvariable=self.btn_capture_stt, width = 10, height = 2, command = self.captureStream)
+        self.btn_capture = tk.Button(self.frame, textvariable=self.btn_capture_stt, width = 15, height = 2, command = self.captureStream)
         self.btn_capture.grid(row = 0, column = 1)
         self.frame.grid(row = 1, column = 0, pady = (5,0), sticky = tk.E)
         
-        self.socket_cmd('update-stream', (const.FRAME_WIDTH, const.FRAME_HEIGHT))
+        self.update_counting = Count(1, self.socket_cmd, 'update-stream', (const.FRAME_WIDTH, const.FRAME_HEIGHT))
+        self.update_counting.count_up(-1)
+        # self.socket_cmd('update-stream', (const.FRAME_WIDTH, const.FRAME_HEIGHT))
         self.after(const.UPDATE_TIME, self.periodic_call)
 
     def pauseStream(self):
@@ -68,7 +71,7 @@ class UI_screenStream(tk.Toplevel):
 
     def periodic_call(self):
         if self.btn_pause_stt.get() == lb.PAUSE and self.btn_capture_stt.get() == lb.CAPTURE:
-            self.socket_cmd('update-stream', (const.FRAME_WIDTH, const.FRAME_HEIGHT))
+            self.update_counting.count_up()
 
         while True:
             try:
