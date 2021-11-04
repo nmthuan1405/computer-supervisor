@@ -6,6 +6,9 @@ import os
 import magic
 from getmac import get_mac_address as gma
 import subprocess
+import win32com.client
+import win32gui
+import win32process
 
 def take_screenshot(size=None):
     image = ImageGrab.grab()
@@ -47,7 +50,6 @@ def get_dir(path):
     return data_list
 
 def get_MAC():
-    print(gma())
     return gma()
 
 def logout():
@@ -67,3 +69,89 @@ def restart():
         os.system("shutdown /r /t 1")
     except:
         pass
+
+def get_target(file):
+    shell = win32com.client.Dispatch("WScript.Shell")
+    shortcut = shell.CreateShortCut(file)
+    return shortcut.Targetpath
+
+def get_all_app():
+    data_list = []
+    for dir, folder, files in os.walk(os.path.expandvars('%ProgramData%\\Microsoft\\Windows\\Start Menu\\Programs')):
+        for file in files:
+            if file.endswith('.lnk'):
+                target = get_target(os.path.join(dir, file))
+                if target.endswith('.exe'):
+                    data_list.append((file[:-4], target))
+    
+    return data_list
+
+def get_result_from_cmd(cmd, headers):
+    lines = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+
+    firstLine = lines.stdout.readline().decode().rstrip()
+    align = []
+    for header in headers:
+        align.append(firstLine.find(header))
+    align.append(len(firstLine) + 1)
+    
+    result = []
+    for l in lines.stdout:
+        if l.rstrip():
+            line = l.decode().rstrip()
+            row = []
+            for i in range(len(align) - 1):
+                row.append(line[align[i] : align[i + 1] - 1].rstrip())
+            result.append(row)
+
+    return result
+    
+def get_running_process():
+    try:
+        return get_result_from_cmd('wmic process get description, processid, threadcount', ['Description', 'ProcessId', 'ThreadCount'])
+    except:
+        return []
+
+def get_app_id():
+    def getAllWindows(hwnd, result):
+        name = win32gui.GetWindowText(hwnd)
+        isVisible = win32gui.IsWindowVisible(hwnd)
+        nID = win32process.GetWindowThreadProcessId(hwnd)
+
+        if name != '' and isVisible:
+            result.append(str(nID[1]))
+        return True
+
+    try:
+        result = []
+        win32gui.EnumWindows(getAllWindows, result)
+        return result
+    except:
+        return []
+
+def get_running_app():
+    process = get_running_process()
+    app_id  = get_app_id()
+
+    result = []
+    for line in process:
+        if line[1] in app_id:
+            result.append(line)
+
+    return result
+
+def kill_process(pid):
+    try:
+        os.kill(int(pid), 9)
+    except:
+        return False
+    else:
+        return True
+
+def start_process(path):
+    try:
+        subprocess.Popen(path)
+    except:
+        return False
+    else:
+        return True

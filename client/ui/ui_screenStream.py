@@ -7,9 +7,10 @@ from tkinter.messagebox import showerror, showinfo, askokcancel
 import queue
 
 class UI_screenStream(tk.Toplevel):
-    def __init__(self, parent, socket_queue):
+    def __init__(self, parent, socket_queue, ui_queues):
         self.ui_queue = queue.Queue()
         self.socket_queue = socket_queue
+        ui_queues['screen'] = self.ui_queue
 
         super().__init__(parent)
         self.title = lb.SCREEN_STREAM_TITLE

@@ -12,10 +12,11 @@ import ui.ui_runningApps as ra
 import ui.ui_runningProcesses as rp
 
 class UI_main(tk.Tk):
-    def __init__(self):
+    def __init__(self, ui_queues):
         self.ui_queue = queue.Queue()
-        self.ui_queues = {'main': self.ui_queue}
+        self.ui_queues = ui_queues
         self.socket_queue = None
+        ui_queues['main'] = self.ui_queue
 
         super().__init__()
         self.title(lb.MAIN_TITLE)
@@ -105,44 +106,32 @@ class UI_main(tk.Tk):
 
 
     def screenStream(self):
-        window = sc.UI_screenStream(self, self.socket_queue)
-        self.ui_queues['screen'] = window.ui_queue
-
+        window = sc.UI_screenStream(self, self.socket_queue, self.ui_queues)
         window.grab_set()
         window.focus()
 
     def keylogger(self):
-        window = kl.UI_keylogger(self, self.socket_queue)
-        self.ui_queues['keyboard'] = window.ui_queue
-
+        window = kl.UI_keylogger(self, self.socket_queue, self.ui_queues)
         window.grab_set()
         window.focus()
 
     def fileExplorer(self):
-        window = fe.UI_fileExplorer(self, self.socket_queue)
-        self.ui_queues['file'] = window.ui_queue
-        
+        window = fe.UI_fileExplorer(self, self.socket_queue, self.ui_queues)
         window.grab_set()
         window.focus()
 
     def editRegistry(self):
-        window = reg.UI_Registry(self, self.socket_queue)
-        self.ui_queues['registry'] = window.ui_queue
-
+        window = reg.UI_Registry(self, self.socket_queue, self.ui_queues)
         window.grab_set()
         window.focus()
 
     def runningApps(self):
-        window = ra.UI_runningApps(self, self.socket_queue)
-        self.ui_queues['apps'] = window.ui_queue
-
+        window = ra.UI_runningApps(self, self.socket_queue, self.ui_queues)
         window.grab_set()
         window.focus()
 
     def runningProcesses(self):
-        window = rp.UI_runningProcesses(self, self.socket_queue)
-        self.ui_queues['processes'] = window.ui_queue
-
+        window = rp.UI_runningProcesses(self, self.socket_queue, self.ui_queues)                               
         window.grab_set()
         window.focus()
 
@@ -165,7 +154,7 @@ class UI_main(tk.Tk):
         showinfo(lb.ABOUT_US, lb.ABOUT_US_TEXT)
     
     def update_ui(self, task):
-        DEBUG("task", task)
+        # DEBUG("task", task)
         cmd, ext = task
         if cmd == "start":
             self.btn_connect_stt.set(lb.CONNECT)

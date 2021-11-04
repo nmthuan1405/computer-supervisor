@@ -7,9 +7,11 @@ import ui.constraints as const
 import queue
 
 class UI_runningApps(tk.Toplevel):
-    def __init__(self, parent, socket_queue):
+    def __init__(self, parent, socket_queue, ui_queues):
         self.ui_queue = queue.Queue()
         self.socket_queue = socket_queue
+        self.ui_queues = ui_queues
+        ui_queues['app'] = self.ui_queue
 
         super().__init__(parent)
         self.title = lb.APP_TITLE
@@ -44,25 +46,20 @@ class UI_runningApps(tk.Toplevel):
         self.trv_apps.configure(yscroll = self.scrollbar.set)
         self.scrollbar.grid(row = 1, column = 2, padx = 0, pady = (10,0), sticky = 'ns')
 
-        # add data
-        # self.insert()
-
+        self.socket_cmd('get-running-app')
         self.after(const.UPDATE_TIME, self.periodic_call)
 
-    def insert(self, data):
-        try:
-            for line in data:
-                self.trv_apps.insert('', tk.END, values = line)
-        except:
-            print('Error: Unable to get process list')
-            self.clear()
+    def update(self, data):
+        self.clear()
+        for line in data:
+            self.trv_apps.insert('', tk.END, values = line)
 
     def clear(self):
-        for row in self.trv_apps.get_children():
-            self.trv_apps.delete(row)
+        self.trv_apps.delete(*self.trv_apps.get_children())
 
     def start(self):
-        window = UI_startAvailApp(self)
+        window = UI_startAvailApp(self, self.socket_queue)
+        
         window.grab_set()
         window.focus()
 
@@ -73,7 +70,11 @@ class UI_runningApps(tk.Toplevel):
         DEBUG("task", task)
         cmd, ext = task
 
+        if cmd == 'update-running':
+            self.update(ext)
+
     def periodic_call(self):
+        # self.socket_cmd('get-running-app')
         while True:
             try:
                 task = self.ui_queue.get_nowait()
@@ -83,17 +84,14 @@ class UI_runningApps(tk.Toplevel):
                 break
         
         self.after(const.UPDATE_TIME, self.periodic_call)
-
-    def add_socket_queue(self, socket_queue):
-        self.socket_queue = socket_queue
     
     def socket_cmd(self, cmd, ext = None):
         self.socket_queue.put((cmd, ext))
 
 class UI_startAvailApp(tk.Toplevel):
-    def __init__(self, parent):
+    def __init__(self, parent, socket_queue):
         self.ui_queue = queue.Queue()
-        self.socket_queue = None
+        self.socket_queue = socket_queue
 
         super().__init__(parent)
         self.title = lb.START_APP_TITLE
@@ -209,9 +207,6 @@ class UI_startCustomApp(tk.Toplevel):
                 break
         
         self.after(const.UPDATE_TIME, self.periodic_call)
-
-    def add_socket_queue(self, socket_queue):
-        self.socket_queue = socket_queue
     
     def socket_cmd(self, cmd, ext = None):
         self.socket_queue.put((cmd, ext))

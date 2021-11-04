@@ -165,6 +165,8 @@ class Client(Socket, threading.Thread):
                 data_list = utils.get_all_disk_letters()
             else:
                 data_list = utils.get_dir(dir)
+        except:
+            DEBUG("Cannot open folder")
         finally:
             self.send_obj((dir, data_list))
 
@@ -179,6 +181,23 @@ class Client(Socket, threading.Thread):
 
     def task_restart(self):
         utils.restart()
+
+    def task_kill_process(self):
+        uid = self.recv_str()
+        self.send_state(utils.kill_process(uid))
+
+    def task_start_process(self):
+        path = self. recv_str()
+        self.send_state(utils.start_process(path))
+
+    def task_get_running_process(self):
+        self.send_obj(utils.get_running_process())
+
+    def task_get_running_app(self):
+        self.send_obj(utils.get_running_app())
+
+    def task_get_app_list(self):
+        self.send_obj(utils.get_all_app())
 
     def run(self):
         while True:
@@ -218,6 +237,17 @@ class Client(Socket, threading.Thread):
                 self.task_logout()
             elif flag == 'restart':
                 self.task_restart()
+            elif flag == 'kill-process':
+                self.task_kill_process()
+            elif flag == 'start-process':
+                self.task_start_process()
+            elif flag == 'get-running-process':
+                self.task_get_running_process()
+            elif flag == 'get-running-app':
+                self.task_get_running_app()
+            elif flag == 'get-app-list':
+                self.task_get_app_list()
+
             else:
                 DEBUG("unknown flag", flag)
     

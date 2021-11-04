@@ -16,7 +16,7 @@ class Client(Socket, threading.Thread):
     def add_ui_queue(self, ui_queue):
         self.ui_queue = ui_queue
     
-    def ui_cmd(self, cmd, ext = None, ui='main'):
+    def ui_cmd(self, cmd, ext = None, ui = 'main'):
         self.ui_queue[ui].put((cmd, ext))
 
     def start_socket(self, SERVER):
@@ -53,14 +53,14 @@ class Client(Socket, threading.Thread):
         self.send_obj(size)
 
         img = self.recv_obj()
-        self.ui_cmd("update-stream", img,'screen')
+        self.ui_cmd("update-stream", img, 'screen')
 
     def task_capture_stream(self):
         self.send_str("screen-capture")
 
         img = self.recv_obj()
         DEBUG("received screenshot")
-        self.ui_cmd("save-image", img,'screen')
+        self.ui_cmd("save-image", img, 'screen')
 
     def task_keyboard_start(self):
         self.send_str("listener-start")
@@ -79,7 +79,7 @@ class Client(Socket, threading.Thread):
 
     def task_log_get(self):
         self.send_str("listener-get")
-        self.ui_cmd("update-log", self.recv_str(), "keyboard")
+        self.ui_cmd("update-log", self.recv_str(), 'keyboard')
 
     def task_keyboard_block(self):
         self.send_str("listener-block")
@@ -91,11 +91,11 @@ class Client(Socket, threading.Thread):
         self.send_str("get-dir")
         self.send_str(dir)
 
-        self.ui_cmd("update-dir", self.recv_obj(), "file")
+        self.ui_cmd("update-dir", self.recv_obj(),'file')
 
     def task_get_MAC(self):
         self.send_str("get-MAC")
-        self.ui_cmd("update-MAC", self.recv_str(), "main")
+        self.ui_cmd("update-MAC", self.recv_str())
 
     def task_send_logout(self):
         self.send_str("logout")
@@ -105,6 +105,38 @@ class Client(Socket, threading.Thread):
 
     def task_send_restart(self):
         self.send_str("restart")
+
+    def task_kill_process(self, uid, ui = 'process'):
+        self.send_str('kill-process')
+        self.send_str(uid)
+        if self.recv_state():
+            self.ui_cmd("ok", "kill", ui)
+        else:
+            self.ui_cmd("err", "kill", ui)
+
+    def task_start_process(self, path, ui = 'process'):
+        self.send_str('start-process')
+        self.send_str(path)
+        if self.recv_state():
+            self.ui_cmd("ok", "start", ui)
+        else:
+            self.ui_cmd("err", "start", ui)
+
+    def task_get_running_process(self):
+        self.send_str('get-running-process')
+        process_list = self.recv_obj()
+        self.ui_cmd("update-running", process_list, 'process')
+
+    def task_get_running_app(self):
+        self.send_str('get-running-app')
+        process_list = self.recv_obj()
+        self.ui_cmd("update-running", process_list, 'app')
+
+    def task_get_app_list(self):
+        self.send_str('get-app-list')
+        process_list = self.recv_obj()
+        self.ui_cmd("update-app", process_list, 'start-app')
+
 
     def run(self):
         while True:
@@ -148,6 +180,20 @@ class Client(Socket, threading.Thread):
                 self.task_send_shutdown()
             elif cmd == "restart":
                 self.task_send_restart()
+            elif cmd == 'kill-process':
+                self.task_kill_process(ext)
+            elif cmd == 'start-process':
+                self.task_start_process(ext)
+            elif cmd == 'kill-app':
+                self.task_kill_process(ext, 'app')
+            elif cmd == 'start-app':
+                self.task_start_process(ext, 'app')
+            elif cmd == 'get-running-process':
+                self.task_get_running_process()
+            elif cmd == 'get-running-app':
+                self.task_get_running_app()
+            elif cmd == 'get-app-list':
+                self.task_get_app_list()
 
 def DEBUG(*args,**kwargs):
     print("Client:", *args,**kwargs)
