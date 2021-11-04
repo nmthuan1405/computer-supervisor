@@ -1,6 +1,7 @@
 from services.Socket import Socket
 import services.utils as utils
 import services.keyboard as keyboard
+import services.registry as registry
 import socket
 import threading
 import queue
@@ -199,6 +200,36 @@ class Client(Socket, threading.Thread):
     def task_get_app_list(self):
         self.send_obj(utils.get_all_app())
 
+    def task_merge_reg_file(self):
+        file_data = self.recv_str()
+        self.send_state(registry.merge_reg_file(file_data))
+
+    def task_query_reg_value(self):
+        path = self.recv_str()
+        value = self.recv_str()
+        self.send_obj((value, *registry.query_value(path, value)))
+
+    def task_set_reg_value(self):
+        path = self.recv_str()
+        value = self.recv_str()
+        type = self.recv_str()
+        data = self.recv_obj()
+
+        self.send_state(registry.set_value(path, value, type, data))
+
+    def task_delete_reg_value(self):
+        path = self.recv_str()
+        value = self.recv_str()
+        self.send_obj(registry.delete_value(path, value))
+
+    def task_create_reg_key(self):
+        path = self.recv_str()
+        self.send_state(registry.create_key(path))
+
+    def task_delete_reg_key(self):
+        path = self.recv_str()
+        self.send_state(registry.delete_key(path))
+
     def run(self):
         while True:
             flag = self.recv_str()
@@ -247,6 +278,18 @@ class Client(Socket, threading.Thread):
                 self.task_get_running_app()
             elif flag == 'get-app-list':
                 self.task_get_app_list()
+            elif flag == 'merge-reg-file':
+                self.task_merge_reg_file()
+            elif flag == 'query-reg-value':
+                self.task_query_reg_value()
+            elif flag == 'set-reg-value':
+                self.task_set_reg_value()
+            elif flag == 'delete-reg-value':
+                self.task_delete_reg_value()
+            elif flag == 'create-reg-key':
+                self.task_create_reg_key()
+            elif flag == 'delete-reg-key':
+                self.task_delete_reg_key()
 
             else:
                 DEBUG("unknown flag", flag)

@@ -9,9 +9,10 @@ import ui.constraints as const
 import queue
 
 class UI_Registry(tk.Toplevel):
-    def __init__(self, parent, socket_queue):
+    def __init__(self, parent, socket_queue, ui_queues):
         self.ui_queue = queue.Queue()
         self.socket_queue = socket_queue
+        ui_queues['reg'] = self.ui_queue
 
         super().__init__(parent)
         self.title = lb.REGISTRY_TITLE
@@ -37,8 +38,9 @@ class UI_Registry(tk.Toplevel):
 
         self.text_area = st.ScrolledText(self, wrap = tk.WORD, width = 38, height = 10)
         self.text_area.grid(column = 0, row = 3)
-
-        self.btn_send = tk.Button(self, text="Send", command = self.sendReg)
+    
+        self.btn_send_stt = tk.StringVar(value="Send")
+        self.btn_send = tk.Button(self, textvariable=self.btn_send_stt, command = self.sendReg)
         self.btn_send.grid(column = 1, row = 3, padx = 4, ipadx = 15, ipady = 70, sticky = tk.E)
 
         self.frame_editDirectly = tk.LabelFrame(self, text = "Edit value directly", relief = tk.RIDGE)
@@ -237,9 +239,10 @@ class UI_Registry(tk.Toplevel):
         self.result_area = st.ScrolledText(self.frame_editDirectly, wrap = tk.WORD, width = 46, height = 10, bg = "gray92", state = tk.DISABLED)
         self.result_area.place(x = 4, y = 150)
 
-        self.button1 = ttk.Button(self.frame_editDirectly, text="Send", command = self.sendCommand)
+        self.button1_stt = tk.StringVar(value='Send')
+        self.button1 = tk.Button(self.frame_editDirectly, textvariable=self.btn_send_stt, command = self.sendCommand)
         self.button1.place(x = 100, y = 320)
-        self.button2 = ttk.Button(self.frame_editDirectly, text="Clear log", command = self.clearLog)
+        self.button2 = tk.Button(self.frame_editDirectly, text="Clear log", command = self.clearLog)
         self.button2.place(x = 220, y = 320)
 
         self.after(const.UPDATE_TIME, self.periodic_call)
@@ -256,72 +259,72 @@ class UI_Registry(tk.Toplevel):
             data = f.read()
             f.close()
         except:
-            data = 'ERROR'
+            data = 'Error when read file'
 
         self.text_area.delete(1.0, tk.END)
         self.text_area.insert(tk.INSERT, data)
 
     def sendReg(self):
-        # if self.service.sendRegFile(self.text_area.get(1.0, tk.END)) == 'OK':
-        #     showinfo('Success', 'Merge registry successfully', parent = self)
-        # else:
-            showerror('Error', 'Unable to merge registry', parent = self)
+        if self.btn_send_stt.get() == 'Send':
+            file_data = self.text_area.get(1.0, tk.END)
+            self.socket_cmd('merge-reg-file', file_data)
+            self.btn_send_stt.set('Wait')
+    
+    def query_reg_value(self):
+        path = self.txt_pathInput2.get()
+        value = self.txt_nameValue.get()
 
+        self.socket_cmd('query-reg-value', (path, value))
+
+    def set_reg_value(self):
+        path = self.txt_pathInput2.get()
+        value = self.txt_nameValue.get()
+        type = self.cbb_dataType.get()
+        data = self.txt_value.get()
+        try:
+            if type == self.dataTypes[1]:
+                data = bytearray.fromhex(data)
+            elif type == self.dataTypes[2] or type == self.dataTypes[3]:
+                data = int(data)
+            elif type == self.dataTypes[4]:
+                data = data.split(self.txt_seperator.get())
+
+                dataDisplay = ['\'' + element + '\'' for element in data]
+                self.writeLog('Data: ' + ', '.join(dataDisplay))
+        except:
+            self.writeLog('Unable to parse data')
+            return
+
+        self.socket_cmd('set-reg-value', (path, value, type, data))
+
+    def delete_reg_value(self):
+        path = self.txt_pathInput2.get()
+        value = self.txt_nameValue.get()
+
+        self.socket_cmd('delete-reg-value', (path, value))
+
+    def create_reg_key(self):
+        path = self.txt_pathInput2.get()
+        self.socket_cmd('create-reg-key', path)
+
+    def delete_reg_key(self):
+        path = self.txt_pathInput2.get()
+        self.socket_cmd('delete-reg-key', path)
+
+    
     def sendCommand(self):
-        # if self.cbb_option.get() == self.options[0]:
-        #     data = self.service.sendRegGetVal(self.txt_pathInput2.get(), self.txt_nameValue.get())
-        #     if (len(data) == 2):
-
-        #         if data[1] == self.dataTypes[1]:
-        #             dataDisplay = str(data[0].hex())
-        #         else:
-        #             dataDisplay = str(data[0])
-
-        #         self.writeLog(self.txt_nameValue.get() + ': ' + dataDisplay)
-        #         self.writeLog('\t\tType: ' + data[1])
-        #     else:
-        #         self.writeLog(self.txt_nameValue.get() + ': Error')
-
-        # elif self.cbb_option.get() == self.options[1]:
-        #     data = self.txt_value.get()
-        #     type = self.cbb_dataType.get()
-
-        #     try:
-        #         if type == self.dataTypes[1]:
-        #             data = bytearray.fromhex(data)
-        #         elif type == self.dataTypes[2] or type == self.dataTypes[3]:
-        #             data = int(data)
-        #         elif type == self.dataTypes[4]:
-        #             data = data.split(self.txt_seperator.get())
-
-        #             dataDisplay = ['\'' + element + '\'' for element in data]
-        #             self.writeLog('Data: ' + ', '.join(dataDisplay))
-        #     except:
-        #         self.writeLog('Unable to parse data')
-        #         return
-
-        #     if self.service.sendRegSetVal(self.txt_pathInput2.get(), self.txt_nameValue.get(), data, type) == 'OK':
-        #         self.writeLog('Set value successfully')
-        #     else:
-        #         self.writeLog('Unable to set value')
-
-        # elif (self.cbb_option.get() == self.options[2]):
-        #     if self.service.sendRegDeVal(self.txt_pathInput2.get(), self.txt_nameValue.get()) == 'OK':
-        #         self.writeLog('Delete value successfully')
-        #     else:
-        #         self.writeLog('Unable to delete value')
-            
-        # elif (self.cbb_option.get() == self.options[3]):
-        #     if self.service.sendRegCreateKey(self.txt_pathInput2.get()) == 'OK':
-        #         self.writeLog('Create key successfully')
-        #     else:
-        #         self.writeLog('Unable to create key')
-            
-        # elif (self.cbb_option.get() == self.options[4]):
-        #     if self.service.sendRegDelKey(self.txt_pathInput2.get()) == 'OK':
-        #         self.writeLog('Delete key successfully')
-        #     else:
-                self.writeLog('Unable to delete key')
+        if self.button1_stt.get() == 'Send':
+            if self.cbb_option.get() == self.options[0]:
+                self.query_reg_value()
+            elif self.cbb_option.get() == self.options[1]:
+                self.set_reg_value()
+            elif (self.cbb_option.get() == self.options[2]):
+                self.delete_reg_value()   
+            elif (self.cbb_option.get() == self.options[3]):
+                self.create_reg_key()   
+            elif (self.cbb_option.get() == self.options[4]):
+                self.delete_reg_key()
+            self.button1_stt.set('Wait')
             
     def clearLog(self):
         self.result_area.config(state = 'normal')
@@ -337,6 +340,56 @@ class UI_Registry(tk.Toplevel):
     def update_ui(self, task):
         DEBUG("task", task)
         cmd, ext = task
+
+        if cmd == 'merge':
+            if ext == 'ok':
+                showinfo('Merge', 'Merge registry file successfully')
+            else:
+                showerror('Merge', 'Error when merge registry file')
+            self.btn_send_stt.set('Send')
+
+        elif cmd == 'query':
+            value, data, type = ext
+
+            if data is None:
+                self.writeLog(f'{value}: Query error')
+            else:
+                if type == self.dataTypes[1]:
+                    data = str(data.hex())
+                else:
+                    data = str(data)
+                self.writeLog(f'{value}: {data}\n\tType: {type}')
+            self.button1_stt.set('Send')
+
+        elif cmd == 'set-value':
+            if ext == 'ok':
+                showinfo('Set', 'Set registry value successfully')
+            else:
+                showerror('Set', 'Error when set registry value')
+            self.button1_stt.set('Send')
+
+        elif cmd == 'delete-value':
+            if ext == 'ok':
+                self.writeLog('Delete registry value successfully')
+            else:
+                self.writeLog('Error when delete registry value')
+            self.button1_stt.set('Send')
+
+        elif cmd == 'create-key':
+            if ext == 'ok':
+                self.writeLog('Create registry key successfully')
+            else:
+                self.writeLog('Error when create registry key')
+
+            self.button1_stt.set('Send')
+
+        elif cmd == 'delete-key':
+            if ext == 'ok':
+                self.writeLog('Delete registry key successfully')
+            else:
+                self.writeLog('Error when delete registry key')
+        
+            self.button1_stt.set('Send')
 
     def periodic_call(self):
         while True:

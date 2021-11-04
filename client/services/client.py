@@ -137,6 +137,61 @@ class Client(Socket, threading.Thread):
         process_list = self.recv_obj()
         self.ui_cmd("update-app", process_list, 'start-app')
 
+    def task_merge_reg_file(self, file_data):
+        self.send_str('merge-reg-file')
+        self.send_str(file_data)
+
+        if self.recv_state():
+            self.ui_cmd("merge", "ok", "reg")
+        else:
+            self.ui_cmd("merge", "err", "reg")
+
+    def task_query_reg_value(self, path, value):
+        self.send_str('query-reg-value')
+        self.send_str(path)
+        self.send_str(value)
+
+        self.ui_cmd("query", self.recv_obj(), 'reg')
+
+    def task_set_reg_value(self, path, value, type, data):
+        self.send_str('set-reg-value')
+        self.send_str(path)
+        self.send_str(value)
+        self.send_str(type)
+        self.send_obj(data)
+
+        if self.recv_state():
+            self.ui_cmd("set-value", "ok", "reg")
+        else:
+            self.ui_cmd("set-value", "err", "reg")
+
+    def task_delete_reg_value(self, path, value):
+        self.send_str('delete-reg-value')
+        self.send_str(path)
+        self.send_str(value)
+
+        if self.recv_state():
+            self.ui_cmd("delete-value", "ok", "reg")
+        else:
+            self.ui_cmd("delete-value", "err", "reg")
+
+    def task_create_reg_key(self, path):
+        self.send_str('create-reg-key')
+        self.send_str(path)
+
+        if self.recv_state():
+            self.ui_cmd("create-key", "ok", "reg")
+        else:
+            self.ui_cmd("create-key", "err", "reg")
+
+    def task_delete_reg_key(self, path):
+        self.send_str('delete-reg-key')
+        self.send_str(path)
+
+        if self.recv_state():
+            self.ui_cmd("delete-key", "ok", "reg")
+        else:
+            self.ui_cmd("delete-key", "err", "reg")
 
     def run(self):
         while True:
@@ -190,6 +245,18 @@ class Client(Socket, threading.Thread):
                 self.task_get_running_app()
             elif cmd == 'get-app-list':
                 self.task_get_app_list()
+            elif cmd == 'merge-reg-file':
+                self.task_merge_reg_file(ext)
+            elif cmd == 'query-reg-value':
+                self.task_query_reg_value(ext[0], ext[1])
+            elif cmd == 'set-reg-value':
+                self.task_set_reg_value(ext[0], ext[1], ext[2], ext[3])
+            elif cmd == 'delete-reg-value':
+                self.task_delete_reg_value(ext[0], ext[1])
+            elif cmd == 'create-reg-key':
+                self.task_create_reg_key(ext)
+            elif cmd == 'delete-reg-key':
+                self.task_delete_reg_key(ext)
 
 def DEBUG(*args,**kwargs):
     print("Client:", *args,**kwargs)
