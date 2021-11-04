@@ -181,13 +181,9 @@ class Client(Socket, threading.Thread):
             elif cmd == "restart":
                 self.task_send_restart()
             elif cmd == 'kill-process':
-                self.task_kill_process(ext)
+                self.task_kill_process(ext[0], ext[1])
             elif cmd == 'start-process':
-                self.task_start_process(ext)
-            elif cmd == 'kill-app':
-                self.task_kill_process(ext, 'app')
-            elif cmd == 'start-app':
-                self.task_start_process(ext, 'app')
+                self.task_start_process(ext[0], ext[1])
             elif cmd == 'get-running-process':
                 self.task_get_running_process()
             elif cmd == 'get-running-app':

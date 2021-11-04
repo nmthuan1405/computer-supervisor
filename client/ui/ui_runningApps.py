@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter.messagebox import askokcancel, showerror, showinfo
-
+from services.count import Count
 import ui.label as lb
 import ui.constraints as const
 import queue
@@ -46,25 +46,38 @@ class UI_runningApps(tk.Toplevel):
         self.trv_apps.configure(yscroll = self.scrollbar.set)
         self.scrollbar.grid(row = 1, column = 2, padx = 0, pady = (5,0), sticky = 'ns')
 
-        self.socket_cmd('get-running-app')
+        self.update_counting = Count(10, self.socket_cmd, 'get-running-app')
+        self.update_counting.count_up(-1)
         self.after(const.UPDATE_TIME, self.periodic_call)
 
     def update(self, data):
+        selected =  self.trv_apps.item(self.trv_apps.focus())['values']
         self.clear()
         for line in data:
             self.trv_apps.insert('', tk.END, values = line)
+            
+            if selected != '' and str(selected[1]) == str(line[1]):
+                last_element = self.trv_apps.get_children()[-1]
+                self.trv_apps.focus(last_element)
+                self.trv_apps.selection_set(last_element)
 
     def clear(self):
         self.trv_apps.delete(*self.trv_apps.get_children())
 
     def start(self):
-        window = UI_startAvailApp(self, self.socket_queue)
+        window = UI_startAvailApp(self, self.socket_queue, self.ui_queues)
         
         window.grab_set()
         window.focus()
 
     def kill(self):
-        return
+        selected = self.trv_apps.item(self.trv_apps.focus())['values']
+        if selected == '':
+            showinfo(lb.ERR, lb.APP_SELECT_APP, parent = self)
+            return
+
+        if askokcancel(lb.APP_KILL, lb.APP_KILL_CONFIRM, parent = self):
+            self.socket_cmd('kill-process', (selected[1], 'app'))
 
     def update_ui(self, task):
         DEBUG("task", task)
@@ -72,9 +85,14 @@ class UI_runningApps(tk.Toplevel):
 
         if cmd == 'update-running':
             self.update(ext)
+        elif cmd == 'ok':
+            showinfo(lb.APP_KILL, lb.APP_KILL_OK, parent = self)
+        elif cmd == 'err':
+            showerror(lb.APP_KILL, lb.APP_KILL_ERR, parent = self)
 
     def periodic_call(self):
-        # self.socket_cmd('get-running-app')
+        self.update_counting.count_up()
+
         while True:
             try:
                 task = self.ui_queue.get_nowait()
@@ -89,9 +107,11 @@ class UI_runningApps(tk.Toplevel):
         self.socket_queue.put((cmd, ext))
 
 class UI_startAvailApp(tk.Toplevel):
-    def __init__(self, parent, socket_queue):
+    def __init__(self, parent, socket_queue, ui_queues):
         self.ui_queue = queue.Queue()
         self.socket_queue = socket_queue
+        self.ui_queues = ui_queues
+        ui_queues['start-app'] = self.ui_queue
 
         super().__init__(parent)
         self.title = lb.START_APP_TITLE
@@ -121,9 +141,6 @@ class UI_startAvailApp(tk.Toplevel):
         self.trv_apps.configure(yscroll = self.scrollbar.set)
         self.scrollbar.grid(row = 1, column = 1, padx = 0, pady = (10,0), sticky = 'ns')
 
-        # add data
-        # self.insert()
-
         self.frame = tk.Frame(self)
         self.btn_start = tk.Button(self.frame, text=lb.START_APP_START, width = 8, height = 2, command = self.startApp)
         self.btn_start.grid(row = 0, column = 0, padx = (0,5))
@@ -132,22 +149,40 @@ class UI_startAvailApp(tk.Toplevel):
         self.btn_custom.grid(row = 0, column = 1)
         self.frame.grid(row = 2, column = 0, pady = (5,0), sticky= tk.E)
 
+        self.socket_cmd('get-app-list')
         self.after(const.UPDATE_TIME, self.periodic_call)
 
     def startApp(self):
-        # if (self.services.sendStartProcess(self.txt_name_input.get()) == 'OK'):
-        #     showinfo("Sucess", "Start application successful!", parent = self)
-        # else:
-            showerror("Error", "Unable to start this application", parent = self)
+        selected = self.trv_apps.item(self.trv_apps.focus())['values']
+        if selected == '':
+            showinfo(lb.ERR, lb.START_APP_SELECT_APP, parent = self)
+            return
+
+        self.socket_cmd('start-process', (selected[1], 'start-app'))
 
     def customApp(self):
-        window = UI_startCustomApp(self)
+        window = UI_startCustomApp(self, self.socket_queue, self.ui_queues)
         window.grab_set()
         window.focus()
+
+    def clear(self):
+        self.trv_apps.delete(*self.trv_apps.get_children())
+
+    def update(self, data):
+        self.clear()
+        for line in data:
+            self.trv_apps.insert('', tk.END, values = line)
 
     def update_ui(self, task):
         DEBUG("task", task)
         cmd, ext = task
+
+        if cmd == 'update-app':
+            self.update(ext)
+        elif cmd == 'ok':
+            showinfo(lb.START_APP_START, lb.START_APP_START_OK, parent = self)
+        elif cmd == 'err':
+            showerror(lb.START_APP_START, lb.START_APP_START_ERR, parent = self)
 
     def periodic_call(self):
         while True:
@@ -160,16 +195,14 @@ class UI_startAvailApp(tk.Toplevel):
         
         self.after(const.UPDATE_TIME, self.periodic_call)
 
-    def add_socket_queue(self, socket_queue):
-        self.socket_queue = socket_queue
-    
     def socket_cmd(self, cmd, ext = None):
         self.socket_queue.put((cmd, ext))
 
 class UI_startCustomApp(tk.Toplevel):
-    def __init__(self, parent):
+    def __init__(self, parent, socket_queue, ui_queues):
         self.ui_queue = queue.Queue()
-        self.socket_queue = None
+        self.socket_queue = socket_queue
+        ui_queues['start-custom-app'] = self.ui_queue
 
         super().__init__(parent)
         self.title = lb.START_APP_TITLE
@@ -190,14 +223,17 @@ class UI_startCustomApp(tk.Toplevel):
         self.after(const.UPDATE_TIME, self.periodic_call)
 
     def startApp(self):
-        # if (self.services.sendStartProcess(self.txt_name_input.get()) == 'OK'):
-        #     showinfo("Sucess", "Start application successful!", parent = self)
-        # else:
-            showerror("Error", "Unable to start this application", parent = self)
+        self.socket_cmd('start-process', (self.txt_name_input.get(), 'start-custom-app'))
 
     def update_ui(self, task):
         DEBUG("task", task)
         cmd, ext = task
+
+        if cmd == 'ok':
+            showinfo(lb.START_APP_START, lb.START_APP_START_OK, parent = self)
+            self.destroy()
+        elif cmd == 'err':
+            showerror(lb.START_APP_START, lb.START_APP_START_ERR, parent = self)
 
     def periodic_call(self):
         while True:

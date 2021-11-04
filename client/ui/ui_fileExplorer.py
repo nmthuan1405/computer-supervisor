@@ -12,7 +12,7 @@ class UI_fileExplorer(tk.Toplevel):
         self.ui_queue = queue.Queue()
         self.socket_queue = socket_queue
         self.ui_queues = ui_queues
-        ui_queues['keyboard'] = self.ui_queue
+        ui_queues['file'] = self.ui_queue
 
         super().__init__(parent)
         self.title = lb.FILE_EXPLORER_TITLE
