@@ -220,7 +220,7 @@ class Client(Socket, threading.Thread):
     def task_delete_reg_value(self):
         path = self.recv_str()
         value = self.recv_str()
-        self.send_obj(registry.delete_value(path, value))
+        self.send_state(registry.delete_value(path, value))
 
     def task_create_reg_key(self):
         path = self.recv_str()
@@ -228,7 +228,7 @@ class Client(Socket, threading.Thread):
 
     def task_delete_reg_key(self):
         path = self.recv_str()
-        self.send_state(registry.detele_key(path))
+        self.send_state(registry.delete_key(path))
 
     def task_copy_file(self):
         path = self.recv_str()
