@@ -45,15 +45,16 @@ class UI_main(tk.Tk):
         self.destroy()
     
     def update_ui(self, task):
-        DEBUG("task", task)
         cmd, ext = task
         if cmd == "start":
-            self.btn_start_stt.set(lb.START)
-        elif cmd == "stop":
-            self.btn_start_stt.set(lb.STOP)
-        elif cmd == "err":
-            if ext == "cannot start":
+            if ext == 'ok':
+                self.btn_start_stt.set(lb.STOP)
+            else:
                 showerror(lb.ERR, lb.CANNOT_START)
+                self.btn_start_stt.set(lb.START)
+
+        elif cmd == "stop":
+            self.btn_start_stt.set(lb.START)
 
     def periodic_call(self):
         while True:
