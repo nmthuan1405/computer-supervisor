@@ -99,16 +99,17 @@ class UI_file_explorer(tpl.UI_ToplevelTemplate):
     def copy_file(self):
         path = self.txt_path_input.get()
         name = self.trv_file_exp.item(self.trv_file_exp.focus())['values']
-        if name != '':
+        if name != '' and name[2] not in ("File folder", "Disk drive"):
             name = name[0]
         else:
+            showinfo(lb.INFO, lb.COPY_FILE_CHOOSE_FILE, parent = self)
             return
 
         ext = os.path.splitext(name)[-1]
         description = (ext[1:].upper() + ' Files', "*" + ext)
-        try:
-            dest = asksaveasfilename(initialfile = name, defaultextension= ext, filetypes=[description], parent=self)
-        except:
+    
+        dest = asksaveasfilename(initialfile = name, defaultextension= ext, filetypes=[description], parent=self)
+        if dest == '':
             return
 
         window = UI_copyFile(self, self.socket_queue, self.ui_queues, path, name, dest)
@@ -118,9 +119,10 @@ class UI_file_explorer(tpl.UI_ToplevelTemplate):
     def delete_file(self):
         path = self.txt_path_input.get()
         name = self.trv_file_exp.item(self.trv_file_exp.focus())['values']
-        if name != '':
+        if name != '' and name[2] not in ("File folder", "Disk drive"):
             name = name[0]
         else:
+            showinfo(lb.INFO, lb.COPY_FILE_CHOOSE_FILE, parent = self)
             return
 
         self.socket_cmd('delete-file', os.path.join(path, name))
@@ -177,6 +179,7 @@ class UI_copyFile(tpl.UI_ToplevelTemplate):
 
     def cancel(self):
         if(askokcancel(lb.CANCEL, lb.CANCEL_CONFIRM, parent = self)):
+            self.socket_cmd("cancel-copy-file")
             self.destroy()
 
     def update_ui(self, task):
@@ -184,9 +187,9 @@ class UI_copyFile(tpl.UI_ToplevelTemplate):
 
         if cmd == "get-info":
             if ext == "err":
-                showwarning(lb.WARN, lb.COPY_FILE_FAIL, parent = self)
+                showwarning(lb.WARN, lb.COPY_FILE_FAIL_GET_INFO, parent = self)
                 self.destroy()
-                return
+                
             else:
                 name, size = ext
                 self.lbl_file_name_stt.set(name)
@@ -194,19 +197,19 @@ class UI_copyFile(tpl.UI_ToplevelTemplate):
         
         elif cmd == "create-file":
             if ext == "err":
-                showwarning(lb.WARN, lb.COPY_FILE_FAIL, parent = self)
+                showwarning(lb.WARN, lb.COPY_FILE_FAIL_CREATE_FILE, parent = self)
                 self.destroy()
-                return
+                
 
         elif cmd == "copy-file":
             if ext == "err":
                 showwarning(lb.WARN, lb.COPY_FILE_FAIL, parent = self)
                 self.destroy()
-                return
+                
             elif ext == "done":
                 showinfo(lb.INFO, lb.COPY_FILE_SUCCESS, parent = self)
                 self.destroy()
-                return
+                
             else:
                 size, percent = ext
                 self.progress_bar['value'] = percent
