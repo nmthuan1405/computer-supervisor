@@ -353,6 +353,8 @@ class Client(Socket, threading.Thread):
      
             except:
                 self.task_stop()
+                for ui_queue in self.ui_queues.values:
+                    ui_queue.put('close')
                 
 
     def DEBUG(self, *args,**kwargs):

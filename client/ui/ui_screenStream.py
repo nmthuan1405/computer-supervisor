@@ -12,11 +12,10 @@ from services.count import Count
 
 class UI_screen_stream(tpl.UI_ToplevelTemplate):
     def __init__(self, parent, socket_queue, ui_queues):
-        tpl.UI_ToplevelTemplate.__init__(self, parent, 'screen', socket_queue, ui_queues)
+        tpl.UI_ToplevelTemplate.__init__(self, parent, const.SCREEN, socket_queue, ui_queues)
         self.FRAME_HEIGHT = None
 
         self.title = lb.SCREEN_STREAM_TITLE
-        self.protocol("WM_DELETE_WINDOW", self.close)
         self.resizable(False, False)
         self['padx'] = const.WINDOW_BORDER_PADDING
         self['pady'] = const.WINDOW_BORDER_PADDING

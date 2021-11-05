@@ -15,7 +15,6 @@ class UI_main(tpl.UI_MainTemplate):
         tpl.UI_MainTemplate.__init__(self, const.MAIN, ui_queues)
 
         self.title(lb.MAIN_TITLE)
-        self.protocol("WM_DELETE_WINDOW", self.close)
         self.resizable(False, False)
 
         self.lbl_app_name = tk.Label(self, text = lb.MAIN_APP_NAME, font = ("Arial", 16))

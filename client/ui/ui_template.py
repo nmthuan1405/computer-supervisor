@@ -27,7 +27,7 @@ class UI_MainTemplate(UI_Template, tk.Tk):
     def __init__(self, name, ui_queues):
         tk.Tk.__init__(self)
         UI_Template.__init__(self, name, None, ui_queues)
-
+        self.protocol("WM_DELETE_WINDOW", self.close)
         self.after(const.UPDATE_TIME[self.name], self.periodic_call)
     
     def update_ui(self, task):
@@ -51,7 +51,7 @@ class UI_ToplevelTemplate(UI_Template, tk.Toplevel):
     def __init__(self, parent, name, socket_queue, ui_queues):
         tk.Toplevel.__init__(self, parent)
         UI_Template.__init__(self, name, socket_queue, ui_queues)
-
+        self.protocol("WM_DELETE_WINDOW", self.close)
         self.after(const.UPDATE_TIME[self.name], self.periodic_call)
     
     def update_ui(self, task):
@@ -61,7 +61,10 @@ class UI_ToplevelTemplate(UI_Template, tk.Toplevel):
         while True:
             try:
                 task = self.ui_queue.get_nowait()
-                self.update_ui(task)
+                if task == 'close':
+                    self.close()
+                else:
+                    self.update_ui(task)
                 
             except queue.Empty:
                 break

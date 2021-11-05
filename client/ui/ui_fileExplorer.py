@@ -10,7 +10,7 @@ import os
 
 class UI_file_explorer(tpl.UI_ToplevelTemplate):
     def __init__(self, parent, socket_queue, ui_queues):
-        super().__init__(parent, 'file', socket_queue, ui_queues)
+        super().__init__(parent, const.FILE, socket_queue, ui_queues)
 
         self.title = lb.FILE_EXP_TITLE
         self.resizable(False, False)
@@ -149,7 +149,7 @@ class UI_file_explorer(tpl.UI_ToplevelTemplate):
 
 class UI_copyFile(tpl.UI_ToplevelTemplate):
     def __init__(self, parent, socket_queue, ui_queues, path, name, dest):
-        super().__init__(parent, 'copy-file', socket_queue, ui_queues)
+        super().__init__(parent, const.COPY_FILE, socket_queue, ui_queues)
 
         self.title = lb.COPY_FILE_TITLE
         self.protocol("WM_DELETE_WINDOW", self.cancel)
