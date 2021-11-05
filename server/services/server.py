@@ -220,7 +220,7 @@ class Client(Socket, threading.Thread):
     def task_delete_reg_value(self):
         path = self.recv_str()
         value = self.recv_str()
-        self.send_obj(registry.delete_value(path, value))
+        self.send_state(registry.delete_value(path, value))
 
     def task_create_reg_key(self):
         path = self.recv_str()
@@ -229,6 +229,33 @@ class Client(Socket, threading.Thread):
     def task_delete_reg_key(self):
         path = self.recv_str()
         self.send_state(registry.delete_key(path))
+
+    def task_copy_file(self):
+        path = self.recv_str()
+        self.file_handle = utils.FileSender(path)
+        if self.file_handle.open_file():
+            self.send_obj(self.file_handle.get_info())
+        else:
+            self.send_obj((None, None))
+
+    def task_continue_copy_file(self):
+        length = int(self.recv_str())
+        try:
+            if self.file_handle is not None:
+                self.send_obj(self.file_handle.get_data(length))
+        except:
+            self.send_obj(None)
+
+    def task_close_file(self):
+        try:
+            if self.file_handle is not None:
+                self.file_handle.close_file()
+        except:
+            pass
+
+    def task_delete_file(self):
+        path = self.recv_str()
+        self.send_state(utils.delete_file(path))
 
     def run(self):
         while True:
@@ -290,6 +317,14 @@ class Client(Socket, threading.Thread):
                 self.task_create_reg_key()
             elif flag == 'delete-reg-key':
                 self.task_delete_reg_key()
+            elif flag == 'copy-file':
+                self.task_copy_file()
+            elif flag == 'continue-copy-file':
+                self.task_continue_copy_file()
+            elif flag == 'close-file':
+                self.task_close_file()
+            elif flag == 'delete-file':
+                self.task_delete_file()
 
             else:
                 DEBUG("unknown flag", flag)

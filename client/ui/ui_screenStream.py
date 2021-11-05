@@ -1,18 +1,18 @@
 import tkinter as tk
-import ui.label as lb
-import ui.constraints as const
-from PIL import ImageTk
 from tkinter.filedialog import asksaveasfilename
 from tkinter.messagebox import showerror, showinfo, askokcancel
-from services.count import Count
-import queue
 
-class UI_screen_stream(tk.Toplevel):
+import ui.label as lb
+import ui.constraints as const
+import ui.ui_template as tpl
+
+import queue
+from PIL import ImageTk
+from services.count import Count
+
+class UI_screen_stream(tpl.UI_ToplevelTemplate):
     def __init__(self, parent, socket_queue, ui_queues):
-        super().__init__(parent)
-        self.ui_queue = queue.Queue()
-        self.socket_queue = socket_queue
-        ui_queues['screen'] = self.ui_queue
+        tpl.UI_ToplevelTemplate.__init__(self, parent, 'screen', socket_queue, ui_queues)
 
         self.title = lb.SCREEN_STREAM_TITLE
         self.protocol("WM_DELETE_WINDOW", self.close)
@@ -40,7 +40,6 @@ class UI_screen_stream(tk.Toplevel):
         
         self.update_counting = Count(1, self.socket_cmd, 'update-stream', (const.FRAME_WIDTH, const.FRAME_HEIGHT))
         self.update_counting.count_up(-1)
-        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def handle_return(self, event):
         if self.focus_get() == self.btn_pause:
@@ -69,12 +68,12 @@ class UI_screen_stream(tk.Toplevel):
         self.destroy()
 
     def update_ui(self, task):
-        DEBUG("task", task)
         cmd, ext = task
 
         if cmd == 'update-stream':
             self.render = ImageTk.PhotoImage(ext)
             self.canvas.itemconfig(self.img_on_canvas, image = self.render)
+        
         elif cmd == 'save-image':
             try:
                 f = asksaveasfilename(initialfile = 'screenshot.png', defaultextension=".png", filetypes=[("PNG Files", "*.png")], parent=self)
@@ -88,18 +87,4 @@ class UI_screen_stream(tk.Toplevel):
         if self.btn_pause_stt.get() == lb.SCREEN_STREAM_PAUSE and self.btn_capture_stt.get() == lb.SCREEN_STREAM_CAPTURE:
             self.update_counting.count_up()
 
-        while True:
-            try:
-                task = self.ui_queue.get_nowait()
-                self.update_ui(task)
-                
-            except queue.Empty:
-                break
-        
-        self.after(const.UPDATE_TIME, self.periodic_call)
-
-    def socket_cmd(self, cmd, ext = None):
-        self.socket_queue.put((cmd, ext))
-
-def DEBUG(*args,**kwargs):
-    print("UI:", *args,**kwargs)
+        super().periodic_call()

@@ -1,11 +1,13 @@
-MAIN_TITLE = "Client"
-MAIN_APP_NAME = "Computer Supervisor"
-
 ERR = "Error"
 WARN = "Warning"
 INFO = "Info"
 WAIT = "Waiting..."
 QUIT  = "Quit"
+
+MAIN_TITLE = "Client"
+MAIN_APP_NAME = "Computer Supervisor"
+MAIN_ABOUT_US = "About us"
+MAIN_ABOUT_US_TEXT = "Compter Supervisor is a remote desktop application that allows you to remotely control a computer.\n\nAuthors:\n\tNguyễn Minh Thuận\n\tTrần Anh Huy"
 
 MAIN_LBL_SERVER_IP = "Server IP Address:"
 MAIN_DEFAULT_IP = "localhost"
@@ -39,8 +41,7 @@ MAIN_RESTART_SUCCESS = "Server restart successfully"
 
 MAIN_EXIT = "Exit"
 
-MAIN_ABOUT_US = "About us"
-MAIN_ABOUT_US_TEXT = "Compter Supervisor is a remote desktop application that allows you to remotely control a computer.\n\nAuthors:\nNguyễn Minh Thuận\nTrần Anh Huy"
+
 # ----------------------------------------------------------------------------------------------------------------------
 CONFIRM_CLOSE_WINDOW = "Close window"
 CONFIRM_CLOSE_WINDOW_TXT = "Are you sure you want to close this window?"
@@ -69,10 +70,12 @@ FILE_EXP_TRV_TYPE = "Type"
 FILE_EXP_TRV_SIZE = "Size"
 
 COPY_FILE_TITLE = "Copy File"
-COPY_FILE_FILE_NAME = "default name"
-COPY_FILE_FILE_SIZE = "default size"
-COPY_FILE_CANCEL = "Cancel"
-COPY_FILE_CANCEL_CONFIRM = "Are you sure you want to cancel copy progress?"
+FILE_NAME = "default name"
+FILE_SIZE = "default size"
+CANCEL = "Cancel"
+CANCEL_CONFIRM = "Are you sure you want to cancel copy progress?"
+COPY_FILE_FAIL = "Unable to copy file"
+COPY_FILE_SUCCESS = "File copied successfully"
 # ----------------------------------------------------------------------------------------------------------------------
 REGISTRY_TITLE = "Edit Registry"
 # ----------------------------------------------------------------------------------------------------------------------
@@ -127,7 +130,7 @@ REGISTRY_FRAME_EDIT_DIRECT = "Edit Directly"
 REGISTRY_LBL_OPTION = "Select option"
 REGISTRY_LBL_NAME_VALUE = "Name value"
 REGISTRY_LBL_VALUE = "Value"
-REGISTRY_SEPERATOR = "\\0"
+REGISTRY_SEPERATOR = ","
 REGISTRY_DATA_TYPE = "Data type"
 REGISTRY_LBL_RESULT = "Result"
 REGISTRY_SEND_DIRECT = "Send"
@@ -141,9 +144,8 @@ REGISTRY_MERGE = "Merge"
 REGISTRY_MERGE_OK = "Merge registry file successfully"
 REGISTRY_MERGE_ERR = "Unable to merge registry file"
 
-REGISTRY_SET = "Set"
-REGISTRY_SET_OK = "Set registry value successfully"
-REGISTRY_SET_ERR = "Unable to set registry value"
+REGISTRY_SET_VALUE_OK = "Set registry value successfully"
+REGISTRY_SET_VALUE_ERR = "Unable to set registry value"
 
 REGISTRY_DELETE_VALUE_OK = "Delete registry value successfully"
 REGISTRY_DELETE_VALUE_ERR = "Unable to delete registry value"

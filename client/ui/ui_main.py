@@ -4,6 +4,7 @@ import ui.label as lb
 import ui.constraints as const
 import queue
 
+import ui.ui_template as tpl
 import ui.ui_screenStream as sc
 import ui.ui_keylogger as kl
 import ui.ui_fileExplorer as fe
@@ -11,13 +12,9 @@ import ui.ui_registry as reg
 import ui.ui_runningApps as ra
 import ui.ui_runningProcesses as rp
 
-class UI_main(tk.Tk):
+class UI_main(tpl.UI_MainTemplate):
     def __init__(self, ui_queues):
-        super().__init__()
-        self.ui_queue = queue.Queue()
-        self.ui_queues = ui_queues
-        self.socket_queue = None
-        ui_queues['main'] = self.ui_queue
+        tpl.UI_MainTemplate.__init__(self, 'main', ui_queues)
 
         self.title(lb.MAIN_TITLE)
         self.protocol("WM_DELETE_WINDOW", self.close)
@@ -83,9 +80,7 @@ class UI_main(tk.Tk):
 
         self.lbl_about_us = tk.Label(self, text = lb.MAIN_ABOUT_US, cursor = "hand2")
         self.lbl_about_us.grid(row = 7, column = 0, columnspan = 3, padx = 10, pady = 10)
-        self.lbl_about_us.bind("<Button-1>", self.on_click_about_us)
-        
-        self.after(const.UPDATE_TIME, self.periodic_call)
+        self.lbl_about_us.bind("<Button-1>", self.about_us)
 
     def handle_return(self, event):
         if self.focus_get() == self.txt_IP_input or self.focus_get() == self.btn_connect:
@@ -114,6 +109,9 @@ class UI_main(tk.Tk):
     def handle_escape(self, event):
         self.close()
 
+    def on_click_MAC_address(self, event):
+        self.socket_cmd("get-MAC")
+        
     def close(self):
         if self.btn_connect_stt.get() == lb.MAIN_DISCONNECT:
             if askokcancel(lb.QUIT, lb.MAIN_ASK_QUIT):
@@ -132,12 +130,6 @@ class UI_main(tk.Tk):
             self.socket_cmd("stop")
 
         self.btn_connect_stt.set(lb.WAIT)
-    
-
-    def on_click_MAC_address(self, event):
-        self.socket_cmd("get-MAC")
-
-
 
     def screen_stream(self):
         window = sc.UI_screen_stream(self, self.socket_queue, self.ui_queues)
@@ -184,42 +176,27 @@ class UI_main(tk.Tk):
             self.socket_cmd("restart")
             showinfo(lb.MAIN_RESTART, lb.MAIN_RESTART_SUCCESS)
 
-    def on_click_about_us(self, event):
+    def about_us(self, event):
         showinfo(lb.MAIN_ABOUT_US, lb.MAIN_ABOUT_US_TEXT)
     
     def update_ui(self, task):
-        # DEBUG("task", task)
-        cmd, ext = task
-        if cmd == "start":
+        def change_default():
             self.btn_connect_stt.set(lb.MAIN_CONNECT)
             self.txt_IP_input.config(state = tk.NORMAL)
             self.MAC_address_stt.set("")
+
+        cmd, ext = task
+        if cmd == "start":
+            if ext == "ok":
+                self.btn_connect_stt.set(lb.MAIN_DISCONNECT)
+                self.txt_IP_input.config(state = tk.DISABLED)
+                self.socket_cmd("get-MAC")
+            else:
+                change_default()
+                showerror(lb.ERR, lb.MAIN_CANNOT_CONNECT, parent = self)
+        
         elif cmd == "stop":
-            self.btn_connect_stt.set(lb.MAIN_DISCONNECT)
-            self.txt_IP_input.config(state = tk.DISABLED)
-            self.socket_cmd("get-MAC")
+            change_default()
+
         elif cmd == "update-MAC":
             self.MAC_address_stt.set(ext)
-        elif cmd == "err":
-            if ext == "cannot start":
-                showerror(lb.ERR, lb.MAIN_CANNOT_CONNECT)
-
-    def periodic_call(self):
-        while True:
-            try:
-                task = self.ui_queue.get_nowait()
-                self.update_ui(task)
-                
-            except queue.Empty:
-                break
-        
-        self.after(const.UPDATE_TIME, self.periodic_call)
-
-    def add_socket_queue(self, socket_queue):
-        self.socket_queue = socket_queue
-    
-    def socket_cmd(self, cmd, ext = None):
-        self.socket_queue.put((cmd, ext))
-
-def DEBUG(*args,**kwargs):
-    print("UI:", *args,**kwargs)

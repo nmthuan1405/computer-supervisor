@@ -6,14 +6,12 @@ from tkinter.messagebox import showerror, showinfo
 
 import ui.label as lb
 import ui.constraints as const
+import ui.ui_template as tpl
 import queue
 
-class UI_registry(tk.Toplevel):
+class UI_registry(tpl.UI_ToplevelTemplate):
     def __init__(self, parent, socket_queue, ui_queues):
-        super().__init__(parent)
-        self.ui_queue = queue.Queue()
-        self.socket_queue = socket_queue
-        ui_queues['reg'] = self.ui_queue
+        super().__init__(parent, 'reg', socket_queue, ui_queues)
 
         self.title = lb.REGISTRY_TITLE
         self.geometry('430x637')
@@ -245,8 +243,6 @@ class UI_registry(tk.Toplevel):
         self.btn_clear = tk.Button(self.frame_edit_directly, text = lb.REGISTRY_CLEAR, width = 8, command = self.clear_log)
         self.btn_clear.place(x = 220, y = 320)
 
-        self.after(const.UPDATE_TIME, self.periodic_call)
-
     def browse(self):
         try:
             filename = askopenfilename(defaultextension=".reg", filetypes=[("Registry Files", "*.reg"), ("All Files", "*.*")], parent = self)
@@ -274,34 +270,23 @@ class UI_registry(tk.Toplevel):
         path = self.txt_path_input_direct.get()
         value = self.txt_name_value.get()
 
-        self.socket_cmd('query-reg-value', (path, value))
+        self.socket_cmd('query-reg-value', path, value)
 
     def set_reg_value(self):
         path = self.txt_path_input_direct.get()
         value = self.txt_name_value.get()
         type = self.cbb_data_type.get()
         data = self.txt_value.get()
-        try:
-            if type == self.data_types[1]:
-                data = bytearray.fromhex(data)
-            elif type == self.data_types[2] or type == self.data_types[3]:
-                data = int(data)
-            elif type == self.data_types[4]:
-                data = data.split(self.txt_seperator.get())
+        if type == self.data_types[4]:
+            data = data.split(self.txt_seperator.get())
 
-                data_display = ['\'' + element + '\'' for element in data]
-                self.write_log('Data: ' + ', '.join(data_display))
-        except:
-            self.write_log(lb.REGISTRY_ERR_PARSE_DATA)
-            return
-
-        self.socket_cmd('set-reg-value', (path, value, type, data))
+        self.socket_cmd('set-reg-value', path, value, type, data)
 
     def delete_reg_value(self):
         path = self.txt_path_input_direct.get()
         value = self.txt_name_value.get()
 
-        self.socket_cmd('delete-reg-value', (path, value))
+        self.socket_cmd('delete-reg-value', path, value)
 
     def create_reg_key(self):
         path = self.txt_path_input_direct.get()
@@ -338,7 +323,6 @@ class UI_registry(tk.Toplevel):
         self.result_area.see('end')
 
     def update_ui(self, task):
-        DEBUG("task", task)
         cmd, ext = task
 
         if cmd == 'merge':
@@ -348,65 +332,37 @@ class UI_registry(tk.Toplevel):
                 showerror(lb.REGISTRY_MERGE, lb.REGISTRY_MERGE_ERR, parent = self)
             self.btn_send_stt.set(lb.REGISTRY_SEND)
 
-        elif cmd == 'query':
-            value, data, type = ext
+        else:
+            if cmd == 'query':
+                value, data, type = ext
 
-            if data is None:
-                self.write_log(f'{value}: Query error')
-            else:
-                if type == self.data_types[1]:
-                    data = str(data.hex())
+                if data is None:
+                    self.write_log(f'{value}: Query error')
                 else:
-                    data = str(data)
-                self.write_log(f'{value}: {data}\n\tType: {type}')
+                    self.write_log(f'{value}: {data}\n\tType: {type}')
+
+            elif cmd == 'set-value':
+                if ext == 'ok':
+                    self.write_log(lb.REGISTRY_SET_VALUE_OK)
+                else:
+                    self.write_log(lb.REGISTRY_SET_VALUE_ERR)
+
+            elif cmd == 'delete-value':
+                if ext == 'ok':
+                    self.write_log(lb.REGISTRY_DELETE_VALUE_OK)
+                else:
+                    self.write_log(lb.REGISTRY_DELETE_VALUE_ERR)
+
+            elif cmd == 'create-key':
+                if ext == 'ok':
+                    self.write_log(lb.REGISTRY_CREATE_KEY_OK)
+                else:
+                    self.write_log(lb.REGISTRY_CREATE_KEY_ERR)
+
+            elif cmd == 'delete-key':
+                if ext == 'ok':
+                    self.write_log(lb.REGISTRY_DELETE_KEY_OK)
+                else:
+                    self.write_log(lb.REGISTRY_DELETE_KEY_ERR)
+
             self.btn_send_direct_stt.set(lb.REGISTRY_SEND_DIRECT)
-
-        elif cmd == 'set-value':
-            if ext == 'ok':
-                showinfo(lb.REGISTRY_SET, lb.REGISTRY_SET_OK, parent = self)
-            else:
-                showerror(lb.REGISTRY_SET, lb.REGISTRY_SET_ERR, parent = self)
-            self.btn_send_direct_stt.set(lb.REGISTRY_SEND_DIRECT)
-
-        elif cmd == 'delete-value':
-            if ext == 'ok':
-                self.write_log(lb.REGISTRY_DELETE_VALUE_OK)
-            else:
-                self.write_log(lb.REGISTRY_DELETE_VALUE_ERR)
-            self.btn_send_direct_stt.set(lb.REGISTRY_SEND_DIRECT)
-
-        elif cmd == 'create-key':
-            if ext == 'ok':
-                self.write_log(lb.REGISTRY_CREATE_KEY_OK)
-            else:
-                self.write_log(lb.REGISTRY_CREATE_KEY_ERR)
-
-            self.btn_send_direct_stt.set(lb.REGISTRY_SEND_DIRECT)
-
-        elif cmd == 'delete-key':
-            if ext == 'ok':
-                self.write_log(lb.REGISTRY_DELETE_KEY_OK)
-            else:
-                self.write_log(lb.REGISTRY_DELETE_KEY_ERR)
-        
-            self.btn_send_direct_stt.set(lb.REGISTRY_SEND_DIRECT)
-
-    def periodic_call(self):
-        while True:
-            try:
-                task = self.ui_queue.get_nowait()
-                self.update_ui(task)
-                
-            except queue.Empty:
-                break
-        
-        self.after(const.UPDATE_TIME, self.periodic_call)
-
-    def add_socket_queue(self, socket_queue):
-        self.socket_queue = socket_queue
-    
-    def socket_cmd(self, cmd, ext = None):
-        self.socket_queue.put((cmd, ext))
-
-def DEBUG(*args,**kwargs):
-    print("UI:", *args,**kwargs)

@@ -4,15 +4,12 @@ from tkinter.messagebox import askokcancel, showerror, showinfo
 from services.count import Count
 import ui.label as lb
 import ui.constraints as const
+import ui.ui_template as tpl
 import queue
 
-class UI_running_processes(tk.Toplevel):
+class UI_running_processes(tpl.UI_ToplevelTemplate):
     def __init__(self, parent, socket_queue, ui_queues):
-        super().__init__(parent)
-        self.ui_queue = queue.Queue()
-        self.socket_queue = socket_queue
-        self.ui_queues = ui_queues
-        ui_queues['process'] = self.ui_queue
+        super().__init__(parent, 'process', socket_queue, ui_queues)
 
         self.title = lb.PROCESS_TITLE
         self.resizable(False, False)
@@ -51,7 +48,6 @@ class UI_running_processes(tk.Toplevel):
 
         self.update_counting = Count(10, self.socket_cmd, 'get-running-process')
         self.update_counting.count_up(-1)
-        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def handle_return(self, event):
         if self.focus_get() == self.btn_start:
@@ -89,44 +85,28 @@ class UI_running_processes(tk.Toplevel):
             return
 
         if askokcancel(lb.PROCESS_KILL, lb.PROCESS_KILL_CONFIRM, parent = self):
-            self.socket_cmd('kill-process', (selected[1], 'process'))
+            self.socket_cmd('kill-process', selected[1], 'process')
 
     def update_ui(self, task):
-        DEBUG("task", task)
         cmd, ext = task
 
         if cmd == 'update-running':
             self.update(ext)
-        elif cmd == 'ok':
-            showinfo(lb.PROCESS_KILL, lb.PROCESS_KILL_OK, parent = self)
-        elif cmd == 'err':
-            showerror(lb.PROCESS_KILL, lb.PROCESS_KILL_ERR, parent = self)
+        elif cmd == 'kill':
+            if ext == 'ok':
+                showinfo(lb.PROCESS_KILL, lb.PROCESS_KILL_OK, parent = self)
+            else:
+                showerror(lb.PROCESS_KILL, lb.PROCESS_KILL_ERR, parent = self)
 
     def periodic_call(self):
         self.update_counting.count_up()
+        super().periodic_call()
 
-        while True:
-            try:
-                task = self.ui_queue.get_nowait()
-                self.update_ui(task)
-                
-            except queue.Empty:
-                break
-        
-        self.after(const.UPDATE_TIME, self.periodic_call)
 
-    def add_socket_queue(self, socket_queue):
-        self.socket_queue = socket_queue
-    
-    def socket_cmd(self, cmd, ext = None):
-        self.socket_queue.put((cmd, ext))
 
-class UI_start_process(tk.Toplevel):
+class UI_start_process(tpl.UI_ToplevelTemplate):
     def __init__(self, parent, socket_queue, ui_queues):
-        super().__init__(parent)
-        self.ui_queue = queue.Queue()
-        self.socket_queue = socket_queue
-        ui_queues['start-process'] = self.ui_queue
+        super().__init__(parent, 'start-process', socket_queue, ui_queues)
 
         self.title = lb.START_PROCESS_TITLE
         self.resizable(False, False)
@@ -157,32 +137,14 @@ class UI_start_process(tk.Toplevel):
             self.destroy()
 
     def start_process(self):
-         self.socket_cmd('start-process', (self.txt_name_input.get(), 'start-process'))
+         self.socket_cmd('start-process', self.txt_name_input.get(), 'start-process')
 
     def update_ui(self, task):
-        DEBUG("task", task)
         cmd, ext = task
 
-        if cmd == 'ok':
-            showinfo(lb.START_PROCESS_TITLE, lb.START_PROCESS_START_OK, parent = self)
-            self.destroy()
-        elif cmd == 'err':
-            showerror(lb.START_PROCESS_TITLE, lb.START_PROCESS_START_ERR, parent = self)
-
-
-    def periodic_call(self):
-        while True:
-            try:
-                task = self.ui_queue.get_nowait()
-                self.update_ui(task)
-                
-            except queue.Empty:
-                break
-        
-        self.after(const.UPDATE_TIME, self.periodic_call)
-    
-    def socket_cmd(self, cmd, ext = None):
-        self.socket_queue.put((cmd, ext))
-
-def DEBUG(*args,**kwargs):
-    print("UI:", *args,**kwargs)
+        if cmd == 'start':
+            if ext == 'ok':
+                showinfo(lb.START_PROCESS_TITLE, lb.START_PROCESS_START_OK, parent = self)
+                self.destroy()
+            else:
+                showerror(lb.START_PROCESS_TITLE, lb.START_PROCESS_START_ERR, parent = self)

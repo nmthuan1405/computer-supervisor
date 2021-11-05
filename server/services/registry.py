@@ -3,7 +3,7 @@ from tempfile import NamedTemporaryFile
 import subprocess
 import os
 
-def getHKEY(name):
+def get_HKEY(name):
     if name == "HKEY_CLASSES_ROOT":
         return reg.HKEY_CLASSES_ROOT
     elif name == "HKEY_CURRENT_USER":
@@ -19,7 +19,7 @@ def getHKEY(name):
     elif name == 'HKEY_DYN_DATA':
         return reg.HKEY_DYN_DATA
 
-def getType(type):
+def get_type(type):
     if type == 'String':
         return reg.REG_SZ
     elif type == 'Binary':
@@ -33,7 +33,7 @@ def getType(type):
     elif type == 'Expandable String':
         return reg.REG_EXPAND_SZ 
 
-def returnType(type):
+def return_type(type):
     if type == reg.REG_SZ:
         return 'String'
     elif type == reg.REG_BINARY:
@@ -45,7 +45,21 @@ def returnType(type):
     elif type == reg.REG_MULTI_SZ:
         return 'Multi-String'
     elif type == reg.REG_EXPAND_SZ:
-        return 'Expandable String' 
+        return 'Expandable String'
+
+def get_display_data(value, type):
+    if type == reg.REG_BINARY:
+        return str(value.hex())
+    else:
+        return str(value)
+
+def parse_data(data, type):
+    if type == 'Binary':
+        data = bytearray.fromhex(data)
+    elif type == 'DWORD' or type == 'QWORD':
+        data = int(data)
+    
+    return data
 
 def merge_reg_file(file_data):
     try:
@@ -67,17 +81,16 @@ def merge_reg_file(file_data):
 def query_value(path, value):
     try:
         hkey, key = path.split('\\', 1)
-        value, type  = reg.QueryValueEx(reg.OpenKeyEx(getHKEY(hkey), key, 0, reg.KEY_QUERY_VALUE), value)
-
-        return value, returnType(type)
+        value, type  = reg.QueryValueEx(reg.OpenKeyEx(get_HKEY(hkey), key, 0, reg.KEY_QUERY_VALUE), value)
+        return get_display_data(value, type), return_type(type)
     except:
         return None, None
 
 def set_value(path, value, type, data):
     try:
         hkey, key = path.split('\\', 1)
-        reg.SetValueEx(reg.OpenKeyEx(getHKEY(hkey), key, 0, reg.KEY_SET_VALUE), value, 0, getType(type), data)
-
+        value = parse_data(value, type)
+        reg.SetValueEx(reg.OpenKeyEx(get_HKEY(hkey), key, 0, reg.KEY_SET_VALUE), value, 0, get_type(type), data)
         return True
     except:
         return False
@@ -85,7 +98,7 @@ def set_value(path, value, type, data):
 def delete_value(path, value):
     try:
         hkey, key = path.split('\\', 1)
-        reg.DeleteValue(reg.OpenKeyEx(getHKEY(hkey), key, 0, reg.KEY_SET_VALUE), value)
+        reg.DeleteValue(reg.OpenKeyEx(get_HKEY(hkey), key, 0, reg.KEY_SET_VALUE), value)
 
         return True
     except:
@@ -94,7 +107,7 @@ def delete_value(path, value):
 def create_key(path):
     try:
         hkey, key = path.split('\\', 1)
-        reg.CreateKeyEx(getHKEY(hkey), key, 0, reg.KEY_CREATE_SUB_KEY)
+        reg.CreateKeyEx(get_HKEY(hkey), key, 0, reg.KEY_CREATE_SUB_KEY)
 
         return True
     except:
@@ -103,7 +116,7 @@ def create_key(path):
 def delete_key(path):
     try:
         hkey, key = path.split('\\', 1)
-        reg.DeleteKeyEx(getHKEY(hkey), key)
+        reg.DeleteKeyEx(get_HKEY(hkey), key)
 
         return True
     except:

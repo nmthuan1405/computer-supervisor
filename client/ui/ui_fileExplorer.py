@@ -1,19 +1,16 @@
 import tkinter as tk
 from tkinter import ttk
-from tkinter.messagebox import askokcancel, showerror
-
+from tkinter.messagebox import askokcancel, showerror, showinfo, showwarning
+from tkinter.filedialog import asksaveasfilename
 import ui.label as lb
 import ui.constraints as const
+import ui.ui_template as tpl
 import queue
 import os
 
-class UI_file_explorer(tk.Toplevel):
+class UI_file_explorer(tpl.UI_ToplevelTemplate):
     def __init__(self, parent, socket_queue, ui_queues):
-        super().__init__(parent)
-        self.ui_queue = queue.Queue()
-        self.socket_queue = socket_queue
-        self.ui_queues = ui_queues
-        ui_queues['file'] = self.ui_queue
+        super().__init__(parent, 'file', socket_queue, ui_queues)
 
         self.title = lb.FILE_EXP_TITLE
         self.resizable(False, False)
@@ -69,7 +66,6 @@ class UI_file_explorer(tk.Toplevel):
         self.btn_delete.grid(row = 0, column = 3, sticky=tk.E)
 
         self.goto_dir("")
-        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def handle_return(self, event):
         if self.focus_get() == self.btn_up:
@@ -89,19 +85,8 @@ class UI_file_explorer(tk.Toplevel):
             parent_dir = os.path.dirname(dir)
             if parent_dir == dir:
                 parent_dir = ''
-                
             self.goto_dir(parent_dir)
 
-    def copy_file(self):
-        window = UI_copy_file(self, self.socket_queue)
-        self.ui_queue = window.ui_queue
-
-        window.grab_set()
-        window.focus()
-
-    def delete_file(self):
-        return
-    
     def update_dir(self, path):
         self.txt_path_input.configure(state = 'normal')
         self.txt_path_input.delete(0, tk.END)
@@ -126,35 +111,59 @@ class UI_file_explorer(tk.Toplevel):
             next_dir = os.path.join(self.txt_path_input.get(), self.trv_file_exp.item(item, "values")[0])
             self.goto_dir(next_dir)
 
+    def copy_file(self):
+        path = self.txt_path_input.get()
+        name = self.trv_file_exp.item(self.trv_file_exp.focus())['values']
+        if name != '':
+            name = name[0]
+        else:
+            return
+
+        ext = os.path.splitext(name)[-1]
+        description = (ext[1:].upper() + ' Files', "*" + ext)
+        try:
+            dest = asksaveasfilename(initialfile = name, defaultextension= ext, filetypes=[description], parent=self)
+        except:
+            return
+
+        window = UI_copyFile(self, self.socket_queue, self.ui_queues, path, name, dest)
+        window.grab_set()
+        window.focus()
+
+    def delete_file(self):
+        path = self.txt_path_input.get()
+        name = self.trv_file_exp.item(self.trv_file_exp.focus())['values']
+        if name != '':
+            name = name[0]
+        else:
+            return
+
+        self.socket_cmd('delete-file', os.path.join(path, name))
+        self.btn_delete_stt.set(lb.WAIT)
+
     def update_ui(self, task):
-        DEBUG("task", task)
         cmd, ext = task
 
         if cmd == "update-dir":
             path, list_file = ext
             self.update_dir(path)
             self.update_tree(list_file)
-
-    def periodic_call(self):
-        while True:
-            try:
-                task = self.ui_queue.get_nowait()
-                self.update_ui(task)
-                
-            except queue.Empty:
-                break
         
-        self.after(const.UPDATE_TIME, self.periodic_call)
-    
-    def socket_cmd(self, cmd, ext = None):
-        self.socket_queue.put((cmd, ext))
+        elif cmd == "delete-file":
+            if ext == "ok":
+                showinfo(lb.INFO, lb.COPY_FILE_SUCCESS, parent = self)
+            else:
+                 showwarning(lb.WARN, lb.COPY_FILE_FAIL, parent = self)
+            
+            self.btn_delete_stt.set(lb.FILE_EXP_DELETE)
+            self.goto_dir(self.txt_path_input.get())
 
-class UI_copy_file(tk.Toplevel):
-    def __init__(self, parent, socket_queue):
-        self.ui_queue = queue.Queue()
-        self.socket_queue = socket_queue
 
-        super().__init__(parent)
+
+class UI_copyFile(tpl.UI_ToplevelTemplate):
+    def __init__(self, parent, socket_queue, ui_queues, path, name, dest):
+        super().__init__(parent, 'copy-file', socket_queue, ui_queues)
+
         self.title = lb.COPY_FILE_TITLE
         self.protocol("WM_DELETE_WINDOW", self.cancel)
         self.resizable(False, False)
@@ -164,24 +173,25 @@ class UI_copy_file(tk.Toplevel):
         self.bind('<Return>', self.handle_return)
         self.bind('<Escape>', self.handle_escape)
 
-        self.lbl_file_name_stt = tk.StringVar(self, lb.COPY_FILE_FILE_NAME)
-        self.lbl_file_name = tk.Label(self, textvariable = self.lbl_file_name_stt)
+        self.lbl_file_name_stt = tk.StringVar(self)
+        self.lbl_file_name = tk.Label(self, textvariable=self.lbl_file_name_stt)
         self.lbl_file_name.grid(row = 0, column = 0, sticky = tk.W)
 
-        self.lbl_file_size_stt = tk.StringVar(self, lb.COPY_FILE_FILE_SIZE)
+        self.lbl_file_size_stt = tk.StringVar(self)
         self.lbl_file_size = tk.Label(self, textvariable = self.lbl_file_size_stt)
         self.lbl_file_size.grid(row = 0, column = 1, sticky = tk.E)
 
-        self.progress_bar = ttk.Progressbar(self, orient = tk.HORIZONTAL, length = 300, mode = 'indeterminate')
+        self.progress_bar = ttk.Progressbar(self, orient = tk.HORIZONTAL, length = 300, mode = 'determinate')
         self.progress_bar.grid(row = 1, column = 0, columnspan = 2, sticky = tk.EW, pady = (5,0))
-        # update progress bar
-        # self.progress_bar['value'] += 20
+        
+        self.progress_bar['value'] = 0
+        self.progress_bar['maximum'] = 100
  
-
-        self.btn_cancel = tk.Button(self, text = lb.COPY_FILE_CANCEL, command = self.cancel)
+        self.btn_cancel = tk.Button(self, text = lb.CANCEL, command = self.cancel)
         self.btn_cancel.grid(row = 1, column = 2, sticky = tk.W, padx = (5,0), pady = (5,0), ipadx = 10)
 
-        self.after(const.UPDATE_TIME, self.periodic_call)
+        self.socket_cmd("copy-file", os.path.join(path, name), dest)
+        self.socket_cmd("continue-copy-file")
 
     def handle_return(self, event):
         if self.focus_get() == self.btn_cancel:
@@ -192,30 +202,39 @@ class UI_copy_file(tk.Toplevel):
             self.destroy()
 
     def cancel(self):
-        if(askokcancel(lb.COPY_FILE_CANCEL, lb.COPY_FILE_CANCEL_CONFIRM, parent = self)):
+        if(askokcancel(lb.CANCEL, lb.CANCEL_CONFIRM, parent = self)):
             self.destroy()
 
     def update_ui(self, task):
-        DEBUG("task", task)
         cmd, ext = task
 
-    def periodic_call(self):
-        while True:
-            try:
-                task = self.ui_queue.get_nowait()
-                self.update_ui(task)
-                
-            except queue.Empty:
-                break
+        if cmd == "get-info":
+            if ext == "err":
+                showwarning(lb.WARN, lb.COPY_FILE_FAIL, parent = self)
+                self.destroy()
+                return
+            else:
+                name, size = ext
+                self.lbl_file_name_stt.set(name)
+                self.lbl_file_size_stt.set(size)
         
-        self.after(const.UPDATE_TIME, self.periodic_call)
+        elif cmd == "create-file":
+            if ext == "err":
+                showwarning(lb.WARN, lb.COPY_FILE_FAIL, parent = self)
+                self.destroy()
+                return
 
-    def add_socket_queue(self, socket_queue):
-        self.socket_queue = socket_queue
-    
-    def socket_cmd(self, cmd, ext = None):
-        self.socket_queue.put((cmd, ext))
-
-
-def DEBUG(*args,**kwargs):
-    print("File:", *args,**kwargs)
+        elif cmd == "copy-file":
+            if ext == "err":
+                showwarning(lb.WARN, lb.COPY_FILE_FAIL, parent = self)
+                self.destroy()
+                return
+            elif ext == "done":
+                showinfo(lb.INFO, lb.COPY_FILE_SUCCESS, parent = self)
+                self.destroy()
+                return
+            else:
+                size, percent = ext
+                self.progress_bar['value'] = percent
+                self.lbl_file_size_stt.set(size)
+                self.socket_cmd("continue-copy-file")

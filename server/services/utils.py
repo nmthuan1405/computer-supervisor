@@ -155,3 +155,35 @@ def start_process(path):
         return False
     else:
         return True
+
+def delete_file(path):
+    try:
+        os.remove(path)
+    except:
+        return False
+    else:
+        return True
+        
+class FileSender():
+    def __init__(self, path):
+        self.file = None
+        self.path = path
+
+    def open_file(self):
+        try:
+            self.file = open(self.path, 'rb')
+        except:
+            return False
+        else:
+            return True
+
+    def close_file(self):
+        self.file.close()
+
+    def get_data(self, bytes = 1024):
+        return self.file.read(bytes)
+
+    def get_info(self):
+        name = os.path.basename(self.path)
+        size = os.path.getsize(self.path)
+        return (name, size)
