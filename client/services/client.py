@@ -70,6 +70,7 @@ class Client(Socket, threading.Thread):
         img = self.recv_obj()
         self.ui_cmd("save-image", img, 'screen')
 
+    # keyboard GUI
     def task_keyboard_start(self):
         self.send_str("listener-start")
 

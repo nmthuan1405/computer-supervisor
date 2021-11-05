@@ -7,6 +7,7 @@ WINDOW_BORDER_PADDING = 10
 UPDATE_TIME = {}
 UPDATE_TIME['main'] = 200
 UPDATE_TIME['screen'] = 200
+UPDATE_TIME['keyboard'] = 200
 
 FRAME_WIDTH = 800
 FRAME_HEIGHT = int(FRAME_WIDTH * (screensize[1]/screensize[0]))
