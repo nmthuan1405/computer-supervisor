@@ -77,9 +77,9 @@ class UI_file_explorer(tk.Toplevel):
                 
             self.goto_dir(parent_dir)
 
-    def copyFile(self):
+    def copy_file(self):
         path = self.txt_path_input.get()
-        name = self.trv_fileExp.item(self.trv_fileExp.focus())['values']
+        name = self.trv_file_exp.item(self.trv_file_exp.focus())['values']
         if name != '':
             name = name[0]
         else:
@@ -97,7 +97,15 @@ class UI_file_explorer(tk.Toplevel):
         window.focus()
 
     def delete_file(self):
-        return
+        path = self.txt_path_input.get()
+        name = self.trv_file_exp.item(self.trv_file_exp.focus())['values']
+        if name != '':
+            name = name[0]
+        else:
+            return
+
+        self.socket_cmd('delete-file', os.path.join(path, name))
+        self.btn_delete_stt.set(lb.WAIT)
     
     def update_dir(self, path):
         self.txt_path_input.configure(state = 'normal')
@@ -131,6 +139,14 @@ class UI_file_explorer(tk.Toplevel):
             path, list_file = ext
             self.update_dir(path)
             self.update_tree(list_file)
+        
+        elif cmd == "delete-file":
+            if ext == "err":
+                showwarning(lb.WARN, lb.COPY_FILE_FAIL, parent = self)
+            elif ext == "ok":
+                showinfo(lb.INFO, lb.COPY_FILE_SUCCESS, parent = self)
+            self.btn_delete_stt.set(lb.FILE_EXP_DELETE)
+            self.goto_dir(self.txt_path_input.get())
 
     def periodic_call(self):
         while True:
@@ -219,7 +235,7 @@ class UI_copyFile(tk.Toplevel):
                 self.progress_bar['value'] = percent
                 self.lbl_file_size_stt.set(size)
                 self.socket_cmd("continue-copy-file")
-
+        
     def periodic_call(self):
         while True:
             try:

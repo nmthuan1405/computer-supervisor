@@ -156,6 +156,14 @@ def start_process(path):
     else:
         return True
 
+def delete_file(path):
+    try:
+        os.remove(path)
+    except:
+        return False
+    else:
+        return True
+        
 class FileSender():
     def __init__(self, path):
         self.file = None

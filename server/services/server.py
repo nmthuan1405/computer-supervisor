@@ -253,6 +253,10 @@ class Client(Socket, threading.Thread):
         except:
             pass
 
+    def task_delete_file(self):
+        path = self.recv_str()
+        self.send_state(utils.delete_file(path))
+
     def run(self):
         while True:
             flag = self.recv_str()
@@ -319,6 +323,8 @@ class Client(Socket, threading.Thread):
                 self.task_continue_copy_file()
             elif flag == 'close-file':
                 self.task_close_file()
+            elif flag == 'delete-file':
+                self.task_delete_file()
 
             else:
                 DEBUG("unknown flag", flag)

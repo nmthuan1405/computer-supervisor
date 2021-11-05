@@ -243,6 +243,15 @@ class Client(Socket, threading.Thread):
             else:
                 error_handler()
 
+    def task_delete_file(self, path):
+        self.send_str('delete-file')
+        self.send_str(path)
+
+        if self.recv_state():
+            self.ui_cmd("delete-file", "ok", "file")
+        else:
+            self.ui_cmd("delete-file", "err", "file")
+
     def run(self):
         while True:
             task = self.socket_queue.get()
@@ -311,6 +320,8 @@ class Client(Socket, threading.Thread):
                 self.task_copy_file(*ext)
             elif cmd == 'continue-copy-file':
                 self.task_continue_copy_file()
+            elif cmd == 'delete-file':
+                self.task_delete_file(ext)
 
 def DEBUG(*args,**kwargs):
     print("Client:", *args,**kwargs)

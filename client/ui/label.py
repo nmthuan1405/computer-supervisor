@@ -40,7 +40,7 @@ RESTART_SUCCESS = "Server restart successfully"
 EXIT = "Exit"
 
 ABOUT_US = "About us"
-ABOUT_US_TEXT = "Compter Supervisor is a remote desktop application that allows you to remotely control a computer.\n\nAuthors:\nNguyễn Minh Thuận\nTrần Anh Huy"
+ABOUT_US_TEXT = "Compter Supervisor is a remote desktop application that allows you to remotely control a computer.\n\nAuthors:\n\tNguyễn Minh Thuận\n\tTrần Anh Huy"
 # ----------------------------------------------------------------------------------------------------------------------
 SCREEN_STREAM_TITLE = "Screen Stream"
 PAUSE = "Pause"
