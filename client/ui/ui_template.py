@@ -39,3 +39,23 @@ class UI_MainTemplate(UI_Template, tk.Tk):
             except queue.Empty:
                 break
         self.after(const.UPDATE_TIME[self.name], self.periodic_call)
+
+class UI_ToplevelTemplate(UI_Template, tk.Toplevel):
+    def __init__(self, parent, name, socket_queue, ui_queues):
+        tk.Toplevel.__init__(self, parent)
+        UI_Template.__init__(self, name, socket_queue, ui_queues)
+
+        self.after(const.UPDATE_TIME[self.name], self.periodic_call)
+    
+    def update_ui(self, task):
+        pass
+
+    def periodic_call(self):
+        while True:
+            try:
+                task = self.ui_queue.get_nowait()
+                self.update_ui(task)
+                
+            except queue.Empty:
+                break
+        self.after(const.UPDATE_TIME[self.name], self.periodic_call)
