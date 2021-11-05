@@ -8,7 +8,6 @@ import ui.label as lb
 import ui.constraints as const
 import ui.ui_template as tpl
 import queue
-
 class UI_registry(tpl.UI_ToplevelTemplate):
     def __init__(self, parent, socket_queue, ui_queues):
         super().__init__(parent, 'reg', socket_queue, ui_queues)
@@ -271,30 +270,47 @@ class UI_registry(tpl.UI_ToplevelTemplate):
         value = self.txt_name_value.get()
 
         self.socket_cmd('query-reg-value', path, value)
+        self.btn_send_direct_stt.set(lb.REGISTRY_WAIT)
+
+    def parse_reg_value(self, data, type):
+        if type == 'Binary':
+            data = bytearray.fromhex(data)
+        elif type == 'DWORD' or type == 'QWORD':
+            data = int(data)
+        elif type == 'Multi-String':
+            data = data.split(self.txt_seperator.get())
+
+        return data
 
     def set_reg_value(self):
         path = self.txt_path_input_direct.get()
         value = self.txt_name_value.get()
         type = self.cbb_data_type.get()
         data = self.txt_value.get()
-        if type == self.data_types[4]:
-            data = data.split(self.txt_seperator.get())
+        try:
+            data = self.parse_reg_value(data, type)
+        except:
+            showerror(lb.ERR, lb.REGISTRY_ERR_PARSE_DATA)
+            return
 
         self.socket_cmd('set-reg-value', path, value, type, data)
+        self.btn_send_direct_stt.set(lb.REGISTRY_WAIT)
 
     def delete_reg_value(self):
         path = self.txt_path_input_direct.get()
         value = self.txt_name_value.get()
-
         self.socket_cmd('delete-reg-value', path, value)
+        self.btn_send_direct_stt.set(lb.REGISTRY_WAIT)
 
     def create_reg_key(self):
         path = self.txt_path_input_direct.get()
         self.socket_cmd('create-reg-key', path)
+        self.btn_send_direct_stt.set(lb.REGISTRY_WAIT)
 
     def delete_reg_key(self):
         path = self.txt_path_input_direct.get()
         self.socket_cmd('delete-reg-key', path)
+        self.btn_send_direct_stt.set(lb.REGISTRY_WAIT)
 
     
     def send_command(self):
@@ -309,7 +325,6 @@ class UI_registry(tpl.UI_ToplevelTemplate):
                 self.create_reg_key()   
             elif (self.cbb_option.get() == self.options[4]):
                 self.delete_reg_key()
-            self.btn_send_direct_stt.set(lb.REGISTRY_WAIT)
             
     def clear_log(self):
         self.result_area.config(state = 'normal')

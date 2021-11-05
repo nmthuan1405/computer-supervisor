@@ -53,14 +53,6 @@ def get_display_data(value, type):
     else:
         return str(value)
 
-def parse_data(data, type):
-    if type == 'Binary':
-        data = bytearray.fromhex(data)
-    elif type == 'DWORD' or type == 'QWORD':
-        data = int(data)
-    
-    return data
-
 def merge_reg_file(file_data):
     try:
         f = NamedTemporaryFile(mode = 'w', encoding = 'utf-16', delete = False)
@@ -89,7 +81,6 @@ def query_value(path, value):
 def set_value(path, value, type, data):
     try:
         hkey, key = path.split('\\', 1)
-        value = parse_data(value, type)
         reg.SetValueEx(reg.OpenKeyEx(get_HKEY(hkey), key, 0, reg.KEY_SET_VALUE), value, 0, get_type(type), data)
         return True
     except:
