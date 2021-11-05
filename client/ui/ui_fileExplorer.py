@@ -15,7 +15,7 @@ class UI_file_explorer(tk.Toplevel):
         self.ui_queues = ui_queues
         ui_queues['file'] = self.ui_queue
 
-        self.title = lb.FILE_EXPLORER_TITLE
+        self.title = lb.FILE_EXP_TITLE
         self.resizable(False, False)
         self['padx'] = const.WINDOW_BORDER_PADDING
         self['pady'] = const.WINDOW_BORDER_PADDING
@@ -179,7 +179,7 @@ class UI_copyFile(tk.Toplevel):
         self.lbl_file_name = tk.Label(self, textvariable=self.lbl_file_name_stt)
         self.lbl_file_name.grid(row = 0, column = 0, sticky = tk.W)
 
-        self.lbl_file_size_stt = tk.StringVar(self, lb.FILE_SIZE)
+        self.lbl_file_size_stt = tk.StringVar(self)
         self.lbl_file_size = tk.Label(self, textvariable = self.lbl_file_size_stt)
         self.lbl_file_size.grid(row = 0, column = 1, sticky = tk.E)
 

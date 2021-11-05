@@ -132,7 +132,7 @@ class UI_start_avail_app(tk.Toplevel):
 
         # define headings
         self.trv_apps.heading('#1', text=lb.APP_NAME)
-        self.trv_apps.heading('#2', text=lb.APP_LOCATION)
+        self.trv_apps.heading('#2', text=lb.START_APP_LOCATION)
 
         self.trv_apps.grid(row = 1, column = 0, pady = (5,0), sticky='nsew')
 

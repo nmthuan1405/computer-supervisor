@@ -75,7 +75,7 @@ class UI_running_processes(tk.Toplevel):
             showinfo(lb.ERR, lb.PROCESS_SELECT_PROCESS, parent = self)
             return
 
-        if askokcancel(lb.PROCESS_KILL, lb.APP_KILL_CONFIRM, parent = self):
+        if askokcancel(lb.PROCESS_KILL, lb.PROCESS_KILL_CONFIRM, parent = self):
             self.socket_cmd('kill-process', (selected[1], 'process'))
 
     def update_ui(self, task):

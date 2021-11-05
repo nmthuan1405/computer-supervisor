@@ -25,11 +25,11 @@ class UI_screen_stream(tk.Toplevel):
         self.img_on_canvas = self.canvas.create_image(0, 0, anchor = tk.NW)
 
         self.frame = tk.Frame(self)
-        self.btn_pause_stt = tk.StringVar(self.frame, lb.PAUSE)
+        self.btn_pause_stt = tk.StringVar(self.frame, lb.SCREEN_STREAM_PAUSE)
         self.btn_pause = tk.Button(self.frame, textvariable = self.btn_pause_stt, width = 10, height = 2, command = self.pause_stream)
         self.btn_pause.grid(row = 0, column = 0, padx = (0,5))
 
-        self.btn_capture_stt = tk.StringVar(self.frame, lb.CAPTURE)
+        self.btn_capture_stt = tk.StringVar(self.frame, lb.SCREEN_STREAM_CAPTURE)
         self.btn_capture = tk.Button(self.frame, textvariable=self.btn_capture_stt, width = 15, height = 2, command = self.capture_stream)
         self.btn_capture.grid(row = 0, column = 1)
         self.frame.grid(row = 1, column = 0, pady = (5,0), sticky = tk.E)
@@ -39,13 +39,13 @@ class UI_screen_stream(tk.Toplevel):
         self.after(const.UPDATE_TIME, self.periodic_call)
 
     def pause_stream(self):
-        if self.btn_pause_stt.get() == lb.PAUSE:
-            self.btn_pause_stt.set(lb.RESUME)
+        if self.btn_pause_stt.get() == lb.SCREEN_STREAM_PAUSE:
+            self.btn_pause_stt.set(lb.SCREEN_STREAM_RESUME)
         else:
-            self.btn_pause_stt.set(lb.PAUSE)
+            self.btn_pause_stt.set(lb.SCREEN_STREAM_PAUSE)
 
     def capture_stream(self):
-        if self.btn_capture_stt.get() == lb.CAPTURE:
+        if self.btn_capture_stt.get() == lb.SCREEN_STREAM_CAPTURE:
             self.socket_cmd('capture-stream')
             self.btn_capture_stt.set(lb.WAIT)
 
@@ -64,12 +64,12 @@ class UI_screen_stream(tk.Toplevel):
                 f = asksaveasfilename(initialfile = 'screenshot.png', defaultextension=".png", filetypes=[("PNG Files", "*.png")], parent=self)
                 ext.save(f)
             except:
-                showerror(lb.ERR, lb.ERROR_SAVE_FILE, parent=self)
+                showerror(lb.ERR, lb.SCREEN_STREAM_ERROR_SAVE_FILE, parent=self)
             finally:
-                self.btn_capture_stt.set(lb.CAPTURE)
+                self.btn_capture_stt.set(lb.SCREEN_STREAM_CAPTURE)
 
     def periodic_call(self):
-        if self.btn_pause_stt.get() == lb.PAUSE and self.btn_capture_stt.get() == lb.CAPTURE:
+        if self.btn_pause_stt.get() == lb.SCREEN_STREAM_PAUSE and self.btn_capture_stt.get() == lb.SCREEN_STREAM_CAPTURE:
             self.update_counting.count_up()
 
         while True:
