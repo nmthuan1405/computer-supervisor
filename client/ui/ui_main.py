@@ -23,70 +23,70 @@ class UI_main(tk.Tk):
         self.protocol("WM_DELETE_WINDOW", self.close)
         self.resizable(False, False)
 
-        self.lbl_app_name = tk.Label(self, text = lb.THIS_APP_NAME, font = ("Arial", 16))
+        self.lbl_app_name = tk.Label(self, text = lb.MAIN_APP_NAME, font = ("Arial", 16))
         self.lbl_app_name.grid(row = 0, column = 0, columnspan = 3, padx = 10, pady = 10)
 
-        self.lbl_IP_input = tk.Label(self, text = lb.LBL_SERVER_IP)
+        self.lbl_IP_input = tk.Label(self, text = lb.MAIN_LBL_SERVER_IP)
         self.lbl_IP_input.grid(row= 1, column = 0, sticky = tk.W, padx = 10, pady = 10)
 
         self.txt_IP_input = tk.Entry(self)
-        self.txt_IP_input.insert(-1, lb.DEFAULT_IP)
+        self.txt_IP_input.insert(-1, lb.MAIN_DEFAULT_IP)
         self.txt_IP_input.focus()
         self.txt_IP_input.grid(row = 1, column = 1)
 
-        self.btn_connect_stt = tk.StringVar(self, lb.CONNECT)
+        self.btn_connect_stt = tk.StringVar(self, lb.MAIN_CONNECT)
         self.btn_connect = tk.Button(self, textvariable = self.btn_connect_stt, width = 10, command = self.connect)
         self.btn_connect.grid(row = 1, column = 2, sticky = tk.W, padx = 10, pady = 10)
 
-        self.lbl_MAC_address_stt = tk.StringVar(self, lb.LBL_MAC_ADDRESS)
+        self.lbl_MAC_address_stt = tk.StringVar(self, lb.MAIN_LBL_MAC_ADDRESS)
         self.lbl_MAC_address = tk.Label(self, textvariable = self.lbl_MAC_address_stt)
         self.lbl_MAC_address.grid(row = 2, column = 0, sticky = tk.W, padx = 10)
 
-        self.MAC_address_stt = tk.StringVar(self, lb.MAC_ADDRESS)
+        self.MAC_address_stt = tk.StringVar(self, lb.MAIN_MAC_ADDRESS)
         self.MAC_address = tk.Label(self, textvariable = self.MAC_address_stt, cursor = "hand2")
         self.MAC_address.grid(row = 2, column = 1, columnspan = 2, sticky = tk.W)
         # bind mouse click event
         self.MAC_address.bind("<Button-1>", self.on_click_MAC_address)
 
-        self.btn_screen_stream = tk.Button(self, text = lb.SCREEN_STREAM, width = 15, height = 2, command = self.screen_stream)
+        self.btn_screen_stream = tk.Button(self, text = lb.MAIN_SCREEN_STREAM, width = 15, height = 2, command = self.screen_stream)
         self.btn_screen_stream.grid(row = 3, column = 0, sticky = tk.W, padx = 10, pady = 10)
 
-        self.btn_keylogger = tk.Button(self, text = lb.KEYLOGGER, width = 15, height = 2, command = self.keylogger)
+        self.btn_keylogger = tk.Button(self, text = lb.MAIN_KEYLOGGER, width = 15, height = 2, command = self.keylogger)
         self.btn_keylogger.grid(row = 3, column = 1, sticky = tk.W, padx = 10, pady = 10)
 
-        self.btn_file_explorer = tk.Button(self, text = lb.FILE_EXPLORER, width = 15, height = 2, command = self.file_explorer)
+        self.btn_file_explorer = tk.Button(self, text = lb.MAIN_FILE_EXPLORER, width = 15, height = 2, command = self.file_explorer)
         self.btn_file_explorer.grid(row = 3, column = 2, sticky = tk.W, padx = 10, pady = 10)
 
-        self.btn_running_apps = tk.Button(self, text = lb.RUNNING_APPS, width = 15, height = 2, command = self.running_apps)
+        self.btn_running_apps = tk.Button(self, text = lb.MAIN_RUNNING_APPS, width = 15, height = 2, command = self.running_apps)
         self.btn_running_apps.grid(row = 4, column = 0, sticky = tk.W, padx = 10, pady = 10)
 
-        self.btn_running_processes = tk.Button(self, text = lb.RUNNING_PROCESSES, width = 15, height = 2, command = self.running_processes)
+        self.btn_running_processes = tk.Button(self, text = lb.MAIN_RUNNING_PROCESSES, width = 15, height = 2, command = self.running_processes)
         self.btn_running_processes.grid(row = 4, column = 1, sticky = tk.W, padx = 10, pady = 10)
         
-        self.btn_edit_registry = tk.Button(self, text = lb.EDIT_REGISTRY, width = 15, height = 2, command = self.edit_registry)
+        self.btn_edit_registry = tk.Button(self, text = lb.MAIN_EDIT_REGISTRY, width = 15, height = 2, command = self.edit_registry)
         self.btn_edit_registry.grid(row = 4, column = 2, sticky = tk.W, padx = 10, pady = 10)
 
-        self.btn_logout = tk.Button(self, text = lb.LOGOUT, width = 15, height = 2, command = self.logout)
+        self.btn_logout = tk.Button(self, text = lb.MAIN_LOGOUT, width = 15, height = 2, command = self.logout)
         self.btn_logout.grid(row = 5, column = 0, sticky = tk.W, padx = 10, pady = 10)
 
-        self.btn_shutdown = tk.Button(self, text = lb.SHUTDOWN, width = 15, height = 2, command = self.shutdown)
+        self.btn_shutdown = tk.Button(self, text = lb.MAIN_SHUTDOWN, width = 15, height = 2, command = self.shutdown)
         self.btn_shutdown.grid(row = 5, column = 1, sticky = tk.W, padx = 10, pady = 10)
 
-        self.btn_restart = tk.Button(self, text = lb.RESTART, width = 15, height = 2, command = self.restart)
+        self.btn_restart = tk.Button(self, text = lb.MAIN_RESTART, width = 15, height = 2, command = self.restart)
         self.btn_restart.grid(row = 5, column = 2, sticky = tk.W, padx = 10, pady = 10)
 
-        self.btn_exit = tk.Button(self, text = lb.EXIT, width = 15, height = 2, command = self.close)
+        self.btn_exit = tk.Button(self, text = lb.MAIN_EXIT, width = 15, height = 2, command = self.close)
         self.btn_exit.grid(row = 6, column = 0, columnspan = 3, padx = 10, pady = 10)
 
-        self.lbl_about_us = tk.Label(self, text = lb.ABOUT_US, cursor = "hand2")
+        self.lbl_about_us = tk.Label(self, text = lb.MAIN_ABOUT_US, cursor = "hand2")
         self.lbl_about_us.grid(row = 7, column = 0, columnspan = 3, padx = 10, pady = 10)
         self.lbl_about_us.bind("<Button-1>", self.on_click_about_us)
         
         self.after(const.UPDATE_TIME, self.periodic_call)
 
     def close(self):
-        if self.btn_connect_stt.get() == lb.DISCONNECT:
-            if askokcancel(lb.QUIT, lb.ASK_QUIT):
+        if self.btn_connect_stt.get() == lb.MAIN_DISCONNECT:
+            if askokcancel(lb.QUIT, lb.MAIN_ASK_QUIT):
                 self.socket_cmd("stop")
             else:
                 return
@@ -95,10 +95,10 @@ class UI_main(tk.Tk):
         self.destroy()
 
     def connect(self):
-        if self.btn_connect_stt.get() == lb.CONNECT:
+        if self.btn_connect_stt.get() == lb.MAIN_CONNECT:
             ip = self.txt_IP_input.get()
             self.socket_cmd("start", ip)
-        elif self.btn_connect_stt.get() == lb.DISCONNECT:
+        elif self.btn_connect_stt.get() == lb.MAIN_DISCONNECT:
             self.socket_cmd("stop")
 
         self.btn_connect_stt.set(lb.WAIT)
@@ -140,39 +140,39 @@ class UI_main(tk.Tk):
         window.focus()
 
     def logout(self):
-        if askokcancel(lb.LOGOUT, lb.LOGOUT_CONFIRM):
+        if askokcancel(lb.MAIN_LOGOUT, lb.MAIN_LOGOUT_CONFIRM):
             self.socket_cmd("logout")
-            showinfo(lb.LOGOUT, lb.LOGOUT_SUCCESS)
+            showinfo(lb.MAIN_LOGOUT, lb.MAIN_LOGOUT_SUCCESS)
 
     def shutdown(self):
-        if askokcancel(lb.SHUTDOWN, lb.SHUTDOWN_CONFIRM):
+        if askokcancel(lb.MAIN_SHUTDOWN, lb.MAIN_SHUTDOWN_CONFIRM):
             self.socket_cmd("shutdown")
-            showinfo(lb.SHUTDOWN, lb.SHUTDOWN_SUCCESS)
+            showinfo(lb.MAIN_SHUTDOWN, lb.MAIN_SHUTDOWN_SUCCESS)
 
     def restart(self):
-        if askokcancel(lb.RESTART, lb.RESTART_CONFIRM):
+        if askokcancel(lb.MAIN_RESTART, lb.MAIN_RESTART_CONFIRM):
             self.socket_cmd("restart")
-            showinfo(lb.RESTART, lb.RESTART_SUCCESS)
+            showinfo(lb.MAIN_RESTART, lb.MAIN_RESTART_SUCCESS)
 
     def on_click_about_us(self, event):
-        showinfo(lb.ABOUT_US, lb.ABOUT_US_TEXT)
+        showinfo(lb.MAIN_ABOUT_US, lb.MAIN_ABOUT_US_TEXT)
     
     def update_ui(self, task):
         # DEBUG("task", task)
         cmd, ext = task
         if cmd == "start":
-            self.btn_connect_stt.set(lb.CONNECT)
+            self.btn_connect_stt.set(lb.MAIN_CONNECT)
             self.txt_IP_input.config(state = tk.NORMAL)
             self.MAC_address_stt.set("")
         elif cmd == "stop":
-            self.btn_connect_stt.set(lb.DISCONNECT)
+            self.btn_connect_stt.set(lb.MAIN_DISCONNECT)
             self.txt_IP_input.config(state = tk.DISABLED)
             self.socket_cmd("get-MAC")
         elif cmd == "update-MAC":
             self.MAC_address_stt.set(ext)
         elif cmd == "err":
             if ext == "cannot start":
-                showerror(lb.ERR, lb.CANNOT_CONNECT)
+                showerror(lb.ERR, lb.MAIN_CANNOT_CONNECT)
 
     def periodic_call(self):
         while True:

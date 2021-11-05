@@ -15,7 +15,7 @@ class UI_file_explorer(tk.Toplevel):
         self.ui_queues = ui_queues
         ui_queues['file'] = self.ui_queue
 
-        self.title = lb.FILE_EXPLORER_TITLE
+        self.title = lb.FILE_EXP_TITLE
         self.resizable(False, False)
         self['padx'] = const.WINDOW_BORDER_PADDING
         self['pady'] = const.WINDOW_BORDER_PADDING
@@ -146,11 +146,11 @@ class UI_copy_file(tk.Toplevel):
         self['padx'] = const.WINDOW_BORDER_PADDING
         self['pady'] = const.WINDOW_BORDER_PADDING
 
-        self.lbl_file_name_stt = tk.StringVar(self, lb.FILE_NAME)
+        self.lbl_file_name_stt = tk.StringVar(self, lb.COPY_FILE_FILE_NAME)
         self.lbl_file_name = tk.Label(self, textvariable = self.lbl_file_name_stt)
         self.lbl_file_name.grid(row = 0, column = 0, sticky = tk.W)
 
-        self.lbl_file_size_stt = tk.StringVar(self, lb.FILE_SIZE)
+        self.lbl_file_size_stt = tk.StringVar(self, lb.COPY_FILE_FILE_SIZE)
         self.lbl_file_size = tk.Label(self, textvariable = self.lbl_file_size_stt)
         self.lbl_file_size.grid(row = 0, column = 1, sticky = tk.E)
 
@@ -160,13 +160,13 @@ class UI_copy_file(tk.Toplevel):
         # self.progress_bar['value'] += 20
  
 
-        self.btn_cancel = tk.Button(self, text = lb.CANCEL, command = self.cancel)
+        self.btn_cancel = tk.Button(self, text = lb.COPY_FILE_CANCEL, command = self.cancel)
         self.btn_cancel.grid(row = 1, column = 2, sticky = tk.W, padx = (5,0), pady = (5,0), ipadx = 10)
 
         self.after(const.UPDATE_TIME, self.periodic_call)
 
     def cancel(self):
-        if(askokcancel(lb.CANCEL, lb.CANCEL_CONFIRM, parent = self)):
+        if(askokcancel(lb.COPY_FILE_CANCEL, lb.COPY_FILE_CANCEL_CONFIRM, parent = self)):
             self.destroy()
 
     def update_ui(self, task):

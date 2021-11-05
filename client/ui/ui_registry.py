@@ -23,30 +23,30 @@ class UI_registry(tk.Toplevel):
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
 
-        self.lbl_path_input = tk.Label(self, text = "Path")
+        self.lbl_path_input = tk.Label(self, text = lb.REGISTRY_LBL_PATH_INPUT)
         self.lbl_path_input.grid(column = 0, row = 0, sticky = tk.SW)
 
         self.txt_path_input = tk.Entry(self, width = 53)
         self.txt_path_input.grid(column = 0, row = 1)
         self.txt_path_input['state'] = 'readonly'
 
-        self.btn_browse = tk.Button(self, text="Browse", command = self.browse)
+        self.btn_browse = tk.Button(self, text=lb.REGISTRY_BROWSE, command = self.browse)
         self.btn_browse.grid(column = 1, row = 1, padx = 4, ipadx = 10, sticky = tk.E)
 
-        self.lbl_data = tk.Label(self, text = "Data")
+        self.lbl_data = tk.Label(self, text = lb.REGISTRY_LBL_DATA)
         self.lbl_data.grid(column = 0, row = 2, sticky = tk.SW)
 
         self.text_area = st.ScrolledText(self, wrap = tk.WORD, width = 38, height = 10)
         self.text_area.grid(column = 0, row = 3)
     
-        self.btn_send_stt = tk.StringVar(value="Send")
+        self.btn_send_stt = tk.StringVar(value = lb.REGISTRY_SEND)
         self.btn_send = tk.Button(self, textvariable=self.btn_send_stt, command = self.send_reg)
         self.btn_send.grid(column = 1, row = 3, padx = 4, ipadx = 15, ipady = 70, sticky = tk.E)
 
-        self.frame_edit_directly = tk.LabelFrame(self, text = "Edit value directly", relief = tk.RIDGE)
+        self.frame_edit_directly = tk.LabelFrame(self, text = lb.REGISTRY_FRAME_EDIT_DIRECT, relief = tk.RIDGE)
         self.frame_edit_directly.place(x = 3, y = 245, height = 370)
 
-        self.lbl_option = tk.Label(self.frame_edit_directly, text = "Select option")
+        self.lbl_option = tk.Label(self.frame_edit_directly, text = lb.REGISTRY_LBL_OPTION)
         self.lbl_option.grid(column = 0, row = 0, padx = 2, pady = 0, sticky = tk.SW)
 
         self.options = ('Get value', 'Set value', 'Delete value', 'Create key', 'Delete key')
@@ -124,26 +124,26 @@ class UI_registry(tk.Toplevel):
 
         self.cbb_option.bind('<<ComboboxSelected>>', option_changed)
 
-        self.lbl_path_input_direct = tk.Label(self.frame_edit_directly, text = "Path")
+        self.lbl_path_input_direct = tk.Label(self.frame_edit_directly, text = lb.REGISTRY_LBL_PATH_INPUT)
         self.lbl_path_input_direct.grid(column = 0, row = 2, padx = 2, pady = 0, sticky = tk.SW)
 
         self.txt_path_input_direct = tk.Entry(self.frame_edit_directly, width = 64)
         self.txt_path_input_direct.grid(column = 0, row = 3, columnspan = 4, padx = 5)
 
-        self.lbl_name_value = tk.Label(self.frame_edit_directly, text = "Name Value")
+        self.lbl_name_value = tk.Label(self.frame_edit_directly, text = lb.REGISTRY_LBL_NAME_VALUE)
         self.lbl_name_value.grid(column = 0, row = 4, padx = 2, pady = 0, sticky = tk.SW)
 
         self.txt_name_value = tk.Entry(self.frame_edit_directly, width = 15)
         self.txt_name_value.grid(column = 0, row = 5, padx = 5, pady = 0, sticky = tk.W)
 
-        self.lbl_value = tk.Label(self.frame_edit_directly, text = "Value")
+        self.lbl_value = tk.Label(self.frame_edit_directly, text = lb.REGISTRY_LBL_VALUE)
 
         self.txt_value = tk.Entry(self.frame_edit_directly, width = 25)
 
         self.txt_seperator = tk.Entry(self.frame_edit_directly, width = 3, justify = 'center')
-        self.txt_seperator.insert(-1, '\\0')
+        self.txt_seperator.insert(-1, lb.REGISTRY_SEPERATOR)
 
-        self.lbl_data_type = tk.Label(self.frame_edit_directly, text = "Data type")
+        self.lbl_data_type = tk.Label(self.frame_edit_directly, text = lb.REGISTRY_DATA_TYPE)
 
         self.data_types = ('String', 'Binary', 'DWORD', 'QWORD', 'Multi-String', 'Expandable String')
         self.selected_data_type = tk.StringVar()
@@ -233,16 +233,16 @@ class UI_registry(tk.Toplevel):
 
         self.cbb_data_type.bind('<<ComboboxSelected>>', data_type_changed)
 
-        self.lbl_result = tk.Label(self.frame_edit_directly, text = "Result")
+        self.lbl_result = tk.Label(self.frame_edit_directly, text = lb.REGISTRY_LBL_RESULT)
         self.lbl_result.place(x = 4, y = 130)
 
         self.result_area = st.ScrolledText(self.frame_edit_directly, wrap = tk.WORD, width = 46, height = 10, bg = "gray92", state = tk.DISABLED)
         self.result_area.place(x = 4, y = 150)
 
-        self.btn_send_direct_stt = tk.StringVar(value='Send')
+        self.btn_send_direct_stt = tk.StringVar(value = lb.REGISTRY_SEND_DIRECT)
         self.btn_send_direct = tk.Button(self.frame_edit_directly, textvariable=self.btn_send_direct_stt, width = 8, command = self.send_command)
         self.btn_send_direct.place(x = 100, y = 320)
-        self.btn_clear = tk.Button(self.frame_edit_directly, text="Clear log", width = 8, command = self.clear_log)
+        self.btn_clear = tk.Button(self.frame_edit_directly, text = lb.REGISTRY_CLEAR, width = 8, command = self.clear_log)
         self.btn_clear.place(x = 220, y = 320)
 
         self.after(const.UPDATE_TIME, self.periodic_call)
@@ -259,16 +259,16 @@ class UI_registry(tk.Toplevel):
             data = f.read()
             f.close()
         except:
-            data = 'Error when read file'
+            data = lb.REGISTRY_ERR_READ_FILE
 
         self.text_area.delete(1.0, tk.END)
         self.text_area.insert(tk.INSERT, data)
 
     def send_reg(self):
-        if self.btn_send_stt.get() == 'Send':
+        if self.btn_send_stt.get() == lb.REGISTRY_SEND:
             file_data = self.text_area.get(1.0, tk.END)
             self.socket_cmd('merge-reg-file', file_data)
-            self.btn_send_stt.set('Wait')
+            self.btn_send_stt.set(lb.REGISTRY_WAIT)
     
     def query_reg_value(self):
         path = self.txt_path_input_direct.get()
@@ -292,7 +292,7 @@ class UI_registry(tk.Toplevel):
                 data_display = ['\'' + element + '\'' for element in data]
                 self.write_log('Data: ' + ', '.join(data_display))
         except:
-            self.write_log('Unable to parse data')
+            self.write_log(lb.REGISTRY_ERR_PARSE_DATA)
             return
 
         self.socket_cmd('set-reg-value', (path, value, type, data))
@@ -313,7 +313,7 @@ class UI_registry(tk.Toplevel):
 
     
     def send_command(self):
-        if self.btn_send_direct_stt.get() == 'Send':
+        if self.btn_send_direct_stt.get() == lb.REGISTRY_SEND_DIRECT:
             if self.cbb_option.get() == self.options[0]:
                 self.query_reg_value()
             elif self.cbb_option.get() == self.options[1]:
@@ -324,7 +324,7 @@ class UI_registry(tk.Toplevel):
                 self.create_reg_key()   
             elif (self.cbb_option.get() == self.options[4]):
                 self.delete_reg_key()
-            self.btn_send_direct_stt.set('Wait')
+            self.btn_send_direct_stt.set(lb.REGISTRY_WAIT)
             
     def clear_log(self):
         self.result_area.config(state = 'normal')
@@ -343,10 +343,10 @@ class UI_registry(tk.Toplevel):
 
         if cmd == 'merge':
             if ext == 'ok':
-                showinfo('Merge', 'Merge registry file successfully', parent = self)
+                showinfo(lb.REGISTRY_MERGE, lb.REGISTRY_MERGE_OK, parent = self)
             else:
-                showerror('Merge', 'Error when merge registry file', parent = self)
-            self.btn_send_stt.set('Send')
+                showerror(lb.REGISTRY_MERGE, lb.REGISTRY_MERGE_ERR, parent = self)
+            self.btn_send_stt.set(lb.REGISTRY_SEND)
 
         elif cmd == 'query':
             value, data, type = ext
@@ -359,37 +359,37 @@ class UI_registry(tk.Toplevel):
                 else:
                     data = str(data)
                 self.write_log(f'{value}: {data}\n\tType: {type}')
-            self.btn_send_direct_stt.set('Send')
+            self.btn_send_direct_stt.set(lb.REGISTRY_SEND_DIRECT)
 
         elif cmd == 'set-value':
             if ext == 'ok':
-                showinfo('Set', 'Set registry value successfully', parent = self)
+                showinfo(lb.REGISTRY_SET, lb.REGISTRY_SET_OK, parent = self)
             else:
-                showerror('Set', 'Error when set registry value', parent = self)
-            self.btn_send_direct_stt.set('Send')
+                showerror(lb.REGISTRY_SET, lb.REGISTRY_SET_ERR, parent = self)
+            self.btn_send_direct_stt.set(lb.REGISTRY_SEND_DIRECT)
 
         elif cmd == 'delete-value':
             if ext == 'ok':
-                self.write_log('Delete registry value successfully')
+                self.write_log(lb.REGISTRY_DELETE_VALUE_OK)
             else:
-                self.write_log('Error when delete registry value')
-            self.btn_send_direct_stt.set('Send')
+                self.write_log(lb.REGISTRY_DELETE_VALUE_ERR)
+            self.btn_send_direct_stt.set(lb.REGISTRY_SEND_DIRECT)
 
         elif cmd == 'create-key':
             if ext == 'ok':
-                self.write_log('Create registry key successfully')
+                self.write_log(lb.REGISTRY_CREATE_KEY_OK)
             else:
-                self.write_log('Error when create registry key')
+                self.write_log(lb.REGISTRY_CREATE_KEY_ERR)
 
-            self.btn_send_direct_stt.set('Send')
+            self.btn_send_direct_stt.set(lb.REGISTRY_SEND_DIRECT)
 
         elif cmd == 'delete-key':
             if ext == 'ok':
-                self.write_log('Delete registry key successfully')
+                self.write_log(lb.REGISTRY_DELETE_KEY_OK)
             else:
-                self.write_log('Error when delete registry key')
+                self.write_log(lb.REGISTRY_DELETE_KEY_ERR)
         
-            self.btn_send_direct_stt.set('Send')
+            self.btn_send_direct_stt.set(lb.REGISTRY_SEND_DIRECT)
 
     def periodic_call(self):
         while True:
