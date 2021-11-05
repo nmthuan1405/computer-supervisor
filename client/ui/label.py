@@ -76,6 +76,8 @@ CANCEL = "Cancel"
 CANCEL_CONFIRM = "Are you sure you want to cancel copy progress?"
 COPY_FILE_FAIL = "Unable to copy file"
 COPY_FILE_SUCCESS = "File copied successfully"
+DELETE_FILE_FAIL = "Unable to delete file"
+DELETE_FILE_SUCCESS = "File deleted successfully"
 # ----------------------------------------------------------------------------------------------------------------------
 REGISTRY_TITLE = "Edit Registry"
 # ----------------------------------------------------------------------------------------------------------------------

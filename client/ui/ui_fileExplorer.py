@@ -151,9 +151,9 @@ class UI_file_explorer(tpl.UI_ToplevelTemplate):
         
         elif cmd == "delete-file":
             if ext == "ok":
-                showinfo(lb.INFO, lb.COPY_FILE_SUCCESS, parent = self)
+                showinfo(lb.INFO, lb.DELETE_FILE_SUCCESS, parent = self)
             else:
-                 showwarning(lb.WARN, lb.COPY_FILE_FAIL, parent = self)
+                 showwarning(lb.WARN, lb.DELETE_FILE_FAIL, parent = self)
             
             self.btn_delete_stt.set(lb.FILE_EXP_DELETE)
             self.goto_dir(self.txt_path_input.get())
