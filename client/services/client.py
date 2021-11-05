@@ -175,17 +175,17 @@ class Client(Socket, threading.Thread):
         self.send_str('kill-process')
         self.send_str(uid)
         if self.recv_state():
-            self.ui_cmd("ok", "kill", ui)
+            self.ui_cmd("kill", "ok", ui)
         else:
-            self.ui_cmd("err", "kill", ui)
+            self.ui_cmd("kill", "err", ui)
 
     def task_start_process(self, path, ui = 'process'):
         self.send_str('start-process')
         self.send_str(path)
         if self.recv_state():
-            self.ui_cmd("ok", "start", ui)
+            self.ui_cmd("start", "ok", ui)
         else:
-            self.ui_cmd("err", "start", ui)
+            self.ui_cmd("start", "err", ui)
 
     def task_get_running_process(self):
         self.send_str('get-running-process')

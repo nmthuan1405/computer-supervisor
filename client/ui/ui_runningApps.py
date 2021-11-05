@@ -4,15 +4,12 @@ from tkinter.messagebox import askokcancel, showerror, showinfo
 from services.count import Count
 import ui.label as lb
 import ui.constraints as const
+import ui.ui_template as tpl
 import queue
 
-class UI_running_apps(tk.Toplevel):
+class UI_running_apps(tpl.UI_ToplevelTemplate):
     def __init__(self, parent, socket_queue, ui_queues):
-        super().__init__(parent)
-        self.ui_queue = queue.Queue()
-        self.socket_queue = socket_queue
-        self.ui_queues = ui_queues
-        ui_queues['app'] = self.ui_queue
+        super().__init__(parent, 'app', socket_queue, ui_queues)
 
         self.title = lb.APP_TITLE
         self.resizable(False, False)
@@ -48,7 +45,6 @@ class UI_running_apps(tk.Toplevel):
 
         self.update_counting = Count(10, self.socket_cmd, 'get-running-app')
         self.update_counting.count_up(-1)
-        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def update(self, data):
         selected =  self.trv_apps.item(self.trv_apps.focus())['values']
@@ -66,7 +62,6 @@ class UI_running_apps(tk.Toplevel):
 
     def start(self):
         window = UI_start_avail_app(self, self.socket_queue, self.ui_queues)
-        
         window.grab_set()
         window.focus()
 
@@ -77,42 +72,28 @@ class UI_running_apps(tk.Toplevel):
             return
 
         if askokcancel(lb.APP_KILL, lb.APP_KILL_CONFIRM, parent = self):
-            self.socket_cmd('kill-process', (selected[1], 'app'))
+            self.socket_cmd('kill-process', selected[1], 'app')
+
 
     def update_ui(self, task):
-        DEBUG("task", task)
         cmd, ext = task
 
         if cmd == 'update-running':
             self.update(ext)
-        elif cmd == 'ok':
-            showinfo(lb.APP_KILL, lb.APP_KILL_OK, parent = self)
-        elif cmd == 'err':
-            showerror(lb.APP_KILL, lb.APP_KILL_ERR, parent = self)
+        elif cmd == 'kill':
+            if ext == 'ok':
+                showinfo(lb.APP_KILL, lb.APP_KILL_OK, parent = self)
+            else:
+                showerror(lb.APP_KILL, lb.APP_KILL_ERR, parent = self)
 
     def periodic_call(self):
         self.update_counting.count_up()
-
-        while True:
-            try:
-                task = self.ui_queue.get_nowait()
-                self.update_ui(task)
-                
-            except queue.Empty:
-                break
-        
-        self.after(const.UPDATE_TIME, self.periodic_call)
+        super().periodic_call()
     
-    def socket_cmd(self, cmd, ext = None):
-        self.socket_queue.put((cmd, ext))
 
-class UI_start_avail_app(tk.Toplevel):
+class UI_start_avail_app(tpl.UI_ToplevelTemplate):
     def __init__(self, parent, socket_queue, ui_queues):
-        super().__init__(parent)
-        self.ui_queue = queue.Queue()
-        self.socket_queue = socket_queue
-        self.ui_queues = ui_queues
-        ui_queues['start-app'] = self.ui_queue
+        super().__init__(parent, 'start-app', socket_queue, ui_queues)
 
         self.title = lb.START_APP_TITLE
         self.resizable(False, False)
@@ -150,7 +131,6 @@ class UI_start_avail_app(tk.Toplevel):
         self.frame.grid(row = 2, column = 0, pady = (5,0), sticky= tk.E)
 
         self.socket_cmd('get-app-list')
-        self.after(const.UPDATE_TIME, self.periodic_call)
 
     def start_app(self):
         selected = self.trv_apps.item(self.trv_apps.focus())['values']
@@ -158,7 +138,7 @@ class UI_start_avail_app(tk.Toplevel):
             showinfo(lb.ERR, lb.START_APP_SELECT_APP, parent = self)
             return
 
-        self.socket_cmd('start-process', (selected[1], 'start-app'))
+        self.socket_cmd('start-process', selected[1], 'start-app')
 
     def custom_app(self):
         window = UI_start_custom_app(self, self.socket_queue, self.ui_queues)
@@ -174,36 +154,21 @@ class UI_start_avail_app(tk.Toplevel):
             self.trv_apps.insert('', tk.END, values = line)
 
     def update_ui(self, task):
-        DEBUG("task", task)
         cmd, ext = task
 
         if cmd == 'update-app':
             self.update(ext)
-        elif cmd == 'ok':
-            showinfo(lb.START_APP_START, lb.START_APP_START_OK, parent = self)
-        elif cmd == 'err':
-            showerror(lb.START_APP_START, lb.START_APP_START_ERR, parent = self)
+        elif cmd == 'start':
+            if ext == 'ok':
+                showinfo(lb.START_APP_START, lb.START_APP_START_OK, parent = self)
+            else:
+                showerror(lb.START_APP_START, lb.START_APP_START_ERR, parent = self)
 
-    def periodic_call(self):
-        while True:
-            try:
-                task = self.ui_queue.get_nowait()
-                self.update_ui(task)
-                
-            except queue.Empty:
-                break
-        
-        self.after(const.UPDATE_TIME, self.periodic_call)
 
-    def socket_cmd(self, cmd, ext = None):
-        self.socket_queue.put((cmd, ext))
 
-class UI_start_custom_app(tk.Toplevel):
+class UI_start_custom_app(tpl.UI_ToplevelTemplate):
     def __init__(self, parent, socket_queue, ui_queues):
-        super().__init__(parent)
-        self.ui_queue = queue.Queue()
-        self.socket_queue = socket_queue
-        ui_queues['start-custom-app'] = self.ui_queue
+        super().__init__(parent, 'start-custom-app', socket_queue, ui_queues)
 
         self.title = lb.START_APP_TITLE
         self.resizable(False, False)
@@ -220,35 +185,15 @@ class UI_start_custom_app(tk.Toplevel):
         self.btn_start = tk.Button(self, text=lb.START_APP_START, command = self.start_app)
         self.btn_start.grid(column=2, row=0, sticky = tk.W, padx = 0, pady = 0, ipadx = 10)
 
-        self.after(const.UPDATE_TIME, self.periodic_call)
-
     def start_app(self):
-        self.socket_cmd('start-process', (self.txt_name_input.get(), 'start-custom-app'))
+        self.socket_cmd('start-process', self.txt_name_input.get(), 'start-custom-app')
 
     def update_ui(self, task):
-        DEBUG("task", task)
         cmd, ext = task
 
-        if cmd == 'ok':
-            showinfo(lb.START_APP_START, lb.START_APP_START_OK, parent = self)
-            self.destroy()
-        elif cmd == 'err':
-            showerror(lb.START_APP_START, lb.START_APP_START_ERR, parent = self)
-
-    def periodic_call(self):
-        while True:
-            try:
-                task = self.ui_queue.get_nowait()
-                self.update_ui(task)
-                
-            except queue.Empty:
-                break
-        
-        self.after(const.UPDATE_TIME, self.periodic_call)
-    
-    def socket_cmd(self, cmd, ext = None):
-        self.socket_queue.put((cmd, ext))
-
-
-def DEBUG(*args,**kwargs):
-    print("UI:", *args,**kwargs)
+        if cmd == 'start':
+            if ext == 'ok':
+                showinfo(lb.START_APP_START, lb.START_APP_START_OK, parent = self)
+                self.destroy()
+            else:
+                showerror(lb.START_APP_START, lb.START_APP_START_ERR, parent = self)
