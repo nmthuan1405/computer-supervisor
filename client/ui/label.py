@@ -42,6 +42,9 @@ MAIN_EXIT = "Exit"
 MAIN_ABOUT_US = "About us"
 MAIN_ABOUT_US_TEXT = "Compter Supervisor is a remote desktop application that allows you to remotely control a computer.\n\nAuthors:\nNguyễn Minh Thuận\nTrần Anh Huy"
 # ----------------------------------------------------------------------------------------------------------------------
+CONFIRM_CLOSE_WINDOW = "Close window"
+CONFIRM_CLOSE_WINDOW_TXT = "Are you sure you want to close this window?"
+# ----------------------------------------------------------------------------------------------------------------------
 SCREEN_STREAM_TITLE = "Screen Stream"
 SCREEN_STREAM_PAUSE = "Pause"
 SCREEN_STREAM_RESUME = "Resume"

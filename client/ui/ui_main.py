@@ -22,6 +22,9 @@ class UI_main(tk.Tk):
         self.title(lb.MAIN_TITLE)
         self.protocol("WM_DELETE_WINDOW", self.close)
         self.resizable(False, False)
+        # handle return and escape key
+        self.bind("<Return>", self.handle_return)
+        self.bind("<Escape>", self.handle_escape)
 
         self.lbl_app_name = tk.Label(self, text = lb.MAIN_APP_NAME, font = ("Arial", 16))
         self.lbl_app_name.grid(row = 0, column = 0, columnspan = 3, padx = 10, pady = 10)
@@ -83,6 +86,33 @@ class UI_main(tk.Tk):
         self.lbl_about_us.bind("<Button-1>", self.on_click_about_us)
         
         self.after(const.UPDATE_TIME, self.periodic_call)
+
+    def handle_return(self, event):
+        if self.focus_get() == self.txt_IP_input or self.focus_get() == self.btn_connect:
+            self.connect()
+        elif self.focus_get() == self.btn_screen_stream:
+            self.screen_stream()
+        elif self.focus_get() == self.btn_keylogger:
+            self.keylogger()
+        elif self.focus_get() == self.btn_file_explorer:
+            self.file_explorer()
+        elif self.focus_get() == self.btn_running_apps:
+            self.running_apps()
+        elif self.focus_get() == self.btn_running_processes:
+            self.running_processes()
+        elif self.focus_get() == self.btn_edit_registry:
+            self.edit_registry()
+        elif self.focus_get() == self.btn_logout:
+            self.logout()
+        elif self.focus_get() == self.btn_shutdown:
+            self.shutdown()
+        elif self.focus_get() == self.btn_restart:
+            self.restart()
+        elif self.focus_get() == self.btn_exit:
+            self.close()
+
+    def handle_escape(self, event):
+        self.close()
 
     def close(self):
         if self.btn_connect_stt.get() == lb.MAIN_DISCONNECT:

@@ -19,6 +19,10 @@ class UI_screen_stream(tk.Toplevel):
         self.resizable(False, False)
         self['padx'] = const.WINDOW_BORDER_PADDING
         self['pady'] = const.WINDOW_BORDER_PADDING
+        # handle return, space bar and escape key
+        self.bind('<Return>', self.handle_return)
+        self.bind('<space>', self.handle_space)
+        self.bind('<Escape>', self.handle_escape)
 
         self.canvas = tk.Canvas(self, width = const.FRAME_WIDTH, height = const.FRAME_HEIGHT, bg = 'black')
         self.canvas.grid(row = 0, column = 0)
@@ -37,6 +41,18 @@ class UI_screen_stream(tk.Toplevel):
         self.update_counting = Count(1, self.socket_cmd, 'update-stream', (const.FRAME_WIDTH, const.FRAME_HEIGHT))
         self.update_counting.count_up(-1)
         self.after(const.UPDATE_TIME, self.periodic_call)
+
+    def handle_return(self, event):
+        if self.focus_get() == self.btn_pause:
+            self.pause_stream()
+        elif self.focus_get() == self.btn_capture:
+            self.capture_stream()
+    def handle_space(self, event):
+        self.pause_stream()
+
+    def handle_escape(self, event):
+        if askokcancel(lb.CONFIRM_CLOSE_WINDOW, lb.CONFIRM_CLOSE_WINDOW_TXT, parent=self):
+            self.close()
 
     def pause_stream(self):
         if self.btn_pause_stt.get() == lb.SCREEN_STREAM_PAUSE:

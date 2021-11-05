@@ -19,6 +19,9 @@ class UI_file_explorer(tk.Toplevel):
         self.resizable(False, False)
         self['padx'] = const.WINDOW_BORDER_PADDING
         self['pady'] = const.WINDOW_BORDER_PADDING
+        # handle return and escape key
+        self.bind('<Return>', self.handle_return)
+        self.bind('<Escape>', self.handle_escape)
 
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=30)
@@ -67,6 +70,18 @@ class UI_file_explorer(tk.Toplevel):
 
         self.goto_dir("")
         self.after(const.UPDATE_TIME, self.periodic_call)
+
+    def handle_return(self, event):
+        if self.focus_get() == self.btn_up:
+            self.up_folder()
+        elif self.focus_get() == self.btn_copy:
+            self.copy_file()
+        elif self.focus_get() == self.btn_delete:
+            self.delete_file()
+
+    def handle_escape(self, event):
+        if askokcancel(lb.CONFIRM_CLOSE_WINDOW, lb.CONFIRM_CLOSE_WINDOW_TXT, parent=self):
+            self.destroy()
 
     def up_folder(self):
         dir = self.txt_path_input.get()
@@ -145,6 +160,9 @@ class UI_copy_file(tk.Toplevel):
         self.resizable(False, False)
         self['padx'] = const.WINDOW_BORDER_PADDING
         self['pady'] = const.WINDOW_BORDER_PADDING
+        # handle return and escape key
+        self.bind('<Return>', self.handle_return)
+        self.bind('<Escape>', self.handle_escape)
 
         self.lbl_file_name_stt = tk.StringVar(self, lb.COPY_FILE_FILE_NAME)
         self.lbl_file_name = tk.Label(self, textvariable = self.lbl_file_name_stt)
@@ -164,6 +182,14 @@ class UI_copy_file(tk.Toplevel):
         self.btn_cancel.grid(row = 1, column = 2, sticky = tk.W, padx = (5,0), pady = (5,0), ipadx = 10)
 
         self.after(const.UPDATE_TIME, self.periodic_call)
+
+    def handle_return(self, event):
+        if self.focus_get() == self.btn_cancel:
+            self.cancel()
+
+    def handle_escape(self, event):
+        if askokcancel(lb.CONFIRM_CLOSE_WINDOW, lb.CONFIRM_CLOSE_WINDOW_TXT, parent=self):
+            self.destroy()
 
     def cancel(self):
         if(askokcancel(lb.COPY_FILE_CANCEL, lb.COPY_FILE_CANCEL_CONFIRM, parent = self)):

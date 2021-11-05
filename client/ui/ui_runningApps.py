@@ -18,6 +18,9 @@ class UI_running_apps(tk.Toplevel):
         self.resizable(False, False)
         self['padx'] = const.WINDOW_BORDER_PADDING
         self['pady'] = const.WINDOW_BORDER_PADDING
+        # handle return and escape key
+        self.bind('<Return>', self.handle_return)
+        self.bind('<Escape>', self.handle_escape)
 
         self.btn_start = tk.Button(self, text = lb.APP_START, width = 15, height = 2, command = self.start)
         self.btn_start.grid(row = 0, column = 0, sticky = tk.EW)
@@ -49,6 +52,16 @@ class UI_running_apps(tk.Toplevel):
         self.update_counting = Count(10, self.socket_cmd, 'get-running-app')
         self.update_counting.count_up(-1)
         self.after(const.UPDATE_TIME, self.periodic_call)
+
+    def handle_return(self, event):
+        if self.focus_get() == self.btn_start:
+            self.start()
+        elif self.focus_get() == self.btn_kill:
+            self.kill()
+
+    def handle_escape(self, event):
+        if askokcancel(lb.CONFIRM_CLOSE_WINDOW, lb.CONFIRM_CLOSE_WINDOW_TXT, parent=self):
+            self.destroy()
 
     def update(self, data):
         selected =  self.trv_apps.item(self.trv_apps.focus())['values']
@@ -118,6 +131,9 @@ class UI_start_avail_app(tk.Toplevel):
         self.resizable(False, False)
         self['padx'] = const.WINDOW_BORDER_PADDING
         self['pady'] = const.WINDOW_BORDER_PADDING
+        # handle return and escape key
+        self.bind('<Return>', self.handle_return)
+        self.bind('<Escape>', self.handle_escape)
 
         self.lbl_avail_apps = tk.Label(self, text = lb.START_APP_AVAIL_APPS)
         self.lbl_avail_apps.grid(row = 0, column = 0, sticky = tk.W)
@@ -151,6 +167,16 @@ class UI_start_avail_app(tk.Toplevel):
 
         self.socket_cmd('get-app-list')
         self.after(const.UPDATE_TIME, self.periodic_call)
+
+    def handle_return(self, event):
+        if self.focus_get() == self.btn_start:
+            self.start_app()
+        elif self.focus_get() == self.btn_custom:
+            self.custom_app()
+
+    def handle_escape(self, event):
+        if askokcancel(lb.CONFIRM_CLOSE_WINDOW, lb.CONFIRM_CLOSE_WINDOW_TXT, parent=self):
+            self.destroy()
 
     def start_app(self):
         selected = self.trv_apps.item(self.trv_apps.focus())['values']
@@ -209,6 +235,9 @@ class UI_start_custom_app(tk.Toplevel):
         self.resizable(False, False)
         self['padx'] = const.WINDOW_BORDER_PADDING
         self['pady'] = const.WINDOW_BORDER_PADDING
+        # handle return and escape key
+        self.bind('<Return>', self.handle_return)
+        self.bind('<Escape>', self.handle_escape)
 
         self.lbl_app_name = tk.Label(self, text = lb.START_APP_NAME)
         self.lbl_app_name.grid(column = 0, row = 0)
@@ -221,6 +250,14 @@ class UI_start_custom_app(tk.Toplevel):
         self.btn_start.grid(column=2, row=0, sticky = tk.W, padx = 0, pady = 0, ipadx = 10)
 
         self.after(const.UPDATE_TIME, self.periodic_call)
+
+    def handle_return(self, event):
+        if self.focus_get() == self.txt_name_input or self.focus_get() == self.btn_start:
+            self.start_app()
+
+    def handle_escape(self, event):
+        if askokcancel(lb.CONFIRM_CLOSE_WINDOW, lb.CONFIRM_CLOSE_WINDOW_TXT, parent=self):
+            self.destroy()
 
     def start_app(self):
         self.socket_cmd('start-process', (self.txt_name_input.get(), 'start-custom-app'))
