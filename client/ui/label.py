@@ -1,11 +1,13 @@
-MAIN_TITLE = "Client"
-MAIN_APP_NAME = "Computer Supervisor"
-
 ERR = "Error"
 WARN = "Warning"
 INFO = "Info"
 WAIT = "Waiting..."
 QUIT  = "Quit"
+
+MAIN_TITLE = "Client"
+MAIN_APP_NAME = "Computer Supervisor"
+MAIN_ABOUT_US = "About us"
+MAIN_ABOUT_US_TEXT = "Compter Supervisor is a remote desktop application that allows you to remotely control a computer.\n\nAuthors:\n\tNguyễn Minh Thuận\n\tTrần Anh Huy"
 
 MAIN_LBL_SERVER_IP = "Server IP Address:"
 MAIN_DEFAULT_IP = "localhost"
@@ -39,8 +41,7 @@ MAIN_RESTART_SUCCESS = "Server restart successfully"
 
 MAIN_EXIT = "Exit"
 
-ABOUT_US = "About us"
-ABOUT_US_TEXT = "Compter Supervisor is a remote desktop application that allows you to remotely control a computer.\n\nAuthors:\n\tNguyễn Minh Thuận\n\tTrần Anh Huy"
+
 # ----------------------------------------------------------------------------------------------------------------------
 SCREEN_STREAM_TITLE = "Screen Stream"
 SCREEN_STREAM_PAUSE = "Pause"
