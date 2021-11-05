@@ -13,12 +13,12 @@ import ui.ui_runningProcesses as rp
 
 class UI_main(tk.Tk):
     def __init__(self, ui_queues):
+        super().__init__()
         self.ui_queue = queue.Queue()
         self.ui_queues = ui_queues
         self.socket_queue = None
         ui_queues['main'] = self.ui_queue
 
-        super().__init__()
         self.title(lb.MAIN_TITLE)
         self.protocol("WM_DELETE_WINDOW", self.close)
         self.resizable(False, False)
@@ -39,32 +39,32 @@ class UI_main(tk.Tk):
         self.btn_connect.grid(row = 1, column = 2, sticky = tk.W, padx = 10, pady = 10)
 
         self.lbl_MAC_address_stt = tk.StringVar(self, lb.LBL_MAC_ADDRESS)
-        self.lbl_MAC_address = tk.Label(self, textvariable = self.lbl_MAC_address_stt, cursor = "hand2")
+        self.lbl_MAC_address = tk.Label(self, textvariable = self.lbl_MAC_address_stt)
         self.lbl_MAC_address.grid(row = 2, column = 0, sticky = tk.W, padx = 10)
-        # bind mouse click event
-        self.lbl_MAC_address.bind("<Button-1>", self.onClickMACAddress)
 
         self.MAC_address_stt = tk.StringVar(self, lb.MAC_ADDRESS)
-        self.MAC_address = tk.Label(self, textvariable = self.MAC_address_stt)
+        self.MAC_address = tk.Label(self, textvariable = self.MAC_address_stt, cursor = "hand2")
         self.MAC_address.grid(row = 2, column = 1, columnspan = 2, sticky = tk.W)
+        # bind mouse click event
+        self.MAC_address.bind("<Button-1>", self.on_click_MAC_address)
 
-        self.btn_screen_stream = tk.Button(self, text = lb.SCREEN_STREAM, width = 15, height = 2, command = self.screenStream)
+        self.btn_screen_stream = tk.Button(self, text = lb.SCREEN_STREAM, width = 15, height = 2, command = self.screen_stream)
         self.btn_screen_stream.grid(row = 3, column = 0, sticky = tk.W, padx = 10, pady = 10)
 
         self.btn_keylogger = tk.Button(self, text = lb.KEYLOGGER, width = 15, height = 2, command = self.keylogger)
         self.btn_keylogger.grid(row = 3, column = 1, sticky = tk.W, padx = 10, pady = 10)
 
-        self.btn_file_explorer = tk.Button(self, text = lb.FILE_EXPLORER, width = 15, height = 2, command = self.fileExplorer)
+        self.btn_file_explorer = tk.Button(self, text = lb.FILE_EXPLORER, width = 15, height = 2, command = self.file_explorer)
         self.btn_file_explorer.grid(row = 3, column = 2, sticky = tk.W, padx = 10, pady = 10)
 
-        self.btn_edit_registry = tk.Button(self, text = lb.EDIT_REGISTRY, width = 15, height = 2, command = self.editRegistry)
-        self.btn_edit_registry.grid(row = 4, column = 0, sticky = tk.W, padx = 10, pady = 10)
+        self.btn_running_apps = tk.Button(self, text = lb.RUNNING_APPS, width = 15, height = 2, command = self.running_apps)
+        self.btn_running_apps.grid(row = 4, column = 0, sticky = tk.W, padx = 10, pady = 10)
 
-        self.btn_running_apps = tk.Button(self, text = lb.RUNNING_APPS, width = 15, height = 2, command = self.runningApps)
-        self.btn_running_apps.grid(row = 4, column = 1, sticky = tk.W, padx = 10, pady = 10)
-
-        self.btn_running_processes = tk.Button(self, text = lb.RUNNING_PROCESSES, width = 15, height = 2, command = self.runningProcesses)
-        self.btn_running_processes.grid(row = 4, column = 2, sticky = tk.W, padx = 10, pady = 10)
+        self.btn_running_processes = tk.Button(self, text = lb.RUNNING_PROCESSES, width = 15, height = 2, command = self.running_processes)
+        self.btn_running_processes.grid(row = 4, column = 1, sticky = tk.W, padx = 10, pady = 10)
+        
+        self.btn_edit_registry = tk.Button(self, text = lb.EDIT_REGISTRY, width = 15, height = 2, command = self.edit_registry)
+        self.btn_edit_registry.grid(row = 4, column = 2, sticky = tk.W, padx = 10, pady = 10)
 
         self.btn_logout = tk.Button(self, text = lb.LOGOUT, width = 15, height = 2, command = self.logout)
         self.btn_logout.grid(row = 5, column = 0, sticky = tk.W, padx = 10, pady = 10)
@@ -80,7 +80,7 @@ class UI_main(tk.Tk):
 
         self.lbl_about_us = tk.Label(self, text = lb.ABOUT_US, cursor = "hand2")
         self.lbl_about_us.grid(row = 7, column = 0, columnspan = 3, padx = 10, pady = 10)
-        self.lbl_about_us.bind("<Button-1>", self.onClickAboutUs)
+        self.lbl_about_us.bind("<Button-1>", self.on_click_about_us)
         
         self.after(const.UPDATE_TIME, self.periodic_call)
 
@@ -104,13 +104,13 @@ class UI_main(tk.Tk):
         self.btn_connect_stt.set(lb.WAIT)
     
 
-    def onClickMACAddress(self, event):
+    def on_click_MAC_address(self, event):
         self.socket_cmd("get-MAC")
 
 
 
-    def screenStream(self):
-        window = sc.UI_screenStream(self, self.socket_queue, self.ui_queues)
+    def screen_stream(self):
+        window = sc.UI_screen_stream(self, self.socket_queue, self.ui_queues)
         window.grab_set()
         window.focus()
 
@@ -119,23 +119,23 @@ class UI_main(tk.Tk):
         window.grab_set()
         window.focus()
 
-    def fileExplorer(self):
-        window = fe.UI_fileExplorer(self, self.socket_queue, self.ui_queues)
+    def file_explorer(self):
+        window = fe.UI_file_explorer(self, self.socket_queue, self.ui_queues)
         window.grab_set()
         window.focus()
 
-    def editRegistry(self):
-        window = reg.UI_Registry(self, self.socket_queue, self.ui_queues)
+    def edit_registry(self):
+        window = reg.UI_registry(self, self.socket_queue, self.ui_queues)
         window.grab_set()
         window.focus()
 
-    def runningApps(self):
-        window = ra.UI_runningApps(self, self.socket_queue, self.ui_queues)
+    def running_apps(self):
+        window = ra.UI_running_apps(self, self.socket_queue, self.ui_queues)
         window.grab_set()
         window.focus()
 
-    def runningProcesses(self):
-        window = rp.UI_runningProcesses(self, self.socket_queue, self.ui_queues)                               
+    def running_processes(self):
+        window = rp.UI_running_processes(self, self.socket_queue, self.ui_queues)                               
         window.grab_set()
         window.focus()
 
@@ -154,7 +154,7 @@ class UI_main(tk.Tk):
             self.socket_cmd("restart")
             showinfo(lb.RESTART, lb.RESTART_SUCCESS)
 
-    def onClickAboutUs(self, event):
+    def on_click_about_us(self, event):
         showinfo(lb.ABOUT_US, lb.ABOUT_US_TEXT)
     
     def update_ui(self, task):

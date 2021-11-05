@@ -6,14 +6,14 @@ import ui.label as lb
 import ui.constraints as const
 import queue
 
-class UI_runningProcesses(tk.Toplevel):
+class UI_running_processes(tk.Toplevel):
     def __init__(self, parent, socket_queue, ui_queues):
+        super().__init__(parent)
         self.ui_queue = queue.Queue()
         self.socket_queue = socket_queue
         self.ui_queues = ui_queues
         ui_queues['process'] = self.ui_queue
 
-        super().__init__(parent)
         self.title = lb.PROCESS_TITLE
         self.resizable(False, False)
         self['padx'] = const.WINDOW_BORDER_PADDING
@@ -65,7 +65,7 @@ class UI_runningProcesses(tk.Toplevel):
         self.trv_processes.delete(*self.trv_processes.get_children())
 
     def start(self):
-        window = UI_startProcess(self, self.socket_queue, self.ui_queues)
+        window = UI_start_process(self, self.socket_queue, self.ui_queues)
         window.grab_set()
         window.focus()
 
@@ -108,13 +108,13 @@ class UI_runningProcesses(tk.Toplevel):
     def socket_cmd(self, cmd, ext = None):
         self.socket_queue.put((cmd, ext))
 
-class UI_startProcess(tk.Toplevel):
+class UI_start_process(tk.Toplevel):
     def __init__(self, parent, socket_queue, ui_queues):
+        super().__init__(parent)
         self.ui_queue = queue.Queue()
         self.socket_queue = socket_queue
         ui_queues['start-process'] = self.ui_queue
 
-        super().__init__(parent)
         self.title = lb.START_PROCESS_TITLE
         self.resizable(False, False)
         self['padx'] = const.WINDOW_BORDER_PADDING
@@ -127,12 +127,12 @@ class UI_startProcess(tk.Toplevel):
         self.txt_name_input.focus()
         self.txt_name_input.grid(column = 1, row = 0, padx = 10)
 
-        self.btn_start = tk.Button(self, text=lb.START_PROCESS_START, command = self.startProcess)
+        self.btn_start = tk.Button(self, text=lb.START_PROCESS_START, command = self.start_process)
         self.btn_start.grid(column=2, row=0, sticky = tk.W, padx = 0, pady = 0, ipadx = 10)
 
         self.after(const.UPDATE_TIME, self.periodic_call)
 
-    def startProcess(self):
+    def start_process(self):
          self.socket_cmd('start-process', (self.txt_name_input.get(), 'start-process'))
 
     def update_ui(self, task):

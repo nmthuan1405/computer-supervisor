@@ -6,10 +6,10 @@ import queue
 
 class UI_main(tk.Tk):
     def __init__(self):
+        super().__init__()
         self.ui_queue = queue.Queue()
         self.socket_queue = None
 
-        super().__init__()
         self.title(lb.MAIN_TITLE)
         self.resizable(False, False)
         self['padx'] = 10
@@ -18,10 +18,10 @@ class UI_main(tk.Tk):
         self.protocol("WM_DELETE_WINDOW", self.close)
 
         self.btn_start_stt = tk.StringVar(self, lb.START)
-        self.btn_start = tk.Button(textvariable = self.btn_start_stt, font = 14, width = 20, height = 5, command = self.start)
+        self.btn_start = tk.Button(textvariable = self.btn_start_stt, width = 25, height = 5, command = self.start)
         self.btn_start.grid(row = 0, column = 0)
 
-        self.btn_close = tk.Button(text = lb.EXIT, font = 14, width = 20, height = 2, command = self.close)
+        self.btn_close = tk.Button(text = lb.EXIT, width = 25, height = 2, command = self.close)
         self.btn_close.grid(row = 1, column = 0, pady = (10, 0))
 
         self.after(200, self.periodic_call)
