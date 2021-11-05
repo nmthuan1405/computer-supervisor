@@ -87,13 +87,12 @@ def query_value(path, value):
         return None, None
 
 def set_value(path, value, type, data):
-    # try:
+    try:
         hkey, key = path.split('\\', 1)
         value = parse_data(value, type)
         reg.SetValueEx(reg.OpenKeyEx(get_HKEY(hkey), key, 0, reg.KEY_SET_VALUE), value, 0, get_type(type), data)
-
-    #     return True
-    # except:
+        return True
+    except:
         return False
 
 def delete_value(path, value):
