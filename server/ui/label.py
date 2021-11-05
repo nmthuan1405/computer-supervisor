@@ -4,7 +4,7 @@ START = "Start Server"
 STOP  = "Stop Server"
 WAIT  = "Waiting..."
 EXIT  = "Exit"
-ERR   = "Error!"
+ERR   = "Error"
 QUIT  = "Quit"
 
 CANNOT_START = "Unable to start server"

