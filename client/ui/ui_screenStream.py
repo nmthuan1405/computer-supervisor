@@ -13,6 +13,7 @@ from services.count import Count
 class UI_screen_stream(tpl.UI_ToplevelTemplate):
     def __init__(self, parent, socket_queue, ui_queues):
         tpl.UI_ToplevelTemplate.__init__(self, parent, 'screen', socket_queue, ui_queues)
+        self.FRAME_HEIGHT = None
 
         self.title = lb.SCREEN_STREAM_TITLE
         self.protocol("WM_DELETE_WINDOW", self.close)
@@ -20,7 +21,7 @@ class UI_screen_stream(tpl.UI_ToplevelTemplate):
         self['padx'] = const.WINDOW_BORDER_PADDING
         self['pady'] = const.WINDOW_BORDER_PADDING
 
-        self.canvas = tk.Canvas(self, width = const.FRAME_WIDTH, height = const.FRAME_HEIGHT, bg = 'black')
+        self.canvas = tk.Canvas(self, width = const.FRAME_WIDTH, height = 0, bg = 'black')
         self.canvas.grid(row = 0, column = 0)
         self.img_on_canvas = self.canvas.create_image(0, 0, anchor = tk.NW)
 
@@ -34,8 +35,8 @@ class UI_screen_stream(tpl.UI_ToplevelTemplate):
         self.btn_capture.grid(row = 0, column = 1)
         self.frame.grid(row = 1, column = 0, pady = (5,0), sticky = tk.E)
         
-        self.update_counting = Count(1, self.socket_cmd, 'update-stream', (const.FRAME_WIDTH, const.FRAME_HEIGHT))
-        self.update_counting.count_up(-1)
+        self.update_counter = Count(0, self.socket_cmd, 'update-stream', const.FRAME_WIDTH, self.FRAME_HEIGHT)
+        self.update_counter.count_up(-1)
 
     def pause_stream(self):
         if self.btn_pause_stt.get() == lb.SCREEN_STREAM_PAUSE:
@@ -48,13 +49,15 @@ class UI_screen_stream(tpl.UI_ToplevelTemplate):
             self.socket_cmd('capture-stream')
             self.btn_capture_stt.set(lb.WAIT)
 
-    def close(self):
-        self.destroy()
-
     def update_ui(self, task):
         cmd, ext = task
 
         if cmd == 'update-stream':
+            if self.FRAME_HEIGHT is None:
+                self.FRAME_HEIGHT = ext.size[1]
+                self.canvas.config(height = self.FRAME_HEIGHT)
+                self.update_counter.update_args('update-stream', const.FRAME_WIDTH, self.FRAME_HEIGHT)
+
             self.render = ImageTk.PhotoImage(ext)
             self.canvas.itemconfig(self.img_on_canvas, image = self.render)
         
@@ -69,6 +72,6 @@ class UI_screen_stream(tpl.UI_ToplevelTemplate):
 
     def periodic_call(self):
         if self.btn_pause_stt.get() == lb.SCREEN_STREAM_PAUSE and self.btn_capture_stt.get() == lb.SCREEN_STREAM_CAPTURE:
-            self.update_counting.count_up()
+            self.update_counter.count_up()
 
         super().periodic_call()

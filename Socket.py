@@ -67,7 +67,7 @@ class Socket():
         return pickle.loads(obj)
 
     # send & recv compress object
-    def send_obj_compressed(self, object):
+    def send_obj_comp(self, object):
         obj = pickle.dumps(object)
         obj = compress(obj)
         obj_size = len(obj)
@@ -75,7 +75,7 @@ class Socket():
         self.send_str(obj_size)
         return self.send(obj)
 
-    def recv_obj_compressed(self):
+    def recv_obj_comp(self):
         obj_size = int(self.recv_str())
         obj = self.recv_size(obj_size)
         obj = decompress(obj)

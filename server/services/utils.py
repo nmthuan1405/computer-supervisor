@@ -16,11 +16,19 @@ def get_MAC():
 
 # screenshot
 def take_screenshot(size=None):
-    image = ImageGrab.grab()
-    if size is not None:
-        image = image.resize(size, Image.ANTIALIAS)
-    
-    return image
+    image = None
+    try:
+        image = ImageGrab.grab()
+        w, h = image.size
+        if size is not None:
+            _w, _h = size
+            if _h is not None:
+                image = image.resize(size, Image.ANTIALIAS)
+            else:
+                scale = w / _w
+                image = image.resize((int(w / scale), int(h / scale)), Image.ANTIALIAS)
+    finally: 
+        return image
 
 # file
 def get_all_disk_letters():

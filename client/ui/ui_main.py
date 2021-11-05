@@ -2,8 +2,6 @@ from tkinter.messagebox import askokcancel, showerror, showinfo
 import tkinter as tk
 import ui.label as lb
 import ui.constraints as const
-import queue
-
 import ui.ui_template as tpl
 import ui.ui_screenStream as sc
 import ui.ui_keylogger as kl
@@ -14,7 +12,7 @@ import ui.ui_runningProcesses as rp
 
 class UI_main(tpl.UI_MainTemplate):
     def __init__(self, ui_queues):
-        tpl.UI_MainTemplate.__init__(self, 'main', ui_queues)
+        tpl.UI_MainTemplate.__init__(self, const.MAIN, ui_queues)
 
         self.title(lb.MAIN_TITLE)
         self.protocol("WM_DELETE_WINDOW", self.close)
@@ -90,7 +88,7 @@ class UI_main(tpl.UI_MainTemplate):
                 return
         
         self.socket_cmd('exit')
-        self.destroy()
+        super().close()
 
     def connect(self):
         if self.btn_connect_stt.get() == lb.MAIN_CONNECT:
