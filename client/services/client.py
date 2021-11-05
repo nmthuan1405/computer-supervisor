@@ -1,7 +1,10 @@
+from ctypes import sizeof
 from services.Socket import Socket
+import services.utils as utils
 import socket
 import threading
 import queue
+import humanize
 
 PORT = 1234
 
@@ -12,6 +15,7 @@ class Client(Socket, threading.Thread):
 
         self.ui_queue = None
         self.socket_queue = queue.Queue()
+        self.file_handle = None
 
     def add_ui_queue(self, ui_queue):
         self.ui_queue = ui_queue
@@ -193,6 +197,52 @@ class Client(Socket, threading.Thread):
         else:
             self.ui_cmd("delete-key", "err", "reg")
 
+    def task_copy_file(self, path, des):
+        self.file_handle = utils.FileDownloader(des)
+        if self.file_handle.create_file():
+            self.send_str('copy-file')
+            self.send_str(path)
+
+            name, size = self.recv_obj()
+            if size is not None:
+                self.file_handle.set_total_size(size)
+
+                self.ui_cmd("get-info", (name, humanize.naturalsize(size)), "copy-file")
+            else:
+                self.ui_cmd("get-info", "err", "copy-file")
+                self.file_handle.close_file()
+                self.file_handle = None
+        else:
+            self.ui_cmd("create-file", "err", "copy-file")
+
+    def task_continue_copy_file(self):
+        def error_handler(e):
+            self.file_handle.close_file()
+            self.file_handle = None
+            self.ui_cmd("copy-file", "err", "copy-file")
+
+        if self.file_handle is not None:
+            self.send_str('continue-copy-file')
+            self.send_str(1024)
+            data = self.recv_obj()
+
+            if data is not None:
+                if self.file_handle.write_file(data):
+                    size = humanize.naturalsize(self.file_handle.get_received_size()) + ' / ' + humanize.naturalsize(self.file_handle.get_total_size())
+                    percent = self.file_handle.get_received_size() / self.file_handle.get_total_size() * 100
+                    self.ui_cmd("copy-file", (size, percent), "copy-file")
+
+                    if percent >= 100:
+                        self.ui_cmd("copy-file", "done", "copy-file")
+                        self.send_str('close-file')
+                        self.file_handle.close_file()
+                        self.file_handle = None
+                else:
+                    self.send_str('close-file')
+                    error_handler()
+            else:
+                error_handler()
+
     def run(self):
         while True:
             task = self.socket_queue.get()
@@ -257,6 +307,10 @@ class Client(Socket, threading.Thread):
                 self.task_create_reg_key(ext)
             elif cmd == 'delete-reg-key':
                 self.task_delete_reg_key(ext)
+            elif cmd == 'copy-file':
+                self.task_copy_file(*ext)
+            elif cmd == 'continue-copy-file':
+                self.task_continue_copy_file()
 
 def DEBUG(*args,**kwargs):
     print("Client:", *args,**kwargs)

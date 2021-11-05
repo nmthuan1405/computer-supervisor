@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
-from tkinter.messagebox import askokcancel, showerror
-
+from tkinter.messagebox import askokcancel, showerror, showinfo, showwarning
+from tkinter.filedialog import asksaveasfilename
 import ui.label as lb
 import ui.constraints as const
 import queue
@@ -85,9 +85,21 @@ class UI_fileExplorer(tk.Toplevel):
             self.goto_dir(parent_dir)
 
     def copyFile(self):
-        window = UI_copyFile(self, self.socket_queue)
-        self.ui_queue = window.ui_queue
+        path = self.txt_path_input.get()
+        name = self.trv_fileExp.item(self.trv_fileExp.focus())['values']
+        if name != '':
+            name = name[0]
+        else:
+            return
 
+        ext = os.path.splitext(name)[-1]
+        description = (ext[1:].upper() + ' Files', "*" + ext)
+        try:
+            dest = asksaveasfilename(initialfile = name, defaultextension= ext, filetypes=[description], parent=self)
+        except:
+            return
+
+        window = UI_copyFile(self, self.socket_queue, self.ui_queues, path, name, dest)
         window.grab_set()
         window.focus()
 
@@ -142,9 +154,10 @@ class UI_fileExplorer(tk.Toplevel):
         self.socket_queue.put((cmd, ext))
 
 class UI_copyFile(tk.Toplevel):
-    def __init__(self, parent, socket_queue):
+    def __init__(self, parent, socket_queue, ui_queues, path, name, dest):
         self.ui_queue = queue.Queue()
         self.socket_queue = socket_queue
+        ui_queues['copy-file'] = self.ui_queue
 
         super().__init__(parent)
         self.title = lb.COPY_FILE_TITLE
@@ -153,24 +166,27 @@ class UI_copyFile(tk.Toplevel):
         self['padx'] = const.WINDOW_BORDER_PADDING
         self['pady'] = const.WINDOW_BORDER_PADDING
 
-        self.lbl_file_name_stt = tk.StringVar(self, lb.FILE_NAME)
-        self.lbl_file_name = tk.Label(self, textvariable = self.lbl_file_name_stt)
+        self.lbl_file_name_stt = tk.StringVar(self)
+        self.lbl_file_name = tk.Label(self, textvariable=self.lbl_file_name_stt)
         self.lbl_file_name.grid(row = 0, column = 0, sticky = tk.W)
 
         self.lbl_file_size_stt = tk.StringVar(self, lb.FILE_SIZE)
         self.lbl_file_size = tk.Label(self, textvariable = self.lbl_file_size_stt)
         self.lbl_file_size.grid(row = 0, column = 1, sticky = tk.E)
 
-        self.progress_bar = ttk.Progressbar(self, orient = tk.HORIZONTAL, length = 300, mode = 'indeterminate')
+        self.progress_bar = ttk.Progressbar(self, orient = tk.HORIZONTAL, length = 300, mode = 'determinate')
         self.progress_bar.grid(row = 1, column = 0, columnspan = 2, sticky = tk.EW, pady = (5,0))
-        # update progress bar
-        # self.progress_bar['value'] += 20
+        
+        self.progress_bar['value'] = 0
+        self.progress_bar['maximum'] = 100
  
-
         self.btn_cancel = tk.Button(self, text = lb.CANCEL, command = self.cancel)
         self.btn_cancel.grid(row = 1, column = 2, sticky = tk.W, padx = (5,0), pady = (5,0), ipadx = 10)
 
+        self.socket_cmd("copy-file", (os.path.join(path, name), dest))
+        self.socket_cmd("continue-copy-file")
         self.after(const.UPDATE_TIME, self.periodic_call)
+
 
     def cancel(self):
         if(askokcancel(lb.CANCEL, lb.CANCEL_CONFIRM, parent = self)):
@@ -179,6 +195,37 @@ class UI_copyFile(tk.Toplevel):
     def update_ui(self, task):
         DEBUG("task", task)
         cmd, ext = task
+
+        if cmd == "get-info":
+            if ext == "err":
+                showwarning(lb.WARN, lb.COPY_FILE_FAIL, parent = self)
+                self.destroy()
+                return
+            else:
+                name, size = ext
+                self.lbl_file_name_stt.set(name)
+                self.lbl_file_size_stt.set(size)
+        
+        elif cmd == "create-file":
+            if ext == "err":
+                showwarning(lb.WARN, lb.COPY_FILE_FAIL, parent = self)
+                self.destroy()
+                return
+
+        elif cmd == "copy-file":
+            if ext == "err":
+                showwarning(lb.WARN, lb.COPY_FILE_FAIL, parent = self)
+                self.destroy()
+                return
+            elif ext == "done":
+                showinfo(lb.INFO, lb.COPY_FILE_SUCCESS, parent = self)
+                self.destroy()
+                return
+            else:
+                size, percent = ext
+                self.progress_bar['value'] = percent
+                self.lbl_file_size_stt.set(size)
+                self.socket_cmd("continue-copy-file")
 
     def periodic_call(self):
         while True:
