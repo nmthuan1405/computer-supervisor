@@ -13,7 +13,12 @@ class Socket():
         self.socket.sendall(data)
 
     def recv(self, buff_size):
-        return self.socket.recv(buff_size)
+        data = self.socket.recv(buff_size)
+        if len(data) > 0:
+            return data
+            
+        raise Exception('Connection closed')
+
 
     # advanced recv
     def recv_until(self, DELIM=None):
