@@ -74,4 +74,5 @@ class UI_main(tk.Tk):
         self.socket_queue.put((cmd, ext))
 
 def DEBUG(*args,**kwargs):
-    print("UI:", *args,**kwargs)
+    # print("UI:", *args,**kwargs)
+    pass

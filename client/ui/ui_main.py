@@ -193,7 +193,6 @@ class UI_main(tpl.UI_MainTemplate):
         self.socket_cmd("continue-work")
     
     def update_ui(self, task):
-        print('task in main', task)
         cmd, ext = task
         if cmd == "start":
             if ext == "ok":

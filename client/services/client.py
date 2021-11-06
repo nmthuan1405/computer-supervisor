@@ -365,4 +365,5 @@ class Client(Socket, threading.Thread):
                 
 
     def DEBUG(self, *args,**kwargs):
-        print('Client:', *args,**kwargs)
+        # print('Client:', *args,**kwargs)
+        pass

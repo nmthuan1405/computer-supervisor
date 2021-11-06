@@ -21,7 +21,8 @@ class UI_Template():
         self.ui_queues.pop(self.name)
 
     def DEBUG(self, *args, **kwargs):
-        print((self.name, ':', args, kwargs))
+        pass
+        # print((self.name, ':', args, kwargs))
 
 class UI_MainTemplate(UI_Template, tk.Tk):
     def __init__(self, name, ui_queues):
