@@ -15,6 +15,7 @@ MAIN_CONNECT = "Connect"
 MAIN_DISCONNECT = "Disconnect"
 MAIN_CANNOT_CONNECT = "Cannot connect to server"
 MAIN_ASK_QUIT = "Client is connecting.\nDo you want to quit?"
+MAIN_PLEASE_CONNECT = "Please connect to server"
 
 MAIN_LBL_MAC_ADDRESS = "Server MAC Address:"
 MAIN_MAC_ADDRESS = ""
@@ -29,15 +30,15 @@ MAIN_RUNNING_PROCESSES = "Running Processes"
 
 MAIN_LOGOUT = "Logout"
 MAIN_LOGOUT_CONFIRM = "Are you sure you want to logout server?"
-MAIN_LOGOUT_SUCCESS = "Server logout successfully"
+MAIN_LOGOUT_SUCCESS = "Command logout server sent successfully"
 
 MAIN_SHUTDOWN = "Shutdown"
 MAIN_SHUTDOWN_CONFIRM = "Are you sure you want to shutdown server?"
-MAIN_SHUTDOWN_SUCCESS = "Server shutdown successfully"
+MAIN_SHUTDOWN_SUCCESS = "Command shutdown server sent successfully"
 
 MAIN_RESTART = "Restart"
 MAIN_RESTART_CONFIRM = "Are you sure you want to restart server?"
-MAIN_RESTART_SUCCESS = "Server restart successfully"
+MAIN_RESTART_SUCCESS = "Command restart server sent successfully"
 
 MAIN_EXIT = "Exit"
 MAIN_SOCKET_ERROR = "Socket error"

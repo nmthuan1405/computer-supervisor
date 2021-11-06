@@ -47,7 +47,7 @@ class UI_running_apps(tpl.UI_ToplevelTemplate):
         self.scrollbar.grid(row = 1, column = 2, padx = 0, pady = (5,0), sticky = 'ns')
 
         self.update_counting = Count(10, self.socket_cmd, 'get-running-app')
-        self.update_counting.count_up(-1)
+        self.update_counting.run()
 
     def handle_return(self, event):
         if self.focus_get() == self.btn_start:

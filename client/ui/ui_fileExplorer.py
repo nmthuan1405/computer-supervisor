@@ -167,7 +167,7 @@ class UI_copyFile(tpl.UI_ToplevelTemplate):
         super().__init__(parent, const.COPY_FILE, socket_queue, ui_queues)
 
         self.title = lb.COPY_FILE_TITLE
-        self.protocol("WM_DELETE_WINDOW", self.cancel)
+        self.protocol("WM_DELETE_WINDOW", self.close)
         self.resizable(False, False)
         self['padx'] = const.WINDOW_BORDER_PADDING
         self['pady'] = const.WINDOW_BORDER_PADDING
@@ -189,7 +189,7 @@ class UI_copyFile(tpl.UI_ToplevelTemplate):
         self.progress_bar['value'] = 0
         self.progress_bar['maximum'] = 100
  
-        self.btn_cancel = tk.Button(self, text = lb.CANCEL, command = self.cancel)
+        self.btn_cancel = tk.Button(self, text = lb.CANCEL, command = self.close)
         self.btn_cancel.grid(row = 1, column = 2, sticky = tk.W, padx = (5,0), pady = (5,0), ipadx = 10)
 
         self.socket_cmd("copy-file", os.path.join(path, name), dest)
@@ -204,9 +204,13 @@ class UI_copyFile(tpl.UI_ToplevelTemplate):
             self.destroy()
 
     def cancel(self):
+    def close(self):
         if(askokcancel(lb.CANCEL, lb.CANCEL_CONFIRM, parent = self)):
             self.socket_cmd("cancel-copy-file")
-            self.destroy()
+            super().close()
+
+    def handle_error(self):
+        super().close()
 
     def update_ui(self, task):
         cmd, ext = task

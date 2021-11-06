@@ -39,7 +39,7 @@ class UI_screen_stream(tpl.UI_ToplevelTemplate):
         self.frame.grid(row = 1, column = 0, pady = (5,0), sticky = tk.E)
         
         self.update_counter = Count(0, self.socket_cmd, 'update-stream', const.FRAME_WIDTH, self.FRAME_HEIGHT)
-        self.update_counter.count_up(-1)
+        self.update_counter.run()
 
     def handle_return(self, event):
         if self.focus_get() == self.btn_pause:
@@ -58,7 +58,6 @@ class UI_screen_stream(tpl.UI_ToplevelTemplate):
             self.btn_pause_stt.set(lb.SCREEN_STREAM_RESUME)
         else:
             self.btn_pause_stt.set(lb.SCREEN_STREAM_PAUSE)
-            self.update_counter.count_up()
 
 
     def capture_stream(self):
@@ -74,8 +73,6 @@ class UI_screen_stream(tpl.UI_ToplevelTemplate):
                 self.FRAME_HEIGHT = ext.size[1]
                 self.canvas.config(height = self.FRAME_HEIGHT)
                 self.update_counter.update_args('update-stream', const.FRAME_WIDTH, self.FRAME_HEIGHT)
-            if self.btn_pause_stt.get() == lb.SCREEN_STREAM_PAUSE:
-                self.update_counter.count_up()
 
             self.render = ImageTk.PhotoImage(ext)
             self.canvas.itemconfig(self.img_on_canvas, image = self.render)
@@ -88,3 +85,8 @@ class UI_screen_stream(tpl.UI_ToplevelTemplate):
                 showerror(lb.ERR, lb.SCREEN_STREAM_ERROR_SAVE_FILE, parent=self)
             finally:
                 self.btn_capture_stt.set(lb.SCREEN_STREAM_CAPTURE)
+
+    def periodic_call(self):
+        if self.btn_pause_stt.get() == lb.SCREEN_STREAM_PAUSE:
+                self.update_counter.count_up()
+        super().periodic_call()

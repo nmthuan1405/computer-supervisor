@@ -357,4 +357,5 @@ class Client(Socket, threading.Thread):
                 break
     
 def DEBUG(*args,**kwargs):
-    print("Server:", *args,**kwargs)
+    # print("Server:", *args,**kwargs)
+    pass

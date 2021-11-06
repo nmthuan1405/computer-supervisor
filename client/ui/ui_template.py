@@ -21,7 +21,8 @@ class UI_Template():
         self.ui_queues.pop(self.name)
 
     def DEBUG(self, *args, **kwargs):
-        print((self.name, ':', args, kwargs))
+        pass
+        # print((self.name, ':', args, kwargs))
 
 class UI_MainTemplate(UI_Template, tk.Tk):
     def __init__(self, name, ui_queues):
@@ -39,6 +40,7 @@ class UI_MainTemplate(UI_Template, tk.Tk):
                 task = self.ui_queue.get_nowait()
                 if task == 'socket-error':
                     self.handle_error()
+                    
                 else:
                     self.update_ui(task)
                 
@@ -69,6 +71,8 @@ class UI_ToplevelTemplate(UI_Template, tk.Toplevel):
                 task = self.ui_queue.get_nowait()
                 if task == 'socket-error':
                     self.handle_error()
+                    return
+            
                 else:
                     self.update_ui(task)
                 

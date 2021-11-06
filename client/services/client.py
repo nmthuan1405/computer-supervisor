@@ -16,6 +16,7 @@ class Client(Socket, threading.Thread):
 
         self.ui_queue = None
         self.socket_queue = queue.Queue()
+        self.error_event = threading.Event()
         self.file_handle = None
 
     def add_ui_queue(self, ui_queue):
@@ -272,6 +273,11 @@ class Client(Socket, threading.Thread):
                 cmd, args = self.socket_queue.get()
                 self.DEBUG('task', cmd, args)
 
+                if self.error_event.is_set():
+                    if cmd == 'continue-work':
+                        self.error_event.clear()
+                    continue
+
                 if cmd == 'exit':
                     break
                 elif cmd == 'start':
@@ -352,10 +358,12 @@ class Client(Socket, threading.Thread):
                     self.task_get_running_process()
      
             except:
-                print('socket err in client')
                 for ui_queue in self.ui_queue.values():
                     ui_queue.put('socket-error')
+
+                self.error_event.set()
                 
 
     def DEBUG(self, *args,**kwargs):
-        print('Client:', *args,**kwargs)
+        # print('Client:', *args,**kwargs)
+        pass
