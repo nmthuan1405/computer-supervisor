@@ -40,6 +40,7 @@ MAIN_RESTART_CONFIRM = "Are you sure you want to restart server?"
 MAIN_RESTART_SUCCESS = "Server restart successfully"
 
 MAIN_EXIT = "Exit"
+MAIN_SOCKET_ERROR = "Socket error"
 
 
 # ----------------------------------------------------------------------------------------------------------------------

@@ -10,7 +10,7 @@ class Socket():
 
     # pure send & recv
     def send(self, data):
-        return self.socket.sendall(data)
+        self.socket.send(data)
 
     def recv(self, buff_size):
         return self.socket.recv(buff_size)
@@ -28,7 +28,7 @@ class Socket():
 
                 return val
             else:
-                self.buff += self.socket.recv(self.MAX_RECV_SIZE)
+                self.buff += self.recv(self.MAX_RECV_SIZE)
 
     def recv_size(self, size):
         while True:
@@ -39,7 +39,7 @@ class Socket():
 
                 return val
             else:
-                self.buff += self.socket.recv(self.MAX_RECV_SIZE)
+                self.buff += self.recv(self.MAX_RECV_SIZE)
 
     # send & recv string
     def send_str(self, string, DELIM=None):
@@ -63,7 +63,7 @@ class Socket():
     def recv_obj(self):
         obj_size = int(self.recv_str())
         obj = self.recv_size(obj_size)
-
+        
         return pickle.loads(obj)
 
     # send & recv compress object
@@ -77,7 +77,9 @@ class Socket():
 
     def recv_obj_comp(self):
         obj_size = int(self.recv_str())
+        print("start recv")
         obj = self.recv_size(obj_size)
+        print("end recv")
         obj = decompress(obj)
 
         return pickle.loads(obj)

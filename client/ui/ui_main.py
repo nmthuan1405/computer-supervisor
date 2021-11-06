@@ -146,12 +146,17 @@ class UI_main(tpl.UI_MainTemplate):
     def about_us(self, event):
         showinfo(lb.MAIN_ABOUT_US, lb.MAIN_ABOUT_US_TEXT)
     
-    def update_ui(self, task):
-        def change_default():
+    def change_connect_btn_default(self):
             self.btn_connect_stt.set(lb.MAIN_CONNECT)
             self.txt_IP_input.config(state = tk.NORMAL)
             self.MAC_address_stt.set("")
-
+    
+    def handle_error(self):
+        self.change_connect_btn_default()
+        showerror(lb.ERR, lb.MAIN_SOCKET_ERROR, parent = self)
+    
+    def update_ui(self, task):
+        print('task in main', task)
         cmd, ext = task
         if cmd == "start":
             if ext == "ok":
@@ -159,11 +164,11 @@ class UI_main(tpl.UI_MainTemplate):
                 self.txt_IP_input.config(state = tk.DISABLED)
                 self.socket_cmd("get-MAC")
             else:
-                change_default()
+                self.change_connect_btn_default()
                 showerror(lb.ERR, lb.MAIN_CANNOT_CONNECT, parent = self)
         
         elif cmd == "stop":
-            change_default()
+            self.change_connect_btn_default()
 
         elif cmd == "update-MAC":
             self.MAC_address_stt.set(ext)

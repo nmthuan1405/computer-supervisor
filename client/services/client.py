@@ -12,7 +12,7 @@ MSG_SIZE = 4096
 class Client(Socket, threading.Thread):
     def __init__(self, DELIM=b'\x00'):
         Socket.__init__(self, socket= None, DELIM=DELIM)
-        threading.Thread.__init__(self, name='client')
+        threading.Thread.__init__(self, name='client', daemon=True)
 
         self.ui_queue = None
         self.socket_queue = queue.Queue()
@@ -69,7 +69,9 @@ class Client(Socket, threading.Thread):
     
     # screen GUI
     def task_update_stream(self, w, h):
+        print('send cmd')
         self.send_str('screen-stream')
+        print('sendsize')
         self.send_obj((w, h))
 
         img = self.recv_obj_comp()
@@ -352,9 +354,9 @@ class Client(Socket, threading.Thread):
                     self.task_get_running_process()
      
             except:
-                self.task_stop()
-                for ui_queue in self.ui_queues.values:
-                    ui_queue.put('close')
+                print('socket err in client')
+                for ui_queue in self.ui_queue.values():
+                    ui_queue.put('socket-error')
                 
 
     def DEBUG(self, *args,**kwargs):
