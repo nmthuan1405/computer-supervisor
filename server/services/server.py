@@ -12,7 +12,7 @@ PORT    = 1234
 
 class Server(threading.Thread):
     def __init__(self):
-        super().__init__(name="server")
+        super().__init__(name="server", daemon=True)
 
         self.ui_queue = None
         self.socket_queue = queue.Queue()
@@ -80,7 +80,7 @@ class Server(threading.Thread):
 
 class add_client(threading.Thread):
     def __init__(self, socket, clients):
-        super().__init__(name="add_client")
+        super().__init__(name="add_client", daemon=True)
         self.socket = socket
         self.clients = clients
 
@@ -103,7 +103,7 @@ class add_client(threading.Thread):
 class Client(Socket, threading.Thread):
     def __init__(self, socket, addr, DELIM=b'\x00'):
         Socket.__init__(self, socket=socket, DELIM=DELIM)
-        threading.Thread.__init__(self, name=addr)
+        threading.Thread.__init__(self, name=addr, daemon=True)
         self.listener = None
 
         DEBUG("new client", addr)
@@ -271,87 +271,90 @@ class Client(Socket, threading.Thread):
     
     def run(self):
         while True:
-            flag = self.recv_str()
-            DEBUG("received flag", flag)
+            try:
+                flag = self.recv_str()
+                DEBUG("received flag", flag)
 
-            if flag == 'close':
-                self.stop()
+                if flag == 'close':
+                    self.stop()
+                    break
+                elif flag == 'get-MAC':
+                    self.task_get_MAC()
+                elif flag == 'shutdown':
+                    self.task_shutdown()
+                elif flag == 'logout':
+                    self.task_logout()
+                elif flag == 'restart':
+                    self.task_restart()
+
+                # screen
+                elif flag == 'screen-stream':
+                    self.task_screen_stream()
+                elif flag == 'screen-capture':
+                    self.task_screen_capture()
+                
+                # keyboard
+                elif flag == 'listener-start':
+                    self.task_keyboard_start()
+                elif flag == 'listener-stop':
+                    self.task_keyboard_stop()
+                elif flag == 'listener-hook':
+                    self.task_keyboard_hook()
+                elif flag == 'listener-unhook':
+                    self.task_keyboard_unhook()
+                elif flag == 'listener-get':
+                    self.task_keyboard_get_log()
+                elif flag == 'listener-clear':
+                    self.task_keyboard_clear_log()
+                elif flag == 'listener-block':
+                    self.task_keyboard_block()
+                elif flag == 'listener-unblock':
+                    self.task_keyboard_unblock()
+                
+                # file
+                elif flag == 'get-dir':
+                    self.task_get_dir()
+                elif flag == 'delete-file':
+                    self.task_delete_file()    
+                elif flag == 'copy-file':
+                    self.task_copy_file()
+                elif flag == 'continue-copy-file':
+                    self.task_continue_copy_file()
+                elif flag == 'close-file':
+                    self.task_close_file()
+
+                # app
+                elif flag == 'get-running-app':
+                    self.task_get_running_app()
+                elif flag == 'get-app-list':
+                    self.task_get_app_list()
+                
+                # process   
+                elif flag == 'kill-process':
+                    self.task_kill_process()
+                elif flag == 'start-process':
+                    self.task_start_process()
+                elif flag == 'get-running-process':
+                    self.task_get_running_process()
+                
+                # registry
+                elif flag == 'merge-reg-file':
+                    self.task_merge_reg_file()
+                elif flag == 'query-reg-value':
+                    self.task_query_reg_value()
+                elif flag == 'set-reg-value':
+                    self.task_set_reg_value()
+                elif flag == 'delete-reg-value':
+                    self.task_delete_reg_value()
+                elif flag == 'create-reg-key':
+                    self.task_create_reg_key()
+                elif flag == 'delete-reg-key':
+                    self.task_delete_reg_key()
+                
+                else:
+                    DEBUG("unknown flag", flag)
+            except:
                 break
-            elif flag == 'get-MAC':
-                self.task_get_MAC()
-            elif flag == 'shutdown':
-                self.task_shutdown()
-            elif flag == 'logout':
-                self.task_logout()
-            elif flag == 'restart':
-                self.task_restart()
-
-            # screen
-            elif flag == 'screen-stream':
-                self.task_screen_stream()
-            elif flag == 'screen-capture':
-                self.task_screen_capture()
-            
-            # keyboard
-            elif flag == 'listener-start':
-                self.task_keyboard_start()
-            elif flag == 'listener-stop':
-                self.task_keyboard_stop()
-            elif flag == 'listener-hook':
-                self.task_keyboard_hook()
-            elif flag == 'listener-unhook':
-                self.task_keyboard_unhook()
-            elif flag == 'listener-get':
-                self.task_keyboard_get_log()
-            elif flag == 'listener-clear':
-                self.task_keyboard_clear_log()
-            elif flag == 'listener-block':
-                self.task_keyboard_block()
-            elif flag == 'listener-unblock':
-                self.task_keyboard_unblock()
-            
-            # file
-            elif flag == 'get-dir':
-                self.task_get_dir()
-            elif flag == 'delete-file':
-                self.task_delete_file()    
-            elif flag == 'copy-file':
-                self.task_copy_file()
-            elif flag == 'continue-copy-file':
-                self.task_continue_copy_file()
-            elif flag == 'close-file':
-                self.task_close_file()
-
-            # app
-            elif flag == 'get-running-app':
-                self.task_get_running_app()
-            elif flag == 'get-app-list':
-                self.task_get_app_list()
-            
-            # process   
-            elif flag == 'kill-process':
-                self.task_kill_process()
-            elif flag == 'start-process':
-                self.task_start_process()
-            elif flag == 'get-running-process':
-                self.task_get_running_process()
-            
-            # registry
-            elif flag == 'merge-reg-file':
-                self.task_merge_reg_file()
-            elif flag == 'query-reg-value':
-                self.task_query_reg_value()
-            elif flag == 'set-reg-value':
-                self.task_set_reg_value()
-            elif flag == 'delete-reg-value':
-                self.task_delete_reg_value()
-            elif flag == 'create-reg-key':
-                self.task_create_reg_key()
-            elif flag == 'delete-reg-key':
-                self.task_delete_reg_key()
-            
-            else:
-                DEBUG("unknown flag", flag)
     
 def DEBUG(*args,**kwargs):
     print("Server:", *args,**kwargs)

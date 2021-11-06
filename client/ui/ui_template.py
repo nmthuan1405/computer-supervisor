@@ -37,11 +37,17 @@ class UI_MainTemplate(UI_Template, tk.Tk):
         while True:
             try:
                 task = self.ui_queue.get_nowait()
-                self.update_ui(task)
+                if task == 'socket-error':
+                    self.handle_error()
+                else:
+                    self.update_ui(task)
                 
             except queue.Empty:
                 break
         self.after(const.UPDATE_TIME[self.name], self.periodic_call)
+    
+    def handle_error(self):
+        self.close()
 
     def close(self):
         super().close()
@@ -61,14 +67,17 @@ class UI_ToplevelTemplate(UI_Template, tk.Toplevel):
         while True:
             try:
                 task = self.ui_queue.get_nowait()
-                if task == 'close':
-                    self.close()
+                if task == 'socket-error':
+                    self.handle_error()
                 else:
                     self.update_ui(task)
                 
             except queue.Empty:
                 break
         self.after(const.UPDATE_TIME[self.name], self.periodic_call)
+
+    def handle_error(self):
+        self.close()
 
     def close(self):
         super().close()
