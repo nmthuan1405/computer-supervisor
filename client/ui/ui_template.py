@@ -39,6 +39,7 @@ class UI_MainTemplate(UI_Template, tk.Tk):
                 task = self.ui_queue.get_nowait()
                 if task == 'socket-error':
                     self.handle_error()
+                    
                 else:
                     self.update_ui(task)
                 
@@ -69,6 +70,8 @@ class UI_ToplevelTemplate(UI_Template, tk.Toplevel):
                 task = self.ui_queue.get_nowait()
                 if task == 'socket-error':
                     self.handle_error()
+                    return
+            
                 else:
                     self.update_ui(task)
                 

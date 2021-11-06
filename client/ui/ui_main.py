@@ -154,6 +154,7 @@ class UI_main(tpl.UI_MainTemplate):
     def handle_error(self):
         self.change_connect_btn_default()
         showerror(lb.ERR, lb.MAIN_SOCKET_ERROR, parent = self)
+        self.socket_cmd("continue-work")
     
     def update_ui(self, task):
         print('task in main', task)
