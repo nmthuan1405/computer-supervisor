@@ -112,7 +112,6 @@ class Client(Socket, threading.Thread):
     def stop(self):
         try:
             self.socket.shutdown(socket.SHUT_RDWR)
-            print(self.name, "shutdownnnnnnnnnnnnnnnnnnnnnn")
             self.socket.close()
         except:
             DEBUG("ERR when stop", self.name)
@@ -134,7 +133,6 @@ class Client(Socket, threading.Thread):
     # screen
     def task_screen_stream(self):
         image_size = self.recv_obj()
-        print('getsize')
         self.send_obj_comp(utils.take_screenshot(image_size))
 
     def task_screen_capture(self):
