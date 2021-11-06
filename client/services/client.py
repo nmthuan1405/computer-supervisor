@@ -7,7 +7,7 @@ import queue
 import humanize
 
 PORT = 1234
-MSG_SIZE = 4096
+MSG_SIZE = 2**16
 
 class Client(Socket, threading.Thread):
     def __init__(self, DELIM=b'\x00'):
