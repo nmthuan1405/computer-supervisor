@@ -69,9 +69,7 @@ class Client(Socket, threading.Thread):
     
     # screen GUI
     def task_update_stream(self, w, h):
-        print('send cmd')
         self.send_str('screen-stream')
-        print('sendsize')
         self.send_obj((w, h))
 
         img = self.recv_obj_comp()
