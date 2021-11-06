@@ -99,46 +99,82 @@ class UI_main(tpl.UI_MainTemplate):
         self.btn_connect_stt.set(lb.WAIT)
 
     def screen_stream(self):
+        if self.btn_connect_stt.get() != lb.MAIN_DISCONNECT:
+            showinfo(lb.INFO, lb.MAIN_PLEASE_CONNECT)
+            return
+
         window = sc.UI_screen_stream(self, self.socket_queue, self.ui_queues)
         window.grab_set()
         window.focus()
 
     def keylogger(self):
+        if self.btn_connect_stt.get() != lb.MAIN_DISCONNECT:
+            showinfo(lb.INFO, lb.MAIN_PLEASE_CONNECT)
+            return
+
         window = kl.UI_keylogger(self, self.socket_queue, self.ui_queues)
         window.grab_set()
         window.focus()
 
     def file_explorer(self):
+        if self.btn_connect_stt.get() != lb.MAIN_DISCONNECT:
+            showinfo(lb.INFO, lb.MAIN_PLEASE_CONNECT)
+            return
+
         window = fe.UI_file_explorer(self, self.socket_queue, self.ui_queues)
         window.grab_set()
         window.focus()
 
     def edit_registry(self):
+        if self.btn_connect_stt.get() != lb.MAIN_DISCONNECT:
+            showinfo(lb.INFO, lb.MAIN_PLEASE_CONNECT)
+            return
+
         window = reg.UI_registry(self, self.socket_queue, self.ui_queues)
         window.grab_set()
         window.focus()
 
     def running_apps(self):
+        if self.btn_connect_stt.get() != lb.MAIN_DISCONNECT:
+            showinfo(lb.INFO, lb.MAIN_PLEASE_CONNECT)
+            return
+
         window = ra.UI_running_apps(self, self.socket_queue, self.ui_queues)
         window.grab_set()
         window.focus()
 
     def running_processes(self):
+        if self.btn_connect_stt.get() != lb.MAIN_DISCONNECT:
+            showinfo(lb.INFO, lb.MAIN_PLEASE_CONNECT)
+            return
+
         window = rp.UI_running_processes(self, self.socket_queue, self.ui_queues)                               
         window.grab_set()
         window.focus()
 
     def logout(self):
+        if self.btn_connect_stt.get() != lb.MAIN_DISCONNECT:
+            showinfo(lb.INFO, lb.MAIN_PLEASE_CONNECT)
+            return
+
         if askokcancel(lb.MAIN_LOGOUT, lb.MAIN_LOGOUT_CONFIRM):
             self.socket_cmd("logout")
             showinfo(lb.MAIN_LOGOUT, lb.MAIN_LOGOUT_SUCCESS)
 
     def shutdown(self):
+        if self.btn_connect_stt.get() != lb.MAIN_DISCONNECT:
+            showinfo(lb.INFO, lb.MAIN_PLEASE_CONNECT)
+            return
+
         if askokcancel(lb.MAIN_SHUTDOWN, lb.MAIN_SHUTDOWN_CONFIRM):
             self.socket_cmd("shutdown")
             showinfo(lb.MAIN_SHUTDOWN, lb.MAIN_SHUTDOWN_SUCCESS)
 
     def restart(self):
+        if self.btn_connect_stt.get() != lb.MAIN_DISCONNECT:
+            showinfo(lb.INFO, lb.MAIN_PLEASE_CONNECT)
+            return
+            
         if askokcancel(lb.MAIN_RESTART, lb.MAIN_RESTART_CONFIRM):
             self.socket_cmd("restart")
             showinfo(lb.MAIN_RESTART, lb.MAIN_RESTART_SUCCESS)
