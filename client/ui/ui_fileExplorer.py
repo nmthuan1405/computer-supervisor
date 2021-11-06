@@ -203,7 +203,6 @@ class UI_copyFile(tpl.UI_ToplevelTemplate):
         if askokcancel(lb.CONFIRM_CLOSE_WINDOW, lb.CONFIRM_CLOSE_WINDOW_TXT, parent=self):
             self.destroy()
 
-    def cancel(self):
     def close(self):
         if(askokcancel(lb.CANCEL, lb.CANCEL_CONFIRM, parent = self)):
             self.socket_cmd("cancel-copy-file")
