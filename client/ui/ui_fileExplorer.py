@@ -180,7 +180,10 @@ class UI_copyFile(tpl.UI_ToplevelTemplate):
     def close(self):
         if(askokcancel(lb.CANCEL, lb.CANCEL_CONFIRM, parent = self)):
             self.socket_cmd("cancel-copy-file")
-            self.destroy()
+            super().close()
+
+    def handle_error(self):
+        super().close()
 
     def update_ui(self, task):
         cmd, ext = task
