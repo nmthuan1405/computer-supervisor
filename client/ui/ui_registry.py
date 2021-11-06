@@ -10,7 +10,7 @@ import ui.ui_template as tpl
 import queue
 class UI_registry(tpl.UI_ToplevelTemplate):
     def __init__(self, parent, socket_queue, ui_queues):
-        super().__init__(parent, 'reg', socket_queue, ui_queues)
+        super().__init__(parent, const.REGISTRY, socket_queue, ui_queues)
 
         self.title = lb.REGISTRY_TITLE
         self.geometry('430x637')

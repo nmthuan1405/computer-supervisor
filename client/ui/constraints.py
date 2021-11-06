@@ -1,21 +1,28 @@
-import ctypes
-user32 = ctypes.windll.user32
-screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
-
 WINDOW_BORDER_PADDING = 10
 
+MAIN = 'main'
+SCREEN = 'screen'
+KEYBOARD = 'keyboard'
+FILE = 'file'
+COPY_FILE = 'copy-file'
+REGISTRY = 'reg'
+APPLICATION = 'app'
+START_APP = 'start-app'
+START_CUSTOM_APP = 'start-custom-app'
+PROCESS = 'process'
+START_PROCESS = 'start-process'
+
 UPDATE_TIME = {}
-UPDATE_TIME['main'] = 200
-UPDATE_TIME['screen'] = 200
-UPDATE_TIME['keyboard'] = 200
-UPDATE_TIME['file'] = 200
-UPDATE_TIME['copy-file'] = 200
-UPDATE_TIME['reg'] = 200
-UPDATE_TIME['app'] = 200
-UPDATE_TIME['start-app'] = 200
-UPDATE_TIME['start-custom-app'] = 200
-UPDATE_TIME['process'] = 200
-UPDATE_TIME['start-process'] = 200
+UPDATE_TIME[MAIN] = 20
+UPDATE_TIME[SCREEN] = 200
+UPDATE_TIME[KEYBOARD] = 200
+UPDATE_TIME[FILE] = 200
+UPDATE_TIME[COPY_FILE] = 200
+UPDATE_TIME[REGISTRY] = 200
+UPDATE_TIME[APPLICATION] = 200
+UPDATE_TIME[START_APP] = 200
+UPDATE_TIME[START_CUSTOM_APP] = 200
+UPDATE_TIME[PROCESS] = 200
+UPDATE_TIME[START_PROCESS] = 200
 
 FRAME_WIDTH = 800
-FRAME_HEIGHT = int(FRAME_WIDTH * (screensize[1]/screensize[0]))

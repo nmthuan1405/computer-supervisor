@@ -1,3 +1,5 @@
+import os
+
 class FileDownloader():
     def __init__(self, file_path):
         self.file_path = file_path
@@ -24,7 +26,10 @@ class FileDownloader():
             return True
 
     def close_file(self):
+        try:
             self.file.close()
+        except:
+            pass
 
     def set_total_size(self, size):
         self.total_size = size
@@ -35,3 +40,9 @@ class FileDownloader():
     def get_received_size(self):
         return self.received_size
 
+    def delete_file(self):
+        self.close_file()
+        try:
+            os.remove(self.file_path)
+        except:
+            pass

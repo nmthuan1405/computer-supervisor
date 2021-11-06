@@ -9,7 +9,7 @@ import queue
 
 class UI_running_processes(tpl.UI_ToplevelTemplate):
     def __init__(self, parent, socket_queue, ui_queues):
-        super().__init__(parent, 'process', socket_queue, ui_queues)
+        super().__init__(parent, const.PROCESS, socket_queue, ui_queues)
 
         self.title = lb.PROCESS_TITLE
         self.resizable(False, False)
@@ -106,7 +106,7 @@ class UI_running_processes(tpl.UI_ToplevelTemplate):
 
 class UI_start_process(tpl.UI_ToplevelTemplate):
     def __init__(self, parent, socket_queue, ui_queues):
-        super().__init__(parent, 'start-process', socket_queue, ui_queues)
+        super().__init__(parent, const.START_PROCESS, socket_queue, ui_queues)
 
         self.title = lb.START_PROCESS_TITLE
         self.resizable(False, False)

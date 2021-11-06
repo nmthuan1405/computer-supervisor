@@ -1,9 +1,10 @@
 import pickle
-
+from gzip import compress, decompress
 # socket wrapper
 class Socket():
-    def __init__(self, socket = None, DELIM=b'\x00'):
+    def __init__(self, socket = None, MAX_RECV_SIZE = 4096, DELIM=b'\x00'):
         self.socket = socket
+        self.MAX_RECV_SIZE = MAX_RECV_SIZE
         self.DELIM = DELIM
         self.buff = b''
 
@@ -27,7 +28,7 @@ class Socket():
 
                 return val
             else:
-                self.buff += self.socket.recv(1024)
+                self.buff += self.socket.recv(self.MAX_RECV_SIZE)
 
     def recv_size(self, size):
         while True:
@@ -38,7 +39,7 @@ class Socket():
 
                 return val
             else:
-                self.buff += self.socket.recv(1024)
+                self.buff += self.socket.recv(self.MAX_RECV_SIZE)
 
     # send & recv string
     def send_str(self, string, DELIM=None):
@@ -62,6 +63,22 @@ class Socket():
     def recv_obj(self):
         obj_size = int(self.recv_str())
         obj = self.recv_size(obj_size)
+
+        return pickle.loads(obj)
+
+    # send & recv compress object
+    def send_obj_comp(self, object):
+        obj = pickle.dumps(object)
+        obj = compress(obj)
+        obj_size = len(obj)
+
+        self.send_str(obj_size)
+        return self.send(obj)
+
+    def recv_obj_comp(self):
+        obj_size = int(self.recv_str())
+        obj = self.recv_size(obj_size)
+        obj = decompress(obj)
 
         return pickle.loads(obj)
 

