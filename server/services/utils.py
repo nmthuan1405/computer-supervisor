@@ -149,18 +149,19 @@ def get_all_app():
 
 # process
 def get_result_from_cmd(cmd, headers):
-    lines = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+    out = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE,  stderr=subprocess.PIPE, stdin=subprocess.PIPE)
 
-    firstLine = lines.stdout.readline().decode().rstrip()
+    lines = out.stdout.decode('utf-8').split('\r\n')
+
+    firstLine = lines[0].rstrip()
     align = []
     for header in headers:
         align.append(firstLine.find(header))
     align.append(len(firstLine) + 1)
     
     result = []
-    for l in lines.stdout:
-        if l.rstrip():
-            line = l.decode().rstrip()
+    for line in lines[1:]:
+        if line.rstrip():
             row = []
             for i in range(len(align) - 1):
                 row.append(line[align[i] : align[i + 1] - 1].rstrip())
