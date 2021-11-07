@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter.messagebox import showerror, showinfo, askokcancel
 import tkinter.scrolledtext as st
 import ui.label as lb
 import ui.constraints as const
@@ -14,6 +15,9 @@ class UI_keylogger(tpl.UI_ToplevelTemplate):
         self.resizable(False, False)
         self['padx'] = const.WINDOW_BORDER_PADDING
         self['pady'] = const.WINDOW_BORDER_PADDING
+        # handle return and escape key
+        self.bind('<Return>', self.handle_return)
+        self.bind('<Escape>', self.handle_escape)
 
         self.btn_hook_stt = tk.StringVar(self, lb.KEYLOGGER_HOOK)
         self.btn_hook = tk.Button(self, textvariable = self.btn_hook_stt, width = 15, height = 2, command = self.hook)
@@ -32,6 +36,18 @@ class UI_keylogger(tpl.UI_ToplevelTemplate):
 
         self.update_counter = Count(2, self.socket_cmd, 'listener-get')
         self.socket_cmd("listener-start")
+
+    def handle_return(self, event):
+        if self.focus_get() == self.btn_hook:
+            self.hook()
+        elif self.focus_get() == self.btn_block:
+            self.block()
+        elif self.focus_get() == self.btn_clear:
+            self.clear()
+            
+    def handle_escape(self, event):
+        if askokcancel(lb.CONFIRM_CLOSE_WINDOW, lb.CONFIRM_CLOSE_WINDOW_TXT, parent=self):
+            self.close()
 
     def hook(self):
         if self.btn_hook_stt.get() == lb.KEYLOGGER_HOOK:

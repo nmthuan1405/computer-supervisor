@@ -45,6 +45,9 @@ MAIN_SOCKET_ERROR = "Socket error"
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+CONFIRM_CLOSE_WINDOW = "Close window"
+CONFIRM_CLOSE_WINDOW_TXT = "Are you sure you want to close this window?"
+# ----------------------------------------------------------------------------------------------------------------------
 SCREEN_STREAM_TITLE = "Screen Stream"
 SCREEN_STREAM_PAUSE = "Pause"
 SCREEN_STREAM_RESUME = "Resume"
@@ -78,6 +81,8 @@ COPY_FILE_FAIL_GET_INFO = "Unable to get file info"
 COPY_FILE_FAIL_CREATE_FILE = "Unable to create file"
 COPY_FILE_FAIL = "Error when copy file"
 COPY_FILE_SUCCESS = "File copied successfully"
+DELETE_FILE_FAIL = "Unable to delete file"
+DELETE_FILE_SUCCESS = "File deleted successfully"
 # ----------------------------------------------------------------------------------------------------------------------
 REGISTRY_TITLE = "Edit Registry"
 # ----------------------------------------------------------------------------------------------------------------------

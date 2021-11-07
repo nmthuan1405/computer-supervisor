@@ -15,6 +15,9 @@ class UI_running_processes(tpl.UI_ToplevelTemplate):
         self.resizable(False, False)
         self['padx'] = const.WINDOW_BORDER_PADDING
         self['pady'] = const.WINDOW_BORDER_PADDING
+        # handle return and escape key
+        self.bind('<Return>', self.handle_return)
+        self.bind('<Escape>', self.handle_escape)
 
         self.btn_start = tk.Button(self, text = lb.PROCESS_START, width = 15, height = 2, command = self.start)
         self.btn_start.grid(row = 0, column = 0, sticky = tk.EW)
@@ -45,6 +48,16 @@ class UI_running_processes(tpl.UI_ToplevelTemplate):
 
         self.update_counting = Count(10, self.socket_cmd, 'get-running-process')
         self.update_counting.count_up(-1)
+
+    def handle_return(self, event):
+        if self.focus_get() == self.btn_start:
+            self.start()
+        elif self.focus_get() == self.btn_kill:
+            self.kill()
+
+    def handle_escape(self, event):
+        if askokcancel(lb.CONFIRM_CLOSE_WINDOW, lb.CONFIRM_CLOSE_WINDOW_TXT, parent=self):
+            self.destroy()
 
     def update(self, data):
         selected =  self.trv_processes.item(self.trv_processes.focus())['values']
@@ -99,6 +112,9 @@ class UI_start_process(tpl.UI_ToplevelTemplate):
         self.resizable(False, False)
         self['padx'] = const.WINDOW_BORDER_PADDING
         self['pady'] = const.WINDOW_BORDER_PADDING
+        # handle return and escape key
+        self.bind('<Return>', self.handle_return)
+        self.bind('<Escape>', self.handle_escape)
 
         self.lbl_process_name = tk.Label(self, text = lb.START_PROCESS_NAME)
         self.lbl_process_name.grid(column = 0, row = 0)
@@ -109,6 +125,16 @@ class UI_start_process(tpl.UI_ToplevelTemplate):
 
         self.btn_start = tk.Button(self, text=lb.START_PROCESS_START, command = self.start_process)
         self.btn_start.grid(column=2, row=0, sticky = tk.W, padx = 0, pady = 0, ipadx = 10)
+
+        self.after(const.UPDATE_TIME, self.periodic_call)
+
+    def handle_return(self, event):
+        if self.focus_get() == self.txt_name_input or self.focus_get() == self.btn_start:
+            self.start_process()
+
+    def handle_escape(self, event):
+        if askokcancel(lb.CONFIRM_CLOSE_WINDOW, lb.CONFIRM_CLOSE_WINDOW_TXT, parent=self):
+            self.destroy()
 
     def start_process(self):
          self.socket_cmd('start-process', self.txt_name_input.get(), 'start-process')

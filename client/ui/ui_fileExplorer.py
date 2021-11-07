@@ -16,6 +16,9 @@ class UI_file_explorer(tpl.UI_ToplevelTemplate):
         self.resizable(False, False)
         self['padx'] = const.WINDOW_BORDER_PADDING
         self['pady'] = const.WINDOW_BORDER_PADDING
+        # handle return and escape key
+        self.bind('<Return>', self.handle_return)
+        self.bind('<Escape>', self.handle_escape)
 
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=30)
@@ -63,6 +66,18 @@ class UI_file_explorer(tpl.UI_ToplevelTemplate):
         self.btn_delete.grid(row = 0, column = 3, sticky=tk.E)
 
         self.goto_dir("")
+
+    def handle_return(self, event):
+        if self.focus_get() == self.btn_up:
+            self.up_folder()
+        elif self.focus_get() == self.btn_copy:
+            self.copy_file()
+        elif self.focus_get() == self.btn_delete:
+            self.delete_file()
+
+    def handle_escape(self, event):
+        if askokcancel(lb.CONFIRM_CLOSE_WINDOW, lb.CONFIRM_CLOSE_WINDOW_TXT, parent=self):
+            self.destroy()
 
     def up_folder(self):
         dir = self.txt_path_input.get()
@@ -138,9 +153,9 @@ class UI_file_explorer(tpl.UI_ToplevelTemplate):
         
         elif cmd == "delete-file":
             if ext == "ok":
-                showinfo(lb.INFO, lb.COPY_FILE_SUCCESS, parent = self)
+                showinfo(lb.INFO, lb.DELETE_FILE_SUCCESS, parent = self)
             else:
-                 showwarning(lb.WARN, lb.COPY_FILE_FAIL, parent = self)
+                 showwarning(lb.WARN, lb.DELETE_FILE_FAIL, parent = self)
             
             self.btn_delete_stt.set(lb.FILE_EXP_DELETE)
             self.goto_dir(self.txt_path_input.get())
@@ -156,6 +171,9 @@ class UI_copyFile(tpl.UI_ToplevelTemplate):
         self.resizable(False, False)
         self['padx'] = const.WINDOW_BORDER_PADDING
         self['pady'] = const.WINDOW_BORDER_PADDING
+        # handle return and escape key
+        self.bind('<Return>', self.handle_return)
+        self.bind('<Escape>', self.handle_escape)
 
         self.lbl_file_name_stt = tk.StringVar(self)
         self.lbl_file_name = tk.Label(self, textvariable=self.lbl_file_name_stt)
@@ -176,6 +194,14 @@ class UI_copyFile(tpl.UI_ToplevelTemplate):
 
         self.socket_cmd("copy-file", os.path.join(path, name), dest)
         self.socket_cmd("continue-copy-file")
+
+    def handle_return(self, event):
+        if self.focus_get() == self.btn_cancel:
+            self.cancel()
+
+    def handle_escape(self, event):
+        if askokcancel(lb.CONFIRM_CLOSE_WINDOW, lb.CONFIRM_CLOSE_WINDOW_TXT, parent=self):
+            self.destroy()
 
     def close(self):
         if(askokcancel(lb.CANCEL, lb.CANCEL_CONFIRM, parent = self)):
